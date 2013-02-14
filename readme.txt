@@ -8,9 +8,11 @@ Stable tag: 1.0.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Provides simpler means of building administration pages for plugin and theme developers. 
+
 
 == Description ==
+Provides simpler means of building administration pages for plugin and theme developers. 
+
 This framework class PHP library provides plugin and theme developers with easier means of creating option pages. Extend the library class and pass your arrays that define the form elements to the predefined class methods. The library handles all the complex coding behind the scene and creates the pages for you. The package includes demo plugins and documentation plugin that help you walk through all necessary features.
 
 **Notes:** this framework does not do anything by itself. If you are not a developer, you do not need this.
@@ -43,7 +45,17 @@ This framework class PHP library provides plugin and theme developers with easie
 * [Hooks and Callbacks](http://en.michaeluno.jp/admin-page-framework/hooks-and-callbacks/ "Hooks and Callbacks") 
 
 == Installation ==
-<h4>Getting Started</h4>
+= List Test = 
+1. one, 2. two, 3. three
+
+
+= List Test 2 = 
+1. one,
+2. two,
+3. three
+
+
+=Getting Started=
 1. Include **`admin-page-framework.php`** that is located in the **`classes`** folder into your theme or plugin.
 `if ( !class_exists( 'Admin_Page_Framework' ) )
     include_once( dirname( __FILE__ ) . '/classes/admin-page-framework.php' );`,
