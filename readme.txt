@@ -46,28 +46,36 @@ This framework class PHP library provides plugin and theme developers with easie
 == Installation ==
 
 <h4>Getting Started</h4>
-* 1. Include **`admin-page-framework.php`** that is located in the **`classes`** folder into your theme or plugin.
+1. Include **`admin-page-framework.php`** that is located in the **`classes`** folder into your theme or plugin.
 `if ( !class_exists( 'Admin_Page_Framework' ) ) 
     include_once( dirname( __FILE__ ) . '/classes/admin-page-framework.php' );`
-* 2. Extend the Library Class
+1. Extend the Library Class
 `class APF_CreateSettingPage extends Admin_Page_Framework {
 }`
-* 3. Define the SetUp() Method. 
+1. Define the SetUp() Method. 
 `function SetUp() {
     $this->SetRootMenu( 'Settings' );               // specifies to which parent menu to belong.
     $this->AddSubMenu(  'My First Setting Page',    // page and menu title
                         'my_first_settings_page' ); // page slug
 }`
-* 4. Define methods for hooks.
+1. Define methods for hooks.
 `function do_my_first_settings_page() {  // do_ + pageslug
     ?>
     <h3>Say Something</h3>
     <p>This is my first admin page!</p>
     <?php
 }`
-* 5. Instantiate the Class
+1. Instantiate the Class
 `new APF_CreateSettingPage;`
 	
+== Screenshots ==
+
+1. **Text Fields**
+1. **Selecter and Checkboxes**
+1. **Image and Upload**
+1. **Form Verification**
+1. **Import and Export**
+
 == Frequently asked questions ==
 
 = What is this for? =
@@ -76,13 +84,6 @@ This is	a PHP class library that enables to create option pages and form fields 
 = I've written a useful class and functions. Do you want to include it? = 
 The [GitHub repository](https://github.com/michaeluno/admin-page-framework "Admin Page Framework") is avaiable. Create an issue first and we'll see if changes can be made. 
 
-== Screenshots ==
-
-1. **Text Fields**
-2. **Selecter and Checkboxes**
-3. **Image and Upload**
-4. **Form Verification**
-5. **Import and Export**
 
 == Changelog ==
 
