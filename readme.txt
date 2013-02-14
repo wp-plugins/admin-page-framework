@@ -4,7 +4,7 @@ Donate link: http://michaeluno.jp/en/donate
 Tags: administration panel, admin panel, option page, option pages, option, options, setting, settings, framework, libraray, class
 Requires at least: 3.0
 Tested up to: 3.5
-Stable tag: 1.2.0
+Stable tag: 1.0.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -79,14 +79,13 @@ The [GitHub repository](https://github.com/michaeluno/admin-page-framework "Admi
 == Screenshots ==
 
 1. **Text Fields**
-1. **Selecter and Checkboxes**
-1. **Image and Upload**
-1. **Form Verification**
-1. **Import and Export**
-
+2. **Selecter and Checkboxes**
+3. **Image and Upload**
+4. **Form Verification**
+5. **Import and Export**
 
 == Changelog ==
 
-1.0.0.0 2/14/2013
+= 1.0.0.0 2/14/2013 = 
 * Initial Release
 
