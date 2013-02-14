@@ -44,40 +44,41 @@ This framework class PHP library provides plugin and theme developers with easie
 
 == Screenshots ==
 
+1. one
+2. two
+3. three
+4. four
+
+== Installation ==
+
 1. **Text Fields**
 2. **Selecter and Checkboxes**
 3. **Image and Upload**
 4. **Form Verification**
 5. **Import and Export**
 
-== Installation ==
 
-= List Test 2 = 
-1. one,
-2. two,
-3. three
-
-=Getting Started=
-1. Include **`admin-page-framework.php`** that is located in the **`classes`** folder into your theme or plugin.,
+= Getting Started =
+1. Include **`admin-page-framework.php`** that is located in the **`classes`** folder into your theme or plugin.
 `if ( !class_exists( 'Admin_Page_Framework' ) )
     include_once( dirname( __FILE__ ) . '/classes/admin-page-framework.php' );`
-2. Extend the Library Class,
+2. Extend the Library Class.
 `class APF_CreateSettingPage extends Admin_Page_Framework {
 }`
-3. Define the SetUp() Method.,
+3. Define the SetUp() Method.
 `function SetUp() {
     $this->SetRootMenu( 'Settings' );               // specifies to which parent menu to belong.
     $this->AddSubMenu(  'My First Setting Page',    // page and menu title
                         'my_first_settings_page' ); // page slug
 }`
-4. Define methods for hooks.,
+4. Define methods for hooks.
 `function do_my_first_settings_page() {  // do_ + pageslug
     ?>
     <h3>Say Something</h3>
     <p>This is my first admin page!</p>
     <?php
 }`
-5. Instantiate the Class,
+5. Instantiate the Class.
 `new APF_CreateSettingPage;`
 
 == Frequently asked questions ==
