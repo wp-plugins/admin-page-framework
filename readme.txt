@@ -11,7 +11,7 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Provides simpler means of building administration pages for plugin and theme developers. 
 
 == Description ==
-This framework class PHP library provides plugin and theme developers with easier means of creating option pages. Extend the library class and pass your arrays that define the form elements to the predefined class methods. The library handles all the complex coding behind the scene and creates the pages for you. The package includes demo plugins and documentation plugin that help you walk through all necessary features.
+It provides plugin and theme developers with easier means of creating option pages. Extend the library class and pass your arrays that define the form elements to the predefined class methods. The library handles all the complex coding behind the scene and creates the pages for you. The package includes a demo plugin that help you walk through necessary features.
 
 **Notes:** this framework does not do anything by itself. If you are not a developer, you do not need this.
 
