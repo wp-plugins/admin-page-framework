@@ -87,6 +87,6 @@ The [GitHub repository](https://github.com/michaeluno/admin-page-framework "Admi
 
 == Changelog ==
 
-= 1.0.0.0 2/14/2013 = 
+= 1.0.0.0 - 2/14/2013 = 
 * Initial Release
 
