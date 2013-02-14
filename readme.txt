@@ -17,11 +17,9 @@ This framework class PHP library provides plugin and theme developers with easie
 **Notes:** this framework does not do anything by itself. If you are not a developer, you do not need this.
 
 <h4>Features</h4>
-* Extensible ? the created admin pages will become highly extensible with the automatically created hooks. In other words, it empowers other developers to customize your plugin or theme. That will result on making your projects grow.
-* Import and Export Options ? buttons that the user can import and export settings by uploading and downloading the text file.
+* Extensible - the created admin pages will become highly extensible with the automatically created hooks. In other words, it empowers other developers to customize your plugin or theme. That will result on making your projects grow.
+* Import and Export Options - buttons that the user can import and export settings by uploading and downloading the text file.
 * Image Upload - it lets the user easily upload images to the site or the user can choose from existent urls or already uploaded files.
-* Demo plugins ? walkthrough demo plugins are included
-* Documentation plugin ? the help file is included as a plugin.
 
 <h4>Supported Field Types</h4>
 * Text 
@@ -33,6 +31,8 @@ This framework class PHP library provides plugin and theme developers with easie
 * Buttons
 * Hidden Fields 
 * File Upload 
+* Image Upload (Custom File Upload)
+* Option Export and Import (Custom File Upload)
 
 <h4>Necessary Files</h4>
 * **`admin-page-framework.php`** is in the classes folder.
@@ -46,26 +46,26 @@ This framework class PHP library provides plugin and theme developers with easie
 == Installation ==
 
 <h4>Getting Started</h4>
-1. Include **`admin-page-framework.php`** that is located in the **`classes`** folder into your theme or plugin.
+* 1. Include **`admin-page-framework.php`** that is located in the **`classes`** folder into your theme or plugin.
 `if ( !class_exists( 'Admin_Page_Framework' ) ) 
     include_once( dirname( __FILE__ ) . '/classes/admin-page-framework.php' );`
-2. Extend the Library Class
+* 2. Extend the Library Class
 `class APF_CreateSettingPage extends Admin_Page_Framework {
 }`
-3. Define the SetUp() Method. 
+* 3. Define the SetUp() Method. 
 `function SetUp() {
     $this->SetRootMenu( 'Settings' );               // specifies to which parent menu to belong.
     $this->AddSubMenu(  'My First Setting Page',    // page and menu title
                         'my_first_settings_page' ); // page slug
 }`
-4. Define methods for hooks.
+* 4. Define methods for hooks.
 `function do_my_first_settings_page() {  // do_ + pageslug
     ?>
     <h3>Say Something</h3>
     <p>This is my first admin page!</p>
     <?php
 }`
-5. Instantiate the Class
+* 5. Instantiate the Class
 `new APF_CreateSettingPage;`
 	
 == Frequently asked questions ==
@@ -74,7 +74,7 @@ This framework class PHP library provides plugin and theme developers with easie
 This is	a PHP class library that enables to create option pages and form fields in the administration panel. Also it helps manage to save, export, and import options.
 
 = I've written a useful class and functions. Do you want to include it? = 
-The GitHub repository is avaiable. Create an issue first and we'll see if changes can be made. 
+The [GitHub repository](https://github.com/michaeluno/admin-page-framework "Admin Page Framework") is avaiable. Create an issue first and we'll see if changes can be made. 
 
 == Screenshots ==
 
@@ -85,9 +85,8 @@ The GitHub repository is avaiable. Create an issue first and we'll see if change
 1. **Import and Export**
 
 
-Changelog
-==========
+== Changelog ==
 
-#### 1.0.0.0 2/14/2013
- - Initial Release
+1.0.0.0 2/14/2013
+* Initial Release
 
