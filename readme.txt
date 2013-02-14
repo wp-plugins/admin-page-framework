@@ -43,34 +43,30 @@ It provides plugin and theme developers with easier means of creating option pag
 * [Hooks and Callbacks](http://en.michaeluno.jp/admin-page-framework/hooks-and-callbacks/ "Hooks and Callbacks") 
 
 == Screenshots ==
-
-1. one
-2. two
-3. three
-4. four
-
-== Installation ==
-
 1. **Text Fields**
 2. **Selecter and Checkboxes**
 3. **Image and Upload**
 4. **Form Verification**
 5. **Import and Export**
 
+== Installation ==
 
 = Getting Started =
 1. Include **`admin-page-framework.php`** that is located in the **`classes`** folder into your theme or plugin.
 `if ( !class_exists( 'Admin_Page_Framework' ) )
     include_once( dirname( __FILE__ ) . '/classes/admin-page-framework.php' );`
+	
 2. Extend the Library Class.
 `class APF_CreateSettingPage extends Admin_Page_Framework {
 }`
+
 3. Define the SetUp() Method.
 `function SetUp() {
     $this->SetRootMenu( 'Settings' );               // specifies to which parent menu to belong.
     $this->AddSubMenu(  'My First Setting Page',    // page and menu title
                         'my_first_settings_page' ); // page slug
 }`
+
 4. Define methods for hooks.
 `function do_my_first_settings_page() {  // do_ + pageslug
     ?>
@@ -78,6 +74,7 @@ It provides plugin and theme developers with easier means of creating option pag
     <p>This is my first admin page!</p>
     <?php
 }`
+
 5. Instantiate the Class.
 `new APF_CreateSettingPage;`
 
