@@ -11,7 +11,7 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Provides simpler means of building administration pages for plugin and theme developers. 
 
 == Description ==
-It provides plugin and theme developers with easier means of creating option pages. Extend the library class and pass your arrays that define the form elements to the predefined class methods. The library handles all the complex coding behind the scene and creates the pages for you. The package includes a demo plugin that help you walk through necessary features.
+It provides plugin and theme developers with easier means of creating option pages. Extend the library class and pass your arrays that define the form elements to the predefined class methods. The library handles all the complex coding behind the scene and creates the pages for you. The package includes a demo plugin which helps you walk through necessary features.
 
 **Notes:** this framework does not do anything by itself. If you are not a developer, you do not need this.
 
@@ -57,26 +57,57 @@ It provides plugin and theme developers with easier means of creating option pag
     include_once( dirname( __FILE__ ) . '/classes/admin-page-framework.php' );`
 	
 2. Extend the Library Class.
-`class APF_CreateSettingPage extends Admin_Page_Framework {
+`class APF_GettingStarted extends Admin_Page_Framework {
 }`
 
 3. Define the SetUp() Method.
 `function SetUp() {
-    $this->SetRootMenu( 'Settings' );               // specifies to which parent menu to belong.
-    $this->AddSubMenu(  'My First Setting Page',    // page and menu title
-                        'my_first_settings_page' ); // page slug
+	$this->SetRootMenu( 'Settings' );               // specifies to which parent menu to belong.
+	$this->AddSubMenu(  'My First Setting Page',    // page and menu title
+						'my_first_settings_page' ); // page slug
 }`
 
 4. Define methods for hooks.
-`function do_my_first_settings_page() {  // do_ + pageslug
-    ?>
-    <h3>Say Something</h3>
-    <p>This is my first admin page!</p>
-    <?php
+`function do_my_first_settings_page() {  // do_ + pageslug	
+	?>
+	<h3>Say Something</h3>
+	<p>This is my first admin page!</p>
+	<?php
 }`
 
 5. Instantiate the Class.
 `new APF_CreateSettingPage;`
+
+= Example Code = 
+`<?php
+/* Plugin Name: Admin Page Framework - Getting Started */ 
+
+if ( !class_exists( 'Admin_Page_Framework' ) )
+    include_once( dirname( __FILE__ ) . '/classes/admin-page-framework.php' );
+	
+class APF_GettingStarted extends Admin_Page_Framework {
+
+	function SetUp() {
+	
+		$this->SetRootMenu( 'Settings' );               // specifies to which parent menu to belong.
+		$this->AddSubMenu(  'My First Setting Page',    // page and menu title
+							'my_first_settings_page' ); // page slug
+							
+	}
+
+	function do_my_first_settings_page() {  // do_ + pageslug
+	
+		?>
+		<h3>Say Something</h3>
+		<p>This is my first admin page!</p>
+		<?php
+		
+	}
+	
+}
+new APF_GettingStarted;
+
+// That's it!`
 
 == Frequently asked questions ==
 = What is this for? =
