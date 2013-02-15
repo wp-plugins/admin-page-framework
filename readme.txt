@@ -50,24 +50,23 @@ It provides plugin and theme developers with easier means of creating option pag
 5. **Import and Export**
 
 == Installation ==
-
 = Getting Started =
- 1. Include **`admin-page-framework.php`** that is located in the **`classes`** folder into your theme or plugin.
+1. Include **`admin-page-framework.php`** that is located in the **`classes`** folder into your theme or plugin.
 `if ( !class_exists( 'Admin_Page_Framework' ) )
     include_once( dirname( __FILE__ ) . '/classes/admin-page-framework.php' );`
 	
- 2. Extend the Library Class.
+1. Extend the Library Class.
 `class APF_GettingStarted extends Admin_Page_Framework {
 }`
 
- 3. Define the SetUp() Method.
+1. Define the SetUp() Method.
 `function SetUp() {
 	$this->SetRootMenu( 'Settings' );               // specifies to which parent menu to belong.
 	$this->AddSubMenu(  'My First Setting Page',    // page and menu title
 						'my_first_settings_page' ); // page slug
 }`
 
- 4. Define methods for hooks.
+1. Define methods for hooks.
 `function do_my_first_settings_page() {  // do_ + pageslug	
 	?>
 	<h3>Say Something</h3>
@@ -75,8 +74,8 @@ It provides plugin and theme developers with easier means of creating option pag
 	<?php
 }`
 
- 5. Instantiate the Class.
-`new APF_CreateSettingPage;`
+1. Instantiate the Class.
+`new APF_GettingStarted;`
 
 = Example Code = 
 `<?php
