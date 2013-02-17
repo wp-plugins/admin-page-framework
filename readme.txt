@@ -1,7 +1,7 @@
 === Admin Page Framework ===
 Contributors: Michael Uno, miunosoft
 Donate link: http://michaeluno.jp/en/donate
-Tags: administration panel, admin panel, option page, option pages, option, options, setting, settings, framework, libraray, class
+Tags: admin, administration panel, admin panel, option page, option pages, option, options, setting, settings, Settings API, API, framework, library, class, development tool, developers
 Requires at least: 3.0
 Tested up to: 3.5
 Stable tag: 1.0.0.1
@@ -19,6 +19,8 @@ It provides plugin and theme developers with easier means of creating option pag
 * **Extensible** - the created admin pages will become highly extensible with the automatically created hooks. In other words, it empowers other developers to customize your plugin or theme. That will result on making your projects grow.
 * **Import and Export Options** - buttons that the user can import and export settings by uploading and downloading the text file.
 * **Image Upload** - it lets the user easily upload images to the site or the user can choose from existent urls or already uploaded files.
+* **Settings API Implemented** - it uses the WordPress Settings API for the creating the form so the standard option design will be implemented.
+* **Validation and Error Messages** - with the pre-defined validation callbacks, the user's submitting data can be verified as a part of using the Settings API. Furthermore, by setting the error array, you can display the error message to the user.
 
 = Supported Field Types =
 * Text 
@@ -117,8 +119,12 @@ The [GitHub repository](https://github.com/michaeluno/admin-page-framework "Admi
 
 == Changelog ==
 
+= 1.0.0.2 - 02/17/2013 =
+* Fixd a warining in debug mode, undefined index, selectors.
+* Added a brief instruction in the demo plugin code and fixed some inaccurate descriptions.
+
 = 1.0.0.1 - 02/15/2013 =
-* Fixed a bug that the options of different pages got deleted when another page's options were saved.
+* Fixed a bug that the options were not properly saved when the forms were created in multiple pages.
 
 = 1.0.0.0 - 02/14/2013 = 
 * Initial Release
