@@ -19,7 +19,7 @@ It provides plugin and theme developers with easier means of creating option pag
 * **Extensible** - the created admin pages will become highly extensible with the automatically created hooks. In other words, it empowers other developers to customize your plugin or theme. That will result on making your projects grow.
 * **Import and Export Options** - buttons that the user can import and export settings by uploading and downloading the text file.
 * **Image Upload** - it lets the user easily upload images to the site or the user can choose from existent urls or already uploaded files.
-* **Settings API Implemented** - it uses the WordPress Settings API for the creating the form so the standard option design will be implemented.
+* **Settings API Implemented** - it uses the WordPress Settings API for creating the form so the standard option design will be implemented.
 * **Validation and Error Messages** - with the pre-defined validation callbacks, the user's submitting data can be verified as a part of using the Settings API. Furthermore, by setting the error array, you can display the error message to the user.
 
 = Supported Field Types =
@@ -46,7 +46,7 @@ It provides plugin and theme developers with easier means of creating option pag
 
 == Screenshots ==
 1. **Text Fields**
-2. **Selecter and Checkboxes**
+2. **Selector and Checkboxes**
 3. **Image and Upload**
 4. **Form Verification**
 5. **Import and Export**
@@ -117,7 +117,24 @@ This is	a PHP class library that enables to create option pages and form fields 
 = I've written a useful class and functions. Do you want to include it? = 
 The [GitHub repository](https://github.com/michaeluno/admin-page-framework "Admin Page Framework") is avaiable. Create an issue first and we'll see if changes can be made. 
 
+== To do ==
+
 == Changelog ==
+
+= 1.0.1.1 =
+* Fixed: typos in the demo plugin.
+* Changed: error message for a field to display the field value as well in addition to the specified error message.
+* Changed: the post_html key to be inserted after the description key.
+* Changed: tip key to use the description key if it is not set.
+
+
+= 1.0.1 - 03/05/2013 =
+* Removed: array_replace_recursive() to support PHP below 5.3 and applied an alternative.
+* Changed: to use md5() for the error transient name, class name + page slug, to prevent WordPress from failing to retrieve or save options for the character lengths exceeding 45 characters.
+* Changed: to echo the value in a user-defined custom field type.
+* Added: the *pre_html* and *post_html* keys for input fields that adds extra HTML code before/after the field input and the description.
+* Added: the *value* key for input fields that precedes the option values saved in the database.
+* Added: the *disable* key for input fields to add disabled="Disabled".
 
 = 1.0.0.2 - 02/17/2013 =
 * Fixd a warining in debug mode, undefined index, selectors.

@@ -5,22 +5,22 @@
 		Description: Demonstrates the features of the Admin Page Framework class.
 		Author: Michael Uno
 		Author URI: http://michaeluno.jp
-		Version: 1.0.0.2
+		Version: 1.0.1.1
 	*/
 
 	/*
 	 * Brief Instruction: How to Use the Framework - Basic Five Steps
 	 * 	1. Include the library.
 	 * 	2. Extend the library class.
-	 * 	3. Define the SetUp() method. Include the following methods in the definition.
+	 * 	3. Define the SetUp() method. Include the following methods in the definition. Decide the page title and the slug.
 	 * 		SetRootMenu() - use it to specify the root menu.
-	 * 	 	AddSubMenu() - use it to specify the sub menu and the page. This page will be the actual page your users will going to access.
+	 * 	 	AddSubMenu() - use it to specify the sub menu and the page. This page will be the actual page your users will be going to access.
 	 * 			IMPORTANT: Decide the page slug witout hyphens and dots. This is very important since the page slug serves as the callback methods name.
 	 * 		for other methods and more details, visit, http://en.michaeluno.jp/admin-page-framework/methods/
 	 * 	4. Define callback methods.
 	 * 	5. Instantiate the extended class.
 	 * 	
-	 * for Getting Started, visit http://en.michaeluno.jp/admin-page-framework/get-started
+	 * To get started, visit http://en.michaeluno.jp/admin-page-framework/get-started . It has the simplest example so you'll see how it works.
 	 * */ 
 	 
 	// 1. Include the library
@@ -37,35 +37,48 @@
 			$this->SetRootMenu( 'Admin Page Framework Demo Plugin' );	
 			
 			// Add the sub menus and the pages
-			$this->AddSubMenu(	'My First Page',	// page and menu title
-								'myfirstpage',		// page slug - this will be the option name saved in the database
-								plugins_url( 'img/demo_01_32x32.png', __FILE__ ) );	// set the screen icon, it should be 32 x 32.
-			$this->AddSubMenu(	'Import and Export Options', 
-								'mysecondpage',
-								plugins_url( 'img/demo_02_32x32.png', __FILE__ ) );
-			$this->AddSubMenu(	'Change Style',
-								'mythirdpage',
-								plugins_url( 'img/demo_03_32x32.png', __FILE__ ) );
-			$this->AddSubMenu(	'Information',
-								'myfourthpage',
-								plugins_url( 'img/demo_04_32x32.png', __FILE__ ) );
+			// You need to decide what page title and the slug to use. 
+			// Important: do not use dots and hyphens in the page slug. Alphabets and numbers only! 
+			// You are going to use the page slug later on for the callback method.
+			$this->AddSubMenu(
+				'My First Page',	// page and menu title
+				'myfirstpage',		// page slug - this will be the option name saved in the database
+				plugins_url( 'img/demo_01_32x32.png', __FILE__ )
+			);	// set the screen icon, it should be 32 x 32.
+			$this->AddSubMenu(
+				'Import and Export Options', 
+				'mysecondpage',
+				plugins_url( 'img/demo_02_32x32.png', __FILE__ ) 
+			);
+			$this->AddSubMenu(
+				'Change Style',
+				'mythirdpage',
+				plugins_url( 'img/demo_03_32x32.png', __FILE__ )
+			);
+			$this->AddSubMenu(
+				'Information',
+				'myfourthpage',
+				plugins_url( 'img/demo_04_32x32.png', __FILE__ )
+			);
 			
-			// Enable heading page tabs.
+			// There are two kinds of tabs supported by this framework: page heading tabs and in-page tabs.
+			// Enable page heading tabs. 
 			$this->ShowPageHeadingTabs( True );
 			
 			// Add in-page tabs in the third page.			
-			$this->AddInPageTabs( 'myfirstpage',	
-						array(	// slug => title
-							'firsttab' => 'Text Fields', 		
-							'secondtab' => 'Selecters and Checkboxes', 		
-							'thirdtab' => 'Image and Upload',
-							'fourthtab' => 'Verify Form Data',
-						) 
-					);	
+			$this->AddInPageTabs(
+				'myfirstpage',	
+				array(	// slug => title
+					'firsttab' => 'Text Fields', 		
+					'secondtab' => 'Selectors and Checkboxes', 		
+					'thirdtab' => 'Image and Upload',
+					'fourthtab' => 'Verify Form Data',
+				) 
+			);	
 								
 			// Add form elements.
 			// Here we have four sections as an example.
-			// If you wonder what keys are need to be passed, please refer to http://en.michaeluno.jp/admin-page-framework/methods/
+			// If you wonder what array keys are need to be used, please refer to http://en.michaeluno.jp/admin-page-framework/methods/
 			$this->AddFormSections( 
 				// Section Arrays
 				array( 	
@@ -83,7 +96,6 @@
 								array(  
 									'id' => 'text', 
 									'title' => 'Text',
-									'tip' => 'Type somethig here.',		// appears on mouse hover on the title
 									'description' => 'Type somethig here.',	// additional notes besides the form field
 									'type' => 'text',
 									'default' => 123456,
@@ -101,7 +113,6 @@
 								array(  
 									'id' => 'textarea',
 									'title' => 'Text Area', 
-									'tip' => 'Type a text string here.',
 									'description' => 'Type a text string here.',
 									'type' => 'textarea',
 									'rows' => 6,
@@ -114,9 +125,9 @@
 					array(  
 						'pageslug' => 'myfirstpage',
 						'tabslug' => 'secondtab',
-						'id' => 'selecters', 
-						'title' => 'Selecters and Checkboxes',
-						'description' => 'These are selecter type options.',
+						'id' => 'selectors', 
+						'title' => 'Selectors and Checkboxes',
+						'description' => 'These are selector type options.',
 						'fields' => 
 							// Field Arrays
 							array(
@@ -124,7 +135,6 @@
 								array(  
 									'id' => 'select',
 									'title' => 'Drop Down List',
-									'tip' => 'This is a drop down list.',
 									'description' => 'This is a drop down list.',
 									'type' => 'select',
 									'default' => 0,
@@ -134,7 +144,6 @@
 								array(  
 									'id' => 'radio',
 									'title' => 'Radio Button', 
-									'tip' => 'Choose one from the radio buttons.',
 									'description' => 'Choose one from the radio buttons.',
 									'type' => 'radio',
 									'label' => array( 'a' => 'apple', 'b' => 'banana', 'c' => 'cherry' ),
@@ -144,7 +153,6 @@
 								array( 
 									'id' => 'checkboxs',
 									'title' => 'Multiple Checkboxes', 
-									'tip' => 'The description key can be omitted though.',
 									'description' => 'The description key can be omitted though.',
 									'type' => 'checkbox',
 									'label' => array( 'moon' => 'Moon', 'earth' => 'Earth', 'sun' => 'Sun', 'mars' => 'Mars' ),
@@ -229,9 +237,9 @@
 									'id' => 'update',
 									'type' => 'submit',		// the submit type creates a button
 									'label' => array( 
-												'save' => 'Update the Options',
-												'delete' => 'Delete the Options'
-												)
+										'save' => 'Update the Options',
+										'delete' => 'Delete the Options'
+									)
 								),									
 							)
 					),
@@ -279,14 +287,15 @@
 						'description' => 'Submitted data can be verified. If it fails, show an error message.',
 						'fields' => 
 							array(
-								array(  'id' => 'field_verify_text', 		// the option key name saved in the database. You will need this when retrieving the saved value later.
-										'title' => 'Verify Text Form Field',
-										'tip' => 'Try entering something that is not a number.',		// appears on mouse hover on the title
-										'error' => 'Please enter a number! This message is set in the field array with the error key.',
-										'description' => 'Try entering something that is not a number.',	// additional notes besides the form field
-										'type' => 'text',	// set the input field type to be text
-										'default' => 'xyz',	// the default value is set here.
-									),
+								array(  
+									'id' => 'field_verify_text', 		// the option key name saved in the database. You will need this when retrieving the saved value later.
+									'title' => 'Verify Text Form Field',
+									'tip' => 'Try entering something that is not a number.',		// appears on mouse hover on the title
+									'error' => 'Please enter a number! This message is set in the field array with the error key. The invalid Value: ',
+									'description' => 'Try entering something that is not a number.',	// additional notes besides the form field
+									'type' => 'text',	// set the input field type to be text
+									'default' => 'xyz',	// the default value is set here.
+								),
 							)
 					),				
 				)
@@ -304,10 +313,9 @@
 
 			// Show the saved option value. The option key is the string passed to the first parameter to the constructor of the class (at the end of this plugin).
 			// If the option key is not set, the page slug will be used. 
-			if ( $options = ( array ) get_option( 'demo_my_option_key' ) )
-				echo '<h3>Saved values</h3><h4>option table key: demo_my_option_key</h4><pre>'
-					. print_r( $options, true ) 
-					. '</pre>';
+			if ( $options = get_option( 'demo_my_option_key' ) )
+				echo '<h3>Saved values</h3><h4>option table key: demo_my_option_key</h4>'
+					. '<pre>' . print_r( ( array ) $options, true ) . '</pre>';	
 					
 		}
 	
@@ -319,9 +327,10 @@
 			// ( Or altenatively retrieve the saved option array from the database and return it. )
 			if ( isset( $arrInput['myfirstpage']['buttons']['reload'] ) ) return array();
 
-			// To discard all the savd option values, return null.
+			// To discard all the saved option values, return null.
 			if ( isset( $arrInput['myfirstpage']['buttons']['update']['delete'] ) ) {
-				add_settings_error( $_POST['pageslug'], 
+				add_settings_error( 
+					$_POST['pageslug'], 
 					'can_be_any_string',  
 					__( 'Options were deleted.', 'admin-page-framework' ),
 					'updated'
@@ -329,8 +338,9 @@
 				return null;		
 			}
 			
-			// This is useful to check the submitted values.
-			add_settings_error( $_POST['pageslug'], 
+			// add_settings_error() is useful to display the submitted values.
+			add_settings_error( 
+					$_POST['pageslug'], 
 					'can_be_any_string',  
 					'<h3>Check Submitted Values</h3>' .
 					'<h4>$arrInput - the passed value to the validation callback</h4><pre>' . print_r( $arrInput, true ) . '</pre>' .
@@ -347,20 +357,18 @@
 			$arrErrors = $_FILES['demo_my_option_key']['error']['myfirstpage']['misc_types']['file_multiple_fields'];
 			$arrErrors[] = $_FILES['demo_my_option_key']['error']['myfirstpage']['misc_types']['file_single_field'];
 			if ( in_array( 0, $arrErrors ) )
-				add_settings_error( $_POST['pageslug'], 
-						'can_be_any_string',  
-						'<h3>File was uploaded</h3>' .
-						'<h4>$_FILES</h4><pre>' . print_r( $_FILES, true ) . '</pre>',
-						'updated'
-					);
+				add_settings_error( 
+					$_POST['pageslug'], 
+					'can_be_any_string',  
+					'<h3>File was uploaded</h3>' .
+					'<h4>$_FILES</h4><pre>' . print_r( $_FILES, true ) . '</pre>',
+					'updated'
+				);
 	
 			return $arrInput;
 		}
 		// The verification callback method for the fourth tab in the first sub page.
 		function validation_myfirstpage_fourthtab( $arrInput ) {	// 'validation_' + page slug + tab slug
-	
-			// if the validation fails, return the originally stored value.
-			$arrOriginal = (array) get_option( 'demo_my_option_key' );
 			
 			// Set the flag 
 			$bIsValid = True;
@@ -380,20 +388,19 @@
 			if ( $bIsValid ) {		
 				// this displays message
 				add_settings_error( $_POST['pageslug'], 'can_be_any_string',  __( 'The options were updated.' ), 'updated' );
-				delete_transient( get_class( $this ) . '_' . $_POST['pageslug'] ); // delete the temporary data for errors.
+				delete_transient( md5( get_class( $this ) . '_' . $_POST['pageslug'] ) ); // delete the temporary data for errors.
 				return $arrInput;
 			}
 
 			// This line is reached if there are invalid values.
-			// Store the error array in the transient with the name of the extended class name + _ + page slug.
-			set_transient( get_class( $this ) . '_' . $_POST['pageslug'], $arrErrors, 60*5 );	// store it for 5 minutes ( 60 seconds * 5 )
+			// Store the error array in the transient with the name of a MD5 hash string that consists of the extended class name + _ + page slug.
+			set_transient( md5( get_class( $this ) . '_' . $_POST['pageslug'] ), $arrErrors, 60*5 );	// store it for 5 minutes ( 60 seconds * 5 )
 			
 			// This displays the error message
 			add_settings_error( $_POST['pageslug'], 'can_be_any_string',  __( 'The value must be numeric.' )  . '<br />Submitted Data: ' . print_r( $arrInput, true )  );	
 			
-			// This will sent to Settings API and it will be saved in the database. 
-			// So the orgiginal data will be stored, meaning nothing changes.
-			return $arrOriginal;
+			// Returning an empty array will not change options.
+			return array();
 		}			
 		
 		/*
@@ -407,14 +414,14 @@
 		}
 		function content_mysecondpage( $strContent ) {	// 'content_' + page slug
 			
-			return $strContent . '<p>After saving some values in the firs page. Try exporting the options and change some values. Then import the file and see if the settings gets reverted.</p>';
+			return $strContent . '<p>After saving some values in the first page. Try exporting the options and change some values. Then import the file and see if the settings gets reverted.</p>';
 
 		}		
 		
 		/*
 		 * The third sub page.
 		 * */
-		// Apply the custom style to the third page only
+		// Apply the custom style to the third page only.
 		function style_mythirdpage( $strRules ) {	// 'style_' + page slug 
 			
 			return $strRules . '#wpwrap {background-color: #EEE;}';
