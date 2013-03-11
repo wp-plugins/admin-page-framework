@@ -4,7 +4,7 @@ Donate link: http://michaeluno.jp/en/donate
 Tags: admin, administration panel, admin panel, option page, option pages, option, options, setting, settings, Settings API, API, framework, library, class, development tool, developers
 Requires at least: 3.0
 Tested up to: 3.5
-Stable tag: 1.0.2
+Stable tag: 1.0.1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -122,7 +122,7 @@ The [GitHub repository](https://github.com/michaeluno/admin-page-framework "Admi
 == Changelog ==
 
 = 1.0.2 =
-* Added: the *export_{suffix}* and *import_{prefix}* filters and the corresponding callback methods to capture exporting/importing array to modify before processing it.
+* Added: the *export_{suffix}* and *import_{suffix}* filters and the corresponding callback methods to capture exporting/importing array to modify before processing it.
 * Suppoerted: multiple export buttons per page.
 * Added: the *delimiter* key which delimits multiple fields passed as array including the field types of checkbox, radio, submit, export, import, and file.
 * Fixed: to apply the value of the *disable* key to the *import* and *export* custom field.
