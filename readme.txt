@@ -4,7 +4,7 @@ Donate link: http://michaeluno.jp/en/donate
 Tags: admin, administration panel, admin panel, option page, option pages, option, options, setting, settings, Settings API, API, framework, library, class, development tool, developers
 Requires at least: 3.0
 Tested up to: 3.5
-Stable tag: 1.0.1.2
+Stable tag: 1.0.1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -121,10 +121,20 @@ The [GitHub repository](https://github.com/michaeluno/admin-page-framework "Admi
 
 == Changelog ==
 
-= 1.0.1.2 =
+= 1.0.2 =
+* Added: the *export_{suffix}* and *import_{prefix}* filters and the corresponding callback methods to capture exporting/importing array to modify before processing it.
+* Suppoerted: multiple export buttons per page.
+* Added: the *delimiter* key which delimits multiple fields passed as array including the field types of checkbox, radio, submit, export, import, and file.
+* Fixed: to apply the value of the *disable* key to the *import* and *export* custom field.
+* Fixed: a bug that an empty string was applied for the *description* key even when it is not set.
+* Added: the transient key for the *export* custom field to set a custom exporting array.
+* Added: *do_form* action hooks ( tag, page, global ) which are triggered before rendering the form elements after the form opening tag.
+* Fixed: a bug that the *file_name* key for the *export* field key did not take effect.
+
+= 1.0.1.2 - 03/09/2013 =
 * Fixed: a typo which caused a page not to be added to the Appearance menu.
 
-= 1.0.1.1 =
+= 1.0.1.1 - 03/08/2013 =
 * Fixed: typos in the demo plugin.
 * Changed: error message for a field to display the field value as well in addition to the specified error message.
 * Changed: the post_html key to be inserted after the description key.
