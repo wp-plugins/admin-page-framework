@@ -121,7 +121,15 @@ The [GitHub repository](https://github.com/michaeluno/admin-page-framework "Admi
 
 == Changelog ==
 
-= 1.0.2 =
+= 1.0.2.1 - 03/16/2013 =
+* Added: the capability key for section and field arrays which sets access rights to the form elements.
+* Added: a hidden tab page which belongs to the first page with a link back-and-forth in the demo plugin. 
+* Changed: the required WordPress version to 3.2 as the newly used filter option_page_capability_{$pageslug} requires it.
+* Fixed: an issue that setting a custom capability caused the "Creatin' huh?" message and the user could not change the options.
+* Added: the HideInPageTab() method which hides a specified in-page tab yet still accessible by the direct url.
+* changed: the method name RenderInPageTabs() to GetInPageTabs() since it did not print anything but returned the output string. 
+
+= 1.0.2 - 03/11/2013 =
 * Added: the *export_{suffix}* and *import_{suffix}* filters and the corresponding callback methods to capture exporting/importing array to modify before processing it.
 * Suppoerted: multiple export buttons per page.
 * Added: the *delimiter* key which delimits multiple fields passed as array including the field types of checkbox, radio, submit, export, import, and file.
