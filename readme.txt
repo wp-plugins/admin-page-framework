@@ -4,7 +4,7 @@ Donate link: http://michaeluno.jp/en/donate
 Tags: admin, administration panel, admin panel, option page, option pages, option, options, setting, settings, Settings API, API, framework, library, class, development tool, developers
 Requires at least: 3.0
 Tested up to: 3.5
-Stable tag: 1.0.2.1
+Stable tag: 1.0.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -120,6 +120,10 @@ The [GitHub repository](https://github.com/michaeluno/admin-page-framework "Admi
 == To do ==
 
 == Changelog ==
+
+= 1.0.2.2 - 03/17/2013 =
+* Changed: the second parameter of the constructor from capability to script path; the capability can be set via the SetCapability() method.
+* Added: the ability to automatically insert script information ( plugin/theme name, version, and author ) into the footer if the second parameter is set in the constructor.
 
 = 1.0.2.1 - 03/16/2013 =
 * Added: the capability key for section and field arrays which sets access rights to the form elements.
