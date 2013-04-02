@@ -4,7 +4,7 @@
 		Plugin URI: http://wordpress.org/extend/plugins/admin-page-framework/
 		Author:  Michael Uno
 		Author URI: http://michaeluno.jp
-		Version: 1.0.3.2
+		Version: 1.0.3.3
 		Requirements: WordPress 3.2 or above, PHP 5.2.4 or above.
 		Description: Provides simpler means of building administration pages for plugin and theme developers. 
 		Usage: 1. Extend the class 2. Override the SetUp() method. 3. Use the hook functions.
@@ -1503,13 +1503,6 @@ class Admin_Page_Framework {
 		);
 		set_transient( $strTransientKey, $arrSettingsErrors, 60*5 );	// for 5 minutes
 
-$this->DumpArray( 
-	array( 
-		'Setting the admin notice transient: ' . 'SettingsErrors_' . get_class( $this ) . '_' . $this->strPageSlug . PHP_EOL
-		. 'md5: ' . $strTransientKey
-	), 
-	dirname(  __FILE__ ) . '/debug.txt' 
-);	
 	}
 	protected function ShowSettingsErrors() {	// since 1.0.3
 	

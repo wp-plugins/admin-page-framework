@@ -4,7 +4,7 @@ Donate link: http://michaeluno.jp/en/donate
 Tags: admin, administration panel, admin panel, option page, option pages, option, options, setting, settings, Settings API, API, framework, library, class, development tool, developers
 Requires at least: 3.0
 Tested up to: 3.5
-Stable tag: 1.0.3.2
+Stable tag: 1.0.3.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -123,6 +123,9 @@ The [GitHub repository](https://github.com/michaeluno/admin-page-framework "Admi
 * <s>Add: the ability to specify a redirect page after the form data is successfully updated.</s> Done in 1.0.3.2.
 
 == Changelog ==
+
+= 1.0.3.3 - 04/02/2013 =
+* Fixed: a bug that a debug log file was created after submitting form data.
 
 = 1.0.3.2 - 04/02/2013 =
 * Added: the *redirect* field key for the submit input type that redirects the page after the submitted form data is successfully saved.
