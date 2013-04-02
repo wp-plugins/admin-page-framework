@@ -5,7 +5,7 @@
 	Description: Demonstrates the features of the Admin Page Framework class.
 	Author: Michael Uno
 	Author URI: http://michaeluno.jp
-	Version: 1.0.3.1
+	Version: 1.0.3.2
 	Requirements: PHP 5.2.4 or above, WordPress 3.2 or above.
 */
 
@@ -39,7 +39,7 @@ class APF_AdminPageFrameworkDemo extends Admin_Page_Framework {
 		
 		// Add the sub menus and the pages
 		// You need to decide what page title and the slug to use. 
-		// Important: do not use dots and hyphens in the page slug. Alphabets and numbers only! 
+		// Important: do not use dots and hyphens in the page slug. Alphabets and numbers and underscores only! 
 		// You are going to use the page slug later on for the callback method.
 		$this->SetCapability( 'read' );		// *Optional: allow subscribers to access the pages
 		$this->AddSubMenu(
@@ -101,37 +101,35 @@ class APF_AdminPageFrameworkDemo extends Admin_Page_Framework {
 					'id' => 'text_fields', 
 					'title' => 'Text Fields',
 					'description' => 'These are text type fields.',
-					'fields' => 
-						// Field Arrays
-						array(
-							// Text Field
-							array(  
-								'id' => 'text', 
-								'title' => 'Text',
-								'description' => 'Type somethig here.',	// additional notes besides the form field
-								'type' => 'text',
-								'default' => 123456,
-								'size' => 40 
-							),
-							// Password Field
-							array(  
-								'id' => 'password',
-								'title' => 'Password',
-								'tip' => 'This input will be masked.',
-								'type' => 'password',
-								'size' => 20
-							),
-							// Text Area
-							array(  
-								'id' => 'textarea',
-								'title' => 'Text Area', 
-								'description' => 'Type a text string here.',
-								'type' => 'textarea',
-								'rows' => 6,
-								'cols' => 80,
-								'default' => 'Hello World! This is set as the default string.'
-							),								
-						)
+					'fields' => array(	// Field Arrays
+						// Text Field
+						array(  
+							'id' => 'text', 
+							'title' => 'Text',
+							'description' => 'Type somethig here.',	// additional notes besides the form field
+							'type' => 'text',
+							'default' => 123456,
+							'size' => 40 
+						),
+						// Password Field
+						array(  
+							'id' => 'password',
+							'title' => 'Password',
+							'tip' => 'This input will be masked.',
+							'type' => 'password',
+							'size' => 20
+						),
+						// Text Area
+						array(  
+							'id' => 'textarea',
+							'title' => 'Text Area', 
+							'description' => 'Type a text string here.',
+							'type' => 'textarea',
+							'rows' => 6,
+							'cols' => 80,
+							'default' => 'Hello World! This is set as the default string.'
+						),								
+					)
 				),
 				// Section Array 2
 				array(  
@@ -140,47 +138,45 @@ class APF_AdminPageFrameworkDemo extends Admin_Page_Framework {
 					'id' => 'selectors', 
 					'title' => 'Selectors and Checkboxes',
 					'description' => 'These are selector type options.',
-					'fields' => 
-						// Field Arrays
-						array(
-							// Dropdown List
-							array(  
-								'id' => 'select',
-								'title' => 'Drop Down List',
-								'description' => 'This is a drop down list.',
-								'type' => 'select',
-								'default' => 0,
-								'label' => array( 'red', 'blue', 'yellow', 'orange' )
-							),		
-							// Radio Buttons
-							array(  
-								'id' => 'radio',
-								'title' => 'Radio Button', 
-								'description' => 'Choose one from the radio buttons.',
-								'type' => 'radio',
-								'label' => array( 'a' => 'apple', 'b' => 'banana', 'c' => 'cherry' ),
-								'default' => 'b'	// banana
-							),
-							// Checkboxes
-							array( 
-								'id' => 'checkboxs',
-								'title' => 'Multiple Checkboxes', 
-								'description' => 'The description key can be omitted though.',
-								'type' => 'checkbox',
-								'label' => array( 'moon' => 'Moon', 'earth' => 'Earth', 'sun' => 'Sun', 'mars' => 'Mars' ),
-								'default' => array( 'moon' => True, 'earth' => False, 'sun' => True, 'mars' => False )
-							),
-							// Single Checkbox
-							array( 
-								'id' => 'checkbox',
-								'title' => 'Single Checkbox', 
-								'tip' => 'The description key can be omitted though.',
-								'description' => 'Check box\'s label can be a string, not an array.',
-								'type' => 'checkbox',
-								'label' => 'One',	// notice that the label key is not an array
-								'default' => False
-							),								
-						)
+					'fields' => array(	// Field Arrays
+						// Dropdown List
+						array(  
+							'id' => 'select',
+							'title' => 'Drop Down List',
+							'description' => 'This is a drop down list.',
+							'type' => 'select',
+							'default' => 0,
+							'label' => array( 'red', 'blue', 'yellow', 'orange' )
+						),		
+						// Radio Buttons
+						array(  
+							'id' => 'radio',
+							'title' => 'Radio Button', 
+							'description' => 'Choose one from the radio buttons.',
+							'type' => 'radio',
+							'label' => array( 'a' => 'apple', 'b' => 'banana', 'c' => 'cherry' ),
+							'default' => 'b'	// banana
+						),
+						// Checkboxes
+						array( 
+							'id' => 'checkboxs',
+							'title' => 'Multiple Checkboxes', 
+							'description' => 'The description key can be omitted though.',
+							'type' => 'checkbox',
+							'label' => array( 'moon' => 'Moon', 'earth' => 'Earth', 'sun' => 'Sun', 'mars' => 'Mars' ),
+							'default' => array( 'moon' => True, 'earth' => False, 'sun' => True, 'mars' => False )
+						),
+						// Single Checkbox
+						array( 
+							'id' => 'checkbox',
+							'title' => 'Single Checkbox', 
+							'tip' => 'The description key can be omitted though.',
+							'description' => 'Check box\'s label can be a string, not an array.',
+							'type' => 'checkbox',
+							'label' => 'One',	// notice that the label key is not an array
+							'default' => False
+						),								
+					)
 				),
 				// Section Array 3
 				array(  
@@ -189,45 +185,42 @@ class APF_AdminPageFrameworkDemo extends Admin_Page_Framework {
 					'id' => 'misc_types', 
 					'title' => 'Hidden Field, Image, and File',
 					'description' => 'Hidden fields and file also can be created with field arrays..',
-					'fields' => 
-						// Field Arrays
-						array(
-							// Hidden fields - invisible but the set value be sent 
-							array(  // single hidden field
-								'id' => 'hidden_field',
-								'title' => 'Hidden Fields',
-								'type' => 'hidden',
-								'label' => 'This is sent in the hidden input field.',		// use the label key to set the value
-							),	
-							array(  // multiple hidden fields
-								'id' => 'hidden_fields',
-								'type' => 'hidden',
-								'description' => 'Hidden fields are embedded here.',
-								'label' => array( 'a' => true, 'b' => false, 'c' =>false, 'd' => true, 'e' =>true ),	// if the label key is an array, it will create multiple hidden keys with the values.
-							),	
-							// Image Uploader - this is for uploading images. There are more keys for custom settings.
-							// For other keys, please refer to the Demo 12 plugin.
-							array( 
-								'id' => 'upload_image',
-								'title' => 'Set Image',
-								'type' => 'image',
-								'default' => admin_url( 'images/wordpress-logo-2x.png' ) ,
-							),										
-							// File - this is for uploading files. The values will be stored in the $_FILES array.
-							array(  // single file upload
-								'id' => 'file_single_field',
-								'title' => 'Single Upload',
-								'type' => 'file',
-							),						
-							array(  // multiple file uploads
-								'id' => 'file_multiple_fields',
-								'title' => 'Multiple Uploads',
-								'type' => 'file',
-								// just set empty values so that the $_FILES array stores them in a single array key.
-								'label' => array( '', '', '', '' ),	
-							),						
-							
-						)
+					'fields' => array(	// Field Arrays
+						// Hidden fields - invisible but the set value be sent 
+						array(  // single hidden field
+							'id' => 'hidden_field',
+							'title' => 'Hidden Fields',
+							'type' => 'hidden',
+							'label' => 'This is sent in the hidden input field.',		// use the label key to set the value
+						),	
+						array(  // multiple hidden fields
+							'id' => 'hidden_fields',
+							'type' => 'hidden',
+							'description' => 'Hidden fields are embedded here.',
+							'label' => array( 'a' => true, 'b' => false, 'c' =>false, 'd' => true, 'e' =>true ),	// if the label key is an array, it will create multiple hidden keys with the values.
+						),	
+						// Image Uploader - this is for uploading images. There are more keys for custom settings.
+						// For other keys, please refer to the Demo 12 plugin.
+						array( 
+							'id' => 'upload_image',
+							'title' => 'Set Image',
+							'type' => 'image',
+							'default' => admin_url( 'images/wordpress-logo-2x.png' ) ,
+						),										
+						// File - this is for uploading files. The values will be stored in the $_FILES array.
+						array(  // single file upload
+							'id' => 'file_single_field',
+							'title' => 'Single Upload',
+							'type' => 'file',
+						),						
+						array(  // multiple file uploads
+							'id' => 'file_multiple_fields',
+							'title' => 'Multiple Uploads',
+							'type' => 'file',
+							// just set empty values so that the $_FILES array stores them in a single array key.
+							'label' => array( '', '', '', '' ),	
+						),						
+					)
 				),	
 				// Section Array 4
 				array(  
@@ -236,33 +229,38 @@ class APF_AdminPageFrameworkDemo extends Admin_Page_Framework {
 					'id' => 'buttons', 
 					'title' => 'Submit Buttons',
 					'description' => 'Buttons also can be created with field arrays.',
-					'fields' => 
-						// Field Arrays
-						array(
-							// Submit Buttons
-							array(  // single button
-								'id' => 'reload',
-								'type' => 'submit',		// the submit type creates a button
-								'label' => 'Reload the Page',
+					'fields' =>	array(	// Field Arrays
+						// Submit Buttons	
+						array(  // make the button like a hyper link
+							'id' => 'link_button',
+							'type' => 'submit',		// the submit type creates a button
+							'label' => __( 'Button as Link', 'admin-page-framework-demo' ),
+							'pre_field' => '<span title="' . __( 'Go to the forth page.', 'admin-page-framework-demo' ) . '">',
+							'href' => admin_url( "admin.php?page=myfourthpage" ),
+							'post_field' => '</span>',
+							'class' => 'button button-secondary',	
+							'description' => __( 'This serves like a hyper link.' ),
+						),		
+						array(  // make a redirect button
+							'id' => 'redirect_button',
+							'type' => 'submit',		// the submit type creates a button
+							'label' => __( 'Button as Redirect', 'admin-page-framework-demo' ),
+							'pre_field' => '<span title="' . __( 'Go to the forth page after submitting the data.', 'admin-page-framework-demo' ) . '">',
+							'redirect' => admin_url( "admin.php?page=myfourthpage" ),
+							'post_field' => '</span>',
+							'class' => 'button button-secondary',	
+							'description' => __( 'Unlike the above button, this saves the data before moving to the page.' ),							
+						),		
+						array(  // multiple buttons
+							'id' => 'update',
+							'type' => 'submit',		// the submit type creates a button
+							'label' => array( 
+								'save' => 'Update the Options',
+								'delete' => 'Delete the Options'
 							),
-							array(  // multiple buttons
-								'id' => 'update',
-								'type' => 'submit',		// the submit type creates a button
-								'label' => array( 
-									'save' => 'Update the Options',
-									'delete' => 'Delete the Options'
-								),
-								'delimiter' => '&nbsp;&nbsp;',
-							),	
-							array(  // make the button like a hyper link
-								'id' => 'link_button',
-								'type' => 'submit',		// the submit type creates a button
-								'label' => __( 'Button as Link', 'admin-page-framework-demo' ),
-								'pre_field' => '<span title="' . __( 'Go to the forth page.', 'admin-page-framework-demo' ) . '">',
-								'href' => admin_url( "admin.php?page=myfourthpage" ),
-								'post_field' => '</span>',
-							),							
-						)
+							'delimiter' => '&nbsp;&nbsp;',
+						),						
+					)
 				),
 			)
 		);
@@ -276,24 +274,23 @@ class APF_AdminPageFrameworkDemo extends Admin_Page_Framework {
 					'title' => 'Import and Export',		
 					'description' => 'With the import and export buttons, option can be saved to a file and restored. ' . 
 						'For that, the <strong>import</strong> and <strong>export</strong> types need to be passed to the field array.',
-					'fields' => 
-						array(
-							array(	// this field type is file and it is for uploading a file.
-								'id' => 'field_import_button', 		
-								'title' => 'Import',
-								'description' => 'Choose a file to import.',
-								'update_message' => 'Options were imported and updated.',
-								'type' => 'import',	// set the input field type to import
-								'label' => 'Import Options From File',	// set the input field type to file
-								'delimiter' => '&nbsp;&nbsp;',
-							),							
-							array(	
-								'id' => 'field_export_button', 		
-								'title' => 'Export',
-								'type' => 'export',	// set the input field type to export
-								'label' => 'Export Options',
-							)								
-						)									
+					'fields' => array(
+						array(	// this field type is file and it is for uploading a file.
+							'id' => 'field_import_button', 		
+							'title' => 'Import',
+							'description' => 'Choose a file to import.',
+							'update_message' => 'Options were imported and updated.',
+							'type' => 'import',	// set the input field type to import
+							'label' => 'Import Options From File',	// set the input field type to file
+							'delimiter' => '&nbsp;&nbsp;',
+						),							
+						array(	
+							'id' => 'field_export_button', 		
+							'title' => 'Export',
+							'type' => 'export',	// set the input field type to export
+							'label' => 'Export Options',
+						),							
+					)									
 				),							
 			)
 		);	
@@ -307,18 +304,17 @@ class APF_AdminPageFrameworkDemo extends Admin_Page_Framework {
 					'id' => 'section_verify_text', 	
 					'title' => 'Verify Text Input',		
 					'description' => 'Submitted data can be verified. If it fails, show an error message.',
-					'fields' => 
-						array(
-							array(  
-								'id' => 'field_verify_text', 		// the option key name saved in the database. You will need this when retrieving the saved value later.
-								'title' => 'Verify Text Form Field',
-								'tip' => 'Try entering something that is not a number.',		// appears on mouse hover on the title
-								'error' => 'Please enter a number! This message is set in the field array with the error key. The invalid Value: ',
-								'description' => 'Try entering something that is not a number.',	// additional notes besides the form field
-								'type' => 'text',	// set the input field type to be text
-								'default' => 'xyz',	// the default value is set here.
-							),
-						)
+					'fields' => array(
+						array(  
+							'id' => 'field_verify_text', 		// the option key name saved in the database. You will need this when retrieving the saved value later.
+							'title' => 'Verify Text Form Field',
+							'tip' => 'Try entering something that is not a number.',		// appears on mouse hover on the title
+							'error' => 'Please enter a number! This message is set in the field array with the error key. The invalid Value: ',
+							'description' => 'Try entering something that is not a number.',	// additional notes besides the form field
+							'type' => 'text',	// set the input field type to be text
+							'default' => 'xyz',	// the default value is set here.
+						),
+					)
 				),				
 			)
 		);					
@@ -371,10 +367,6 @@ class APF_AdminPageFrameworkDemo extends Admin_Page_Framework {
 	// Whennever you need to check the submitted data, use this method. The returned array will be saved in the database.
 	function validation_myfirstpage_firsttab( $arrInput ) {
 	
-		// In order not to do anything with the submitted data, return an empty array. 
-		// ( Or altenatively retrieve the saved option array from the database and return it. )
-		if ( isset( $arrInput['myfirstpage']['buttons']['reload'] ) ) return array();
-
 		// To discard all the saved option values, return null.
 		if ( isset( $arrInput['myfirstpage']['buttons']['update']['delete'] ) ) {
 			$this->AddSettingsError(
@@ -396,6 +388,9 @@ class APF_AdminPageFrameworkDemo extends Admin_Page_Framework {
 		
 		// The returned value will be saved in the database.
 		return $arrInput;
+		
+		// In order not to do anything with the submitted data, return an empty array. 
+		// ( Or altenatively retrieve the saved option array from the database and return it. )
 		
 	}
 	function validation_myfirstpage_thirdtab( $arrInput ) {		// 'validation_' + page slug + _ + tab slug
