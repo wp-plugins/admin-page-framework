@@ -5,7 +5,7 @@
 	Description: Demonstrates the features of the Admin Page Framework class.
 	Author: Michael Uno
 	Author URI: http://michaeluno.jp
-	Version: 1.0.3.3
+	Version: 1.0.4
 	Requirements: PHP 5.2.4 or above, WordPress 3.2 or above.
 */
 
@@ -76,7 +76,8 @@ class APF_AdminPageFrameworkDemo extends Admin_Page_Framework {
 				'secondtab'		=> 'Selectors and Checkboxes', 		
 				'thirdtab'		=> 'Image and Upload',
 				'fourthtab'		=> 'Verify Form Data',
-				'fifthtab'		=> 'Hidden Tab',			
+				'fifthtab'		=> 'Hidden Tab',	
+				'sixthtab'		=> 'Categories and Post Types',
 			) 
 		);	
 		
@@ -197,7 +198,7 @@ class APF_AdminPageFrameworkDemo extends Admin_Page_Framework {
 							'id' => 'hidden_fields',
 							'type' => 'hidden',
 							'description' => 'Hidden fields are embedded here.',
-							'label' => array( 'a' => true, 'b' => false, 'c' =>false, 'd' => true, 'e' =>true ),	// if the label key is an array, it will create multiple hidden keys with the values.
+							'label' => array( 'a' => 'yes', 'b' => 'no', 'c' => 'yes', 'd' => 'yes', 'e' => 'yes' ),	// if the label key is an array, it will create multiple hidden keys with the values.
 						),	
 						// Image Uploader - this is for uploading images. There are more keys for custom settings.
 						// For other keys, please refer to the Demo 12 plugin.
@@ -295,7 +296,7 @@ class APF_AdminPageFrameworkDemo extends Admin_Page_Framework {
 			)
 		);	
 		
-		// for the fourth tab in the first page
+		// For the fourth tab in the first page
 		$this->AddFormSections( 
 			array( 	
 				array(  
@@ -317,9 +318,40 @@ class APF_AdminPageFrameworkDemo extends Admin_Page_Framework {
 					)
 				),				
 			)
-		);					
+		);
+
+		// For the 6th tab
+		$this->AddFormSections( 
+			array( 	
+				array(  
+					'pageslug' => 'myfirstpage',	
+					'tabslug' => 'sixthtab',
+					'id' => 'section_category_checklist', 	
+					'title' => 'Category Checklist',		
+					'description' => 'Lists available categories with checkboxes.',
+					'fields' => array(
+						array(  
+							'id' => 'field_category_checklist', 		// the option key name saved in the database. You will need this when retrieving the saved value later.
+							'title' => 'Categories',
+							'description' => 'Select categories.',	// additional notes besides the form field
+							'type' => 'category',	
+							'default' => array_fill_keys(  get_all_category_ids() , true ),	// this checks all 
+							'max_width' => 400,
+							'max_height' => 200,
+						),
+						array(  
+							'id' => 'field_posttype_checklist', 		// the option key name saved in the database. You will need this when retrieving the saved value later.
+							'title' => 'Post Types',
+							'description' => 'Select post types.',	// additional notes besides the form field
+							'type' => 'posttype',	
+							'delimiter' => '&nbsp;&nbsp;&nbsp;'
+						),						
+					)
+				),				
+			)
+		);		
 	}
-	
+
 	// Step 4. Define the callback methods.
 	/*
 	 * The first sub page.
@@ -369,17 +401,15 @@ class APF_AdminPageFrameworkDemo extends Admin_Page_Framework {
 	
 		// To discard all the saved option values, return null.
 		if ( isset( $arrInput['myfirstpage']['buttons']['update']['delete'] ) ) {
-			$this->AddSettingsError(
-				'firsttab_delete',  // pick a unique ID for the message. If a same ID is used, only the newly added one will be displayed.
+			$this->SetSettingsNotice(
 				__( 'Options were deleted.', 'admin-page-framework' ),
 				'updated'
 			);				
 			return null;		
 		}
 		
-		// AddSettingsError() is useful to display the submitted values.
-		$this->AddSettingsError(
-			'firsttab_value_check',  // pick a unique ID for the message. If a same ID is used, only the newly added one will be displayed.
+		// SetSettingsNotice() is useful to display the submitted values.
+		$this->SetSettingsNotice(
 			'<h3>Check Submitted Values</h3>'
 			. '<h4>$arrInput - the passed value to the validation callback</h4>' . $this->DumpArray( $arrInput )
 			. '<h4>$_POST</h4>' . $this->DumpArray( $_POST ),
@@ -399,8 +429,7 @@ class APF_AdminPageFrameworkDemo extends Admin_Page_Framework {
 		$arrErrors = $_FILES['demo_my_option_key']['error']['myfirstpage']['misc_types']['file_multiple_fields'];
 		$arrErrors[] = $_FILES['demo_my_option_key']['error']['myfirstpage']['misc_types']['file_single_field'];
 		if ( in_array( 0, $arrErrors ) )
-			$this->AddSettingsError(	
-				'third_tab',  // this will be added to the div tag ID of the message 
+			$this->SetSettingsNotice(	
 				'<h3>' . __( 'File(s) was(were) uploaded.', 'admin-page-framework-demo' ) . '</h3>'
 				. '<h4>$_FILES</h4><pre>' . $this->DumpArray( $_FILES, dirname( __FILE__ ) . '/debug_log.txt' ) . '</pre>',
 				'updated'
@@ -431,8 +460,7 @@ class APF_AdminPageFrameworkDemo extends Admin_Page_Framework {
 		if ( $bIsValid ) {		
 		
 			// this displays a message.
-			$this->AddSettingsError( 
-				'fourthtab',  	// will be used in the ID attribute in the message tag element.
+			$this->SetSettingsNotice( 
 				__( 'The options were updated.' ), 	// the message to display
 				'updated' 	// the type. Use 'error' for a red box.
 			);
@@ -442,11 +470,10 @@ class APF_AdminPageFrameworkDemo extends Admin_Page_Framework {
 
 		// This line is reached if there are invalid values.
 		// Set the error array for the input fields.
-		$this->SetFieldErrors( $_POST['pageslug'], $arrErrors );
+		$this->SetFieldErrors( $arrErrors );
 		
 		// This displays the error message at the top of the plugin admin page.
-		$this->AddSettingsError( 
-			'fourthtab',  // will be used in the ID attribute in the message tag element.
+		$this->SetSettingsNotice( 
 			__( 'The value must be numeric.' )  . '<br />Submitted Data: ' . $this->DumpArray( $arrInput ) 
 		);	
 		
@@ -507,6 +534,7 @@ class APF_AdminPageFrameworkDemo extends Admin_Page_Framework {
 		return $strRules . ' ul.admin-page-framework { list-style:disc; padding-left: 20px; }';
 		
 	}
+	
 }
 
 // Step 5. Instantiate the class object.

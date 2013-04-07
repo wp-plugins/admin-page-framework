@@ -4,7 +4,7 @@ Donate link: http://michaeluno.jp/en/donate
 Tags: admin, administration panel, admin panel, option page, option pages, option, options, setting, settings, Settings API, API, framework, library, class, development tool, developers
 Requires at least: 3.0
 Tested up to: 3.5
-Stable tag: 1.0.3.3
+Stable tag: 1.0.3.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -34,6 +34,8 @@ It provides plugin and theme developers with easier means of creating option pag
 * File Upload 
 * Image Upload (Custom File Upload)
 * Option Export and Import (Custom File Upload)
+* Post Types (Custom Checkboxes)
+* Categoris (Custom Checkboxes)
 
 = Necessary Files =
 * **`admin-page-framework.php`** is in the classes folder.
@@ -118,19 +120,33 @@ This is	a PHP class library that enables to create option pages and form fields 
 The [GitHub repository](https://github.com/michaeluno/admin-page-framework "Admin Page Framework") is avaiable. Create an issue first and we'll see if changes can be made. 
 
 == Roadmap ==
-* Add: a custom input filed for category select checkboxes.
 * Add: the ability to remove registered form elements.
-* <s>Add: the ability to specify a redirect page after the form data is successfully updated.</s> Done in 1.0.3.2.
+
+== Done ==
+* <s>Add: a custom input filed for category select checkboxes</s>. Implemented in 1.0.4.
+* <s>Add: the ability to specify a redirect page after the form data is successfully updated.</s> Implemented in 1.0.3.2.
 
 == Changelog ==
 
+= 1.0.4 =
+* Fixed: an issue that submit button with the redirect key caused an unset index warning.
+* Changed: not to use the get_plugin_data() function if it does not exist to support those who change the location of the wp-admin directory.
+* Added: enclosed the checkbox, radio fields and its label in a tag with the *display:inline-block;* property so that each item do not wrap in the middle.
+* Added: the *SetSettingsNotice()* method which can be used instead of the *AddSettingsError()* method. The new method does not require an ID to be passed.
+* Changed: **(Breaking Change)** the parameters of *SetFieldErrors()* method; the first parameter is now the error array and the second parameter is the ID and it is optional.
+* Changed: that when multiple labels were set for the field types that supports multiple labels but the *name* key was set null, it now returns the default value instead of an empty string.
+* Tweaked: the settings registration process including sections and fields to be skipped if the loading page is not one of the pages added by the user.
+* Improved: the accuracy to retrieve the caller script information.
+* Added: the *posttype* field type.
+* Added: the *category* field type.
+
 = 1.0.3.3 - 04/02/2013 =
-* Fixed: a bug that a debug log file was created after submitting form data.
+* Fixed: a bug that a debug log file was created after submitting form data introduced in 1.0.3.2.
 
 = 1.0.3.2 - 04/02/2013 =
 * Added: the *redirect* field key for the submit input type that redirects the page after the submitted form data is successfully saved.
 * Fixed: an issue that when there are multiple submit input fields and the same label was used with the *href* key, the last url was set to previous buttons; the previous buttons urls were overwritten by the last one. 
-* Fixed: a bug that a value for the *pre_field* was applied for the *post_field* key in some field types.
+* Fixed: a bug that a value for the *pre_field* was applied to the *post_field* key in some field types.
 * Added: the ability to disable Settings API's admin notices to be automatically displayed after submitting a form by default. To enable the Settings API's notification messages, use the EnableSettingsAPIAdminNotice() method.
 
 = 1.0.3.1 - 04/01/2013 =
@@ -138,7 +154,7 @@ The [GitHub repository](https://github.com/michaeluno/admin-page-framework "Admi
 * Changed: to automatically insert plugin information into the plugin footer regardless of whether the second parameter of the constructor is set or not.
 
 = 1.0.3 - 04/01/2013 =
-* Added: the *href* field key for the submit field type that makes the button searve like a hyper link.
+* Added: the *href* field key for the submit field type that makes the button serve like a hyper link.
 * Added: the SetFieldErrors() method that enables to set field errors easily without dealing with transients.
 * Added: the *AddSettingsError()* and the *ShowSettingsErrors()* methods to be alternated with the settings_errors() and the add_settings_error() functions to prevent multiple duplicate messages to be displayed.
 * Added: the ability to automatically insert anchor links to each section and field of form elements.
