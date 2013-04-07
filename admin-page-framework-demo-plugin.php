@@ -1,45 +1,30 @@
 <?php
 	/* 
 		Plugin Name: Admin Page Framework Demo Plugin
-		Plugin URI: http://en.michaeluno.jp/admin-page-framework
+		Plugin URI: http://michaeluno.jp/admin-page-framework
 		Description: Demonstrates the features of the Admin Page Framework class.
 		Author: Michael Uno
 		Author URI: http://michaeluno.jp
-		Version: 1.0.0.2
+		Version: 1.0.0.0
 	*/
 
-	/*
-	 * Brief Instruction: How to Use the Framework - Basic Five Steps
-	 * 	1. Include the library.
-	 * 	2. Extend the library class.
-	 * 	3. Define the SetUp() method. Include the following methods in the definition.
-	 * 		SetRootMenu() - use it to specify the root menu.
-	 * 	 	AddSubMenu() - use it to specify the sub menu and the page. This page will be the actual page your users will going to access.
-	 * 			IMPORTANT: Decide the page slug witout hyphens and dots. This is very important since the page slug serves as the callback methods name.
-	 * 		for other methods and more details, visit, http://en.michaeluno.jp/admin-page-framework/methods/
-	 * 	4. Define callback methods.
-	 * 	5. Instantiate the extended class.
-	 * 	
-	 * for Getting Started, visit http://en.michaeluno.jp/admin-page-framework/get-started
-	 * */ 
-	 
-	// 1. Include the library
+	// Include the library
 	if ( !class_exists( 'Admin_Page_Framework' ) ) 
 		include_once( dirname( __FILE__ ) . '/classes/admin-page-framework.php' );
 	
-	// 2. Extend the class
+	// Extend the class
 	class APF_AdminPageFrameworkDemo extends Admin_Page_Framework {
 	
-		// 3. Define the setup method to set how many pages, page titles and icons etc.
+		// Define the setup method to set how many pages, page titles and icons etc.
 		function SetUp() {
 						
 			// Create the root menu - specifies to which parent menu we are going to add sub pages.
 			$this->SetRootMenu( 'Admin Page Framework Demo Plugin' );	
 			
 			// Add the sub menus and the pages
-			$this->AddSubMenu(	'My First Page',	// page and menu title
+			$this->AddSubMenu(	'My First Page',		// page and menu title
 								'myfirstpage',		// page slug - this will be the option name saved in the database
-								plugins_url( 'img/demo_01_32x32.png', __FILE__ ) );	// set the screen icon, it should be 32 x 32.
+								plugins_url( 'img/demo_01_32x32.png', __FILE__ ) );	// set the screen icon
 			$this->AddSubMenu(	'Import and Export Options', 
 								'mysecondpage',
 								plugins_url( 'img/demo_02_32x32.png', __FILE__ ) );
@@ -49,7 +34,8 @@
 			$this->AddSubMenu(	'Information',
 								'myfourthpage',
 								plugins_url( 'img/demo_04_32x32.png', __FILE__ ) );
-			
+
+								
 			// Enable heading page tabs.
 			$this->ShowPageHeadingTabs( True );
 			
@@ -65,11 +51,10 @@
 								
 			// Add form elements.
 			// Here we have four sections as an example.
-			// If you wonder what keys are need to be passed, please refer to http://en.michaeluno.jp/admin-page-framework/methods/
 			$this->AddFormSections( 
 				// Section Arrays
 				array( 	
-					// Section Array 1
+					// Section Array
 					array(  
 						'pageslug' => 'myfirstpage',
 						'tabslug' => 'firsttab',
@@ -110,7 +95,7 @@
 								),								
 							)
 					),
-					// Section Array 2
+					// Section Array
 					array(  
 						'pageslug' => 'myfirstpage',
 						'tabslug' => 'secondtab',
@@ -162,7 +147,6 @@
 								),								
 							)
 					),
-					// Section Array 3
 					array(  
 						'pageslug' => 'myfirstpage',
 						'tabslug' => 'thirdtab',
@@ -208,8 +192,7 @@
 								),						
 								
 							)
-					),	
-					// Section Array 4
+					),					
 					array(  
 						'pageslug' => 'myfirstpage',
 						'tabslug' => 'firsttab',
@@ -254,13 +237,13 @@
 									'title' => 'Import',
 									'description' => 'Choose a file to import.',
 									'update_message' => 'Options were imported and updated.',
-									'type' => 'import',	// set the input field type to import
+									'type' => 'import',	// set the input field type to file
 									'label' => 'Import Options From File',	// set the input field type to file
 								),							
 								array(	
 									'id' => 'field_export_button', 		
 									'title' => 'Export',
-									'type' => 'export',	// set the input field type to export
+									'type' => 'export',	// set the input field type to file
 									'label' => 'Export Options',
 								)								
 							)									
@@ -296,14 +279,11 @@
 		/*
 		 * The first sub page.
 		 * */
-		// Notice that the name of the method is 'do_' + page slug.
-		// If you wonder what else we have for this kind of pre-defined methods and callbacks, 
-		// please refer to http://en.michaeluno.jp/admin-page-framework/hooks-and-callbacks/
+		// Notice that the name of the method is 'do_' + page slug + tab slug.
 		function do_myfirstpage() {		
 			submit_button();	// the save button
 
-			// Show the saved option value. The option key is the string passed to the first parameter to the constructor of the class (at the end of this plugin).
-			// If the option key is not set, the page slug will be used. 
+			// Show the saved option value. The page slugs are used as the option keys.
 			if ( $options = ( array ) get_option( 'demo_my_option_key' ) )
 				echo '<h3>Saved values</h3><h4>option table key: demo_my_option_key</h4><pre>'
 					. print_r( $options, true ) 
@@ -315,11 +295,10 @@
 		// Whennever you need to check the submitted data, use this method. The returned array will be saved in the database.
 		function validation_myfirstpage_firsttab( $arrInput ) {
 		
-			// In order not to do anything with the submitted data, return an empty array. 
-			// ( Or altenatively retrieve the saved option array from the database and return it. )
+			// In order not to do anything with the submitted data, pass an empty array.
 			if ( isset( $arrInput['myfirstpage']['buttons']['reload'] ) ) return array();
 
-			// To discard all the savd option values, return null.
+			// To discard all the savd option values, pass non array value such as null.
 			if ( isset( $arrInput['myfirstpage']['buttons']['update']['delete'] ) ) {
 				add_settings_error( $_POST['pageslug'], 
 					'can_be_any_string',  
@@ -411,6 +390,7 @@
 
 		}		
 		
+		
 		/*
 		 * The third sub page.
 		 * */
@@ -450,19 +430,6 @@
 			
 	}
 	
-	// 5. Instantiate the class object.
-	// Passing a string to the constructor specifies the option key to use. If not set, each page slug will be used for the key.
+	// Instantiate the class object.
+	// Passing a string to the constructor specifies the option key to use.
 	new APF_AdminPageFrameworkDemo( 'demo_my_option_key' );	
-
-	/*
-	 * 
-	 * If you find this framework useful, include it in your project!
-	 * And please leave a nice comment in the review page, http://wordpress.org/support/view/plugin-reviews/admin-page-framework
-	 * 
-	 * If you have a suggestion, the GitHub repository is open to anybody so post an issue there.
-	 * https://github.com/michaeluno/admin-page-framework/issues
-	 * 
-	 * Happy coding!
-	 * 
-	 */
-	 
