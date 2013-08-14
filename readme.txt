@@ -134,6 +134,9 @@ The [GitHub repository](https://github.com/michaeluno/admin-page-framework "Admi
 
 == Changelog ==
 
+= 1.0.4.3 - 08/14/2013 =
+* Fixed: the warning, Strict standards: Declaration of Admin_Page_Framework_Walker_Category_Checklist::start_el() should be compatible with Walker::start_el(&$output, $object, $depth = 0, $args = Array, $current_object_id = 0) ...\admin-page-framework.php on line 2593.
+
 = 1.0.4.2 - 07/01/2013 =
 * Tweaked: the demo plugin to load the admin-page object only in the administration pages with the is_admin() function.
 * Fixed: a bug that setting and retrieving a transient for the field error array caused extra database queries.
