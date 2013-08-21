@@ -134,6 +134,9 @@ The [GitHub repository](https://github.com/michaeluno/admin-page-framework "Admi
 
 == Changelog ==
 
+= 1.0.4.4 - 08/22/2013 =
+* Fixed: a bug that the links of in-page tabs were pointing to the wrong urls when the root menu is a custom post type's page.
+
 = 1.0.4.3 - 08/14/2013 =
 * Fixed: the warning, Strict standards: Declaration of Admin_Page_Framework_Walker_Category_Checklist::start_el() should be compatible with Walker::start_el(&$output, $object, $depth = 0, $args = Array, $current_object_id = 0) ...\admin-page-framework.php on line 2593.
 

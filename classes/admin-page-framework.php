@@ -4,7 +4,7 @@
 	Plugin URI: http://wordpress.org/extend/plugins/admin-page-framework/
 	Author:  Michael Uno
 	Author URI: http://michaeluno.jp
-	Version: 1.0.4.2
+	Version: 1.0.4.4
 	Requirements: WordPress 3.2 or above, PHP 5.2.4 or above.
 	Description: Provides simpler means of building administration pages for plugin and theme developers. 
 	Usage: 1. Extend the class 2. Override the SetUp() method. 3. Use the hook functions.
@@ -1085,7 +1085,10 @@ class Admin_Page_Framework {
 			// checks if the current tab slug matches the iteration slug. 
 			// If not match, assign blank; otherwise, put the active class name.
 			$strClassActive = ( (string) $strCurrentTabSlug === (string) $strTabSlug ) ? 'nav-tab-active' : '';		
-			$strInPageHeadingTabs .= '<a class="nav-tab ' . $strClassActive . '" href="?page=' . $strCurrentPageSlug . '&tab=' . $strTabSlug . '">' . $strTabTitle . '</a>';
+			$strInPageHeadingTabs .= '<a class="nav-tab ' . $strClassActive . '" ' 
+				. 'href="' . add_query_arg( array( 'page' => $strCurrentPageSlug, 'tab' => $strTabSlug ) ) . '">' 
+				. $strTabTitle 
+				. '</a>';
 		
 		}
 		$strInPageHeadingTabs .= '</' . $strHeadingTag . '></div>';								
