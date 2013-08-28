@@ -1,10 +1,10 @@
 === Admin Page Framework ===
 Contributors: Michael Uno, miunosoft
 Donate link: http://michaeluno.jp/en/donate
-Tags: admin, administration panel, admin panel, option page, option pages, option, options, setting, settings, Settings API, API, framework, library, class, development tool, developers
-Requires at least: 3.0
-Tested up to: 3.5
-Stable tag: 1.0.4.2
+Tags: admin, administration, administration panel, admin panel, admin pages, option page, option pages, option, options, setting, settings, Settings API, API, framework, library, class, classes, development tool, developers, developer tool, meta box, custom post type, utility, utilities
+Requires at least: 3.2
+Tested up to: 3.6
+Stable tag: 2.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -19,7 +19,9 @@ It provides plugin and theme developers with easier means of creating option pag
 * **Extensible** - the created admin pages will become highly extensible with the automatically created hooks. In other words, it empowers other developers to customize your plugin or theme. That will result on making your projects grow.
 * **Import and Export Options** - buttons that the user can import and export settings by uploading and downloading the text file.
 * **Image Upload** - it lets the user easily upload images to the site or the user can choose from existent urls or already uploaded files.
-* **Settings API Implemented** - it uses the WordPress Settings API for creating the form so the standard option design will be implemented.
+* **Date Picker** - it lets the user easily select dates.
+* **Color Picker** - it lets the user easily pick a color.
+* **Settings API Implemented** - it uses the [WordPress Settings API](http://codex.wordpress.org/Settings_API) for creating the form so the standard option design will be employed.
 * **Validation and Error Messages** - with the pre-defined validation callbacks, the user's submitting data can be verified as a part of using the Settings API. Furthermore, by setting the error array, you can display the error message to the user.
 
 = Supported Field Types =
@@ -32,90 +34,93 @@ It provides plugin and theme developers with easier means of creating option pag
 * Buttons
 * Hidden Fields 
 * File Upload 
-* Image Upload (Custom File Upload)
-* Option Export and Import (Custom File Upload)
+* Image Upload (Custom Text Field)
+* Color Picker (Custom Text Field)
+* Date Picker (Custom Text Field)
+* Option Export and Import (Custom File Upload and Submit Button)
 * Post Types (Custom Checkboxes)
-* Categoris (Custom Checkboxes)
+* Taxonomies (Custom Checkboxes)
 
 = Necessary Files =
-* **`admin-page-framework.php`** is in the classes folder.
+* **`admin-page-framework.php`** is in the *class* folder.
 
 = Documentation =
-* [Getting Started](http://en.michaeluno.jp/admin-page-framework/get-started/ "Get Started")
-* [Demos](http://en.michaeluno.jp/admin-page-framework/demos/ "Demos")
-* [Methods](http://en.michaeluno.jp/admin-page-framework/methods/ "Methods")
-* [Hooks and Callbacks](http://en.michaeluno.jp/admin-page-framework/hooks-and-callbacks/ "Hooks and Callbacks") 
+Visit [Admin Page Framework Documentation](http://admin-page-framework.michaeluno.jp/en/v2/).
 
 == Screenshots ==
 1. **Text Fields**
 2. **Selector and Checkboxes**
-3. **Image and Upload**
+3. **Image and Upload and Color Picker**
 4. **Form Verification**
 5. **Import and Export**
-6. **Category and Post Type Checklist**
+6. **Taxonomy and Post Type Checklists**
 
 == Installation ==
+
 = Getting Started =
-1. Include **`admin-page-framework.php`** that is located in the **`classes`** folder into your theme or plugin.
-`if ( !class_exists( 'Admin_Page_Framework' ) )
-    include_once( dirname( __FILE__ ) . '/classes/admin-page-framework.php' );`
+
+**Step 1.** Include **`admin-page-framework.php`** that is located in the **`classes`** folder into your theme or plugin.
+
+`if ( !class_exists( 'AdminPageFramework' ) )
+    include_once( dirname( __FILE__ ) . '/class/admin-page-framework.php' );`
 	
-1. Extend the Library Class.
-`class APF_GettingStarted extends Admin_Page_Framework {
+**Step 2.** Extend the Library Class.
+
+`class APF_GettingStarted extends AdminPageFramework {
 }`
 
-1. Define the SetUp() Method.
-`function SetUp() {
-	$this->SetRootMenu( 'Settings' );               // specifies to which parent menu to belong.
-	$this->AddSubMenu(
-		'My First Setting Page',    // page and menu title
-		'my_first_settings_page' 	// page slug
+**Step 3.** Define the **setUp()** Method.
+
+`function setUp() {
+	$this->setRootMenuPage( 'Settings' );               // specifies to which parent menu to belong.
+	$this->addSubMenuPage(
+		'My First Page',    // page and menu title
+		'myfirstpage' 	// page slug
 	); 
 }`
 
-1. Define methods for hooks.
-`function do_my_first_settings_page() {  // do_ + pageslug	
+**Step 4.** Define methods for hooks.
+
+`function do_myfirstpage() {  // do_ + pageslug	
 	?>
 	<h3>Say Something</h3>
 	<p>This is my first admin page!</p>
 	<?php
 }`
 
-1. Instantiate the Class.
+**Step 5.** Instantiate the Class.
+
 `new APF_GettingStarted;`
 
 = Example Code = 
+
 `<?php
 /* Plugin Name: Admin Page Framework - Getting Started */ 
 
-if ( !class_exists( 'Admin_Page_Framework' ) )
-    include_once( dirname( __FILE__ ) . '/classes/admin-page-framework.php' );
-	
-class APF_GettingStarted extends Admin_Page_Framework {
+if ( ! class_exists( 'AdminPageFramework' ) )
+    include_once( dirname( __FILE__ ) . '/class/admin-page-framework.php' );
+    
+class APF extends AdminPageFramework {
 
-	function SetUp() {
-	
-		$this->SetRootMenu( 'Settings' );               // specifies to which parent menu to belong.
-		$this->AddSubMenu(
-			'My First Setting Page',    // page and menu title
-			'my_first_settings_page' 	// page slug
-		); 
-							
-	}
-
-	function do_my_first_settings_page() {  // do_ + pageslug
-	
-		?>
-		<h3>Say Something</h3>
-		<p>This is my first admin page!</p>
-		<?php
+    function setUp() {
 		
-	}
+    	$this->setRootMenuPage( 'Settings' );	
+		$this->addSubMenuPage(
+			'My First Page',	// page and menu title
+			'myfirstpage'		// page slug - this will be the option name saved in the database
+		);
 	
-}
-if ( is_admin() )
-	new APF_GettingStarted;
+    }
 
+    function do_myfirstpage() {  // do_ + pageslug
+        ?>
+        <h3>Say Something</h3>
+        <p>This is my first admin page!</p>
+        <?php   
+    }
+    
+}
+new APF;
 // That's it!`
 
 == Frequently asked questions ==
@@ -123,22 +128,92 @@ if ( is_admin() )
 This is	a PHP class library that enables to create option pages and form fields in the administration panel. Also it helps manage to save, export, and import options.
 
 = I've written a useful class and functions. Do you want to include it? = 
-The [GitHub repository](https://github.com/michaeluno/admin-page-framework "Admin Page Framework") is avaiable. Create an issue first and we'll see if changes can be made. 
+The [GitHub repository](https://github.com/michaeluno/admin-page-framework "Admin Page Framework") is avaiable. Raise an [issue](https://github.com/michaeluno/admin-page-framework/issues) first and we'll see if changes can be made. 
+
+= How can I contribute to improving the documentation? =
+You are welcome to submit documentation. Please follow the [Documentation Guidline](https://github.com/michaeluno/admin-page-framework/blob/master/documentation_guideline.md). 
+
+In addition, your tutorials and snippets for the framework can be listed in the manual. Let us know it [here](https://github.com/michaeluno/admin-page-framework/issues?direction=desc&labels=Documentation&page=1&sort=created&state=open).
 
 == Roadmap ==
-* Add: the ability to remove registered form elements.
+* Add the ability to set text in the screen help section.
 
 == Done ==
+* <s>Add: the date picker form field type.</s> Implemented in 2.0.0.
+* <s>Add: the color picker form field type.</s> Implemented in 2.0.0.
+* <s>Add: the ability to remove registered form elements.</s> Implemented in 2.0.0.
 * <s>Add: a custom input filed for category select checkboxes</s>. Implemented in 1.0.4.
 * <s>Add: the ability to specify a redirect page after the form data is successfully updated.</s> Implemented in 1.0.3.2.
 
 == Changelog ==
 
-= 1.0.4.4 - 08/22/2013 =
-* Fixed: a bug that the links of in-page tabs were pointing to the wrong urls when the root menu is a custom post type's page.
+= 2.0.0 - 08/28/2013 =
+* Released 2.0.0.
 
-= 1.0.4.3 - 08/14/2013 =
-* Fixed: the warning, Strict standards: Declaration of Admin_Page_Framework_Walker_Category_Checklist::start_el() should be compatible with Walker::start_el(&$output, $object, $depth = 0, $args = Array, $current_object_id = 0) ...\admin-page-framework.php on line 2593.
+= 2.0.0.b4 - 08/28/2013 =
+* Fixed: a bug that custom post type preview page did not show the stored values in the demo plugin.
+* Refactered: the code that loads the color picker script.
+* Refactered: the code that loads the image selector script.
+* Refactered: the code that loads framework's style.
+
+= 2.0.0.b3 - 08/28/2013 =
+* Added: more documentation in the source code.
+* Removed: the *document* folder.
+* Moved: the *documentation_guideline.md* file to the top level folder.
+* Removed: the documentation pages and added an external link to the documentation web site.
+* Removed: the *arrField* parameter of the constructor of the *AdminPageFramework_MetaBox* class.
+* Removed: the *setFieldArray()* method of the *AdminPageFramework_MetaBox* class.
+* Fixed: a bug that meta box color piker, image selector, data picker scripts did not load in the page after the Publish button was pressed.
+* Changed: the *validation_ extended class name* filter for meta boxes to accept the second parameter to receive the stored data.
+
+= 2.0.0.b2 - 08/26/2013 =
+* Changed: *addLinkToPluginDescription()* and *addLinkToPluginTitle()* to accept variadic parameters. 
+* Added: an example of using *addLinkToPluginDescription()* and *addLinkToPluginTitle()* in the demo plugin.
+* Changed: the demo plugins file name.
+* Fixed: an issue that date picker script caused an irregular element to be inserted around the page footer.
+* Changed: the documentation compatible with the DocBlock syntax. 
+
+= 2.0.0.b1 - 08/24/13 =
+* Changed: the *setSettingsNotice()* method name to *setSettingNotice()* to be consistent with other names with *Settings*.
+* Added: the *date* input field that adds a date picker.
+* Added: the ability to specify the multiple attribute to the select field with the *vMultiple* key.
+* Added: the *color* input field that adds a color picker.
+
+= 1.1.0 - 2013/07/13 =
+* Added: the *addSubMenuItems()* and *addSubMenuItem()* methods that enables to add not only sub menu pages but also external links.
+* Added: the ability to list the terms of specified taxonomy with checkbox by taxonomy slug.
+* Changed: ( *Breaking Change* ) the *category* field type to *taxonomy* field type.
+* Fixed: a bug that adding sub pages to an existing custom post type page caused the links of in-page tabs to have the wrong urls.
+* Changed: the *image* field type to be a custom text field.
+* Added: the *import_format_{page slug}_{tab slug}*, *import_format_{page slug}*, *import_format_{instantiated class name}* filters to allow to modify the import format type.
+* Added: the *import_option_key_{page slug}_{tab slug}*, *import_option_key_{page slug}*, *import_option_key_{instantiated class name}* filters to allow to modify the import option key.
+* Added: the *export_format_{page slug}_{tab slug}*, *export_format_{page slug}*, *export_fomat_{instantiated class name}* filters to allow to modify the export format type.
+* Added: the *export_name_{page slug}_{tab slug}*, *export_name_{page slug}*, *export_name_{instantiated class name}* filters to allow to modify the export file name.
+* Added: the ability to set the *accept* attribute for the *file* input field.
+* Added: ( *Breaking Change* ) the second parameter to the validation callback method to pass the old stored option data.
+* Changed: ( *Breaking Change* ) the validation behaviour to maintain the stored option values to return the second parameter value in the validation callback method from returning an empty array.
+* Changed: ( *Breaking Change* ) the validation behaviour to delete the stored option values to return an empty array in the validation callback method from returning a null value.
+* Added: the *validation_{instantiated class name}* filter that allows to modify the submitted form data throughout the whole script.
+* Added: the ability to set the text domain for the text messages that the framework uses.
+* Added: the ability to set the minimum width for label tags for *textarea*, *text*, and *number* input fields.
+* Added: the ability to set the label tag for *textarea*, *text*, and *number* input fields.
+* Added: the *{instantiated class name}_field_{field id}* filter to allow to modify settings field output.
+* Added: the *{instantiated class name}_{page slug}_tabs* filter to allow to modify adding in-page tabs.
+* Added: the *{instantiated_class name}_pages* filter to allow to modify adding pages.
+* Added: the *{instantiated class name}_setting_fields* and *{instantiated class name}_setting_sections* filters to allow to modify registering sections and fields.
+* Changed: ( *Breaking Change* ) the default option key that is stored in the option database table to be the instantiated class name from the page slug.
+* Changed: ( *Breaking Change* ) the section and field filters to have the prefix of the instantiated class name of the Admin Page Framework so that it prevents conflicts with other plugins that uses the framework.
+* Changed: the anchor link *name* attribute to *id*.
+* Added: the ability to order the in-page tabs with the *numOrder* key.
+* Added: the *addInPageTab()* methods to set in-page tabs.
+* Changed: ( *Breaking Change* ) the array structure of the parameter of the *addInPageTabs()* methods.
+* Added: the ability to automatically assign the default screen icon if not set, which is of the **generic** id.
+* Added: the ability to set the WordPress built-in screen icon to the custom added sub-menu pages.
+* Added: a class for handling custom-post types.
+* Added: a class for handling meta-boxes.
+* Changed: ( *Breaking Change* ) to apply the camel-back notation to all the array argument keys.
+* Changed: ( *Breaking Change* ) all the method names to be uncapitalised. 
+* Changed: ( *Breaking Change* ) the sub-string of class names, Admin_Page_Framework, to AdminPageFramework.
 
 = 1.0.4.2 - 07/01/2013 =
 * Tweaked: the demo plugin to load the admin-page object only in the administration pages with the is_admin() function.
