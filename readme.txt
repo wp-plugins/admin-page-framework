@@ -50,6 +50,9 @@ It provides plugin and theme developers with easier means of creating option pag
 = Documentation =
 Visit [Admin Page Framework Documentation](http://admin-page-framework.michaeluno.jp/en/v2/).
 
+= Tutorials = 
+* [Tutorials](http://en.michaeluno.jp/admin-page-framework/tutorials/)
+
 == Screenshots ==
 1. **Text Fields**
 2. **Selector and Checkboxes**
