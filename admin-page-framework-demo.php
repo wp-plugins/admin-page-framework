@@ -5,7 +5,7 @@
 	Description: Demonstrates the features of the Admin Page Framework class.
 	Author: Michael Uno
 	Author URI: http://michaeluno.jp
-	Version: 2.0.1
+	Version: 2.0.2
 	Requirements: PHP 5.2.4 or above, WordPress 3.2 or above.
 */ 
 
@@ -149,35 +149,7 @@ class APF_Demo extends AdminPageFramework {
 				'strPageSlug'	=> 'read_me',
 				'strTabSlug'	=> 'changelog',
 				'strTitle'		=> __( 'Change Log', 'admin-page-framework-demo' ),
-			),				
-			/*
-			 * Documentation
-			 * */
-			array(
-				'strPageSlug'	=> 'documentation',
-				'strTabSlug'	=> 'getting_started',
-				'strTitle'		=> __( 'Getting Started', 'admin-page-framework-demo' ),				
-			),			 
-			array(
-				'strPageSlug'	=> 'documentation',
-				'strTabSlug'	=> 'methods',
-				'strTitle'		=> __( 'Methods', 'admin-page-framework-demo' ),				
-			),
-			array(
-				'strPageSlug'	=> 'documentation',
-				'strTabSlug'	=> 'hooks_and_callbacks',
-				'strTitle'		=> __( 'Hooks and Callbacks', 'admin-page-framework-demo' ),				
-			),			
-			array(
-				'strPageSlug'	=> 'documentation',
-				'strTabSlug'	=> 'tutorials',
-				'strTitle'		=> __( 'Tutorials', 'admin-page-framework-demo' ),				
-			),				
-			array(
-				'strPageSlug'	=> 'documentation',
-				'strTabSlug'	=> 'tips',
-				'strTitle'		=> __( 'Tips', 'admin-page-framework-demo' ),				
-			),				
+			),						
 			array()
 		);			
 		
@@ -368,7 +340,7 @@ class APF_Demo extends AdminPageFramework {
 					30,
 				),
 			),
-			array(	// Single Dropdown List
+			array(	// Single Drop-down List
 				'strFieldID' => 'select',
 				'strSectionID' => 'selectors',
 				'strTitle' => 'Dropdown List',
@@ -377,7 +349,7 @@ class APF_Demo extends AdminPageFramework {
 				'vDefault' => 2,
 				'vLabel' => array( 'red', 'blue', 'yellow', 'orange' )
 			),	
-			array(	// Single Dropdown List with Multiple Options
+			array(	// Single Drop-down List with Multiple Options
 				'strFieldID' => 'select_multiple_options',
 				'strSectionID' => 'selectors',
 				'strTitle' => __( 'Dropdown List with Multiple Options', 'admin-page-framework-demo' ),
@@ -389,7 +361,7 @@ class APF_Demo extends AdminPageFramework {
 				'vWidth' => '200px',	// The width property value of CSS.
 				'vLabel' => array( 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'November', 'October', 'December' )
 			),			
-			array(	// Dropdown Lists with Mixed Types
+			array(	// Drop-down Lists with Mixed Types
 				'strFieldID' => 'select_mixed',
 				'strSectionID' => 'selectors',
 				'strTitle' => __( 'Multiple Dropdown Lists with Mixed Types', 'admin-page-framework-demo' ),
@@ -423,7 +395,7 @@ class APF_Demo extends AdminPageFramework {
 			array(	// Multiple sets of radio buttons
 				'strFieldID' => 'radio_multiple',
 				'strSectionID' => 'selectors',
-				'strTitle' => 'Multipe Sets of Radio Buttons',
+				'strTitle' => 'Multiple Sets of Radio Buttons',
 				'strDescription' => 'Multiple sets of radio buttons.',
 				'strType' => 'radio',
 				'vLabel' => array( 
@@ -456,6 +428,48 @@ class APF_Demo extends AdminPageFramework {
 				'vLabel' => array( 'moon' => 'Moon', 'earth' => 'Earth', 'sun' => 'Sun', 'mars' => 'Mars' ),
 				'vDefault' => array( 'moon' => True, 'earth' => False, 'sun' => True, 'mars' => False ),
 			),
+			array(	// Size
+				'strFieldID' => 'size_filed',
+				'strSectionID' => 'selectors',
+				'strTitle' => __( 'Size', 'admin-page-framework-demo' ),
+				'strDescription' => __( 'The default units are the lengths for CSS.', 'admin-page-framework-demo' ),
+				'strType' => 'size',
+				'vDefault'			=> array( 'size' => 5, 'unit' => '%' ),
+			),			
+			array(	// Size with custom units
+				'strFieldID' => 'size_custom_unit_filed',
+				'strSectionID' => 'selectors',
+				'strTitle' => __( 'Size with Custom Units', 'admin-page-framework-demo' ),
+				'strType' => 'size',
+				'vSizeUnits' => array(
+					'grain'	=> 'grains',
+					'dram'	=> 'drams',
+					'ounce'	=> 'ounces',
+					'pounds'	=> 'pounds',
+				),
+				'vDefault'	=> array( 'size' => 200, 'unit' => 'ounce' ),
+			),						
+			array(	// Multiple Sizes
+				'strFieldID' => 'sizes_filed',
+				'strSectionID' => 'selectors',
+				'strTitle' => __( 'Multiple Sizes', 'admin-page-framework-demo' ),
+				'strType' => 'size',
+				'vLabel' => array(
+					'weight'	=> __( 'Weight', 'admin-page-framework-demo' ),
+					'length'	=> __( 'Length', 'admin-page-framework-demo' ),
+					'capacity'	=> __( 'File Size', 'admin-page-framework-demo' ),
+				),
+				'vSizeUnits' => array( 	// notice that the array key structure corresponds to the vLabel array's.
+					'weight'	=> array( 'mg'=>'mg', 'g'=>'g', 'kg'=>'kg' ),
+					'length'	=> array( 'cm'=>'cm', 'mm'=>'mm', 'm'=>'m' ),
+					'capacity'	=> array( 'b'=>'b', 'kb'=>'kb', 'mb'=>'mb', 'gb' => 'gb', 'tb' => 'tb' ),
+				),
+				'vDefault' => array(
+					'weight' => array( 'size' => 15, 'unit' => 'g' ),
+					'length' => array( 'size' => 100, 'unit' => 'mm' ),
+					'capacity' => array( 'size' => 30, 'unit' => 'mb' ),
+				),					
+			),			
 			array( // Image Selector
 				'strFieldID' => 'image_select_field',
 				'strSectionID' => 'image_select',
@@ -834,7 +848,9 @@ if ( is_admin() )
 	
 class APF_PostType extends AdminPageFramework_PostType {
 	
-	public function setUp() {
+	public function start_APF_PostType() {	// start_ + extended class name
+	
+		// the setUp() method is too late to add taxonomies. So we use start_{class name} action hook.
 	
 		$this->setAutoSave( false );
 		$this->setAuthorTableFilter( true );
@@ -1027,6 +1043,32 @@ class APF_MetaBox extends AdminPageFramework_MetaBox {
 				'strTitle'			=> __( 'Date', 'admin-page-framework-demo' ),
 				'strType'			=> 'date',
 			),			
+			array (
+				'strFieldID'		=> 'size_field',
+				'strTitle'			=> __( 'Size', 'admin-page-framework-demo' ),
+				'strType'			=> 'size',
+				'vDefault'			=> array( 'size' => 5, 'unit' => '%' ),
+			),						
+			array (
+				'strFieldID'		=> 'sizes_field',
+				'strTitle'			=> __( 'Multiple Sizes', 'admin-page-framework-demo' ),
+				'strType'			=> 'size',
+				'vLabel' => array(
+					'weight'	=> __( 'Weight', 'admin-page-framework-demo' ),
+					'length'	=> __( 'Length', 'admin-page-framework-demo' ),
+					'capacity'	=> __( 'File Size', 'admin-page-framework-demo' ),
+				),
+				'vSizeUnits' => array( 	// notice that the array key structure corresponds to the vLabel array's.
+					'weight'	=> array( 'mg'=>'mg', 'g'=>'g', 'kg'=>'kg' ),
+					'length'	=> array( 'cm'=>'cm', 'mm'=>'mm', 'm'=>'m' ),
+					'capacity'	=> array( 'b'=>'b', 'kb'=>'kb', 'mb'=>'mb', 'gb' => 'gb', 'tb' => 'tb' ),
+				),
+				'vDefault' => array(
+					'weight' => array( 'size' => 15, 'unit' => 'g' ),
+					'length' => array( 'size' => 100, 'unit' => 'mm' ),
+					'capacity' => array( 'size' => 30, 'unit' => 'mb' ),
+				),				
+			),					
 			array()
 		);		
 	}

@@ -43,6 +43,7 @@ It provides plugin and theme developers with easier means of creating option pag
 * Option Export and Import (Custom File Upload and Submit Button)
 * Post Types (Custom Checkboxes)
 * Taxonomies (Custom Checkboxes)
+* Size ( Custom Text and Select Fields )
 
 = Necessary Files =
 * **`admin-page-framework.php`** is in the *class* folder.
@@ -153,7 +154,11 @@ In addition, your tutorials and snippets for the framework can be listed in the 
 
 == Changelog ==
 
-= 2.0.1 =
+= 2.0.2 - 09/07/2013 =
+* Fixed: a bug in the demo plugin that custom taxonomies were not added.
+* Added: the *size* field type.
+
+= 2.0.1 - 09/04/2013 =
 * Fixed: a bug that admin setting notices were displayed twice in the options-general.php page.
 
 = 2.0.0 - 08/28/2013 =
@@ -161,9 +166,9 @@ In addition, your tutorials and snippets for the framework can be listed in the 
 
 = 2.0.0.b4 - 08/28/2013 =
 * Fixed: a bug that custom post type preview page did not show the stored values in the demo plugin.
-* Refactered: the code that loads the color picker script.
-* Refactered: the code that loads the image selector script.
-* Refactered: the code that loads framework's style.
+* Refactored: the code that loads the color picker script.
+* Refactored: the code that loads the image selector script.
+* Refactored: the code that loads framework's style.
 
 = 2.0.0.b3 - 08/28/2013 =
 * Added: more documentation in the source code.
