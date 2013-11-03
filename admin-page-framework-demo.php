@@ -5,8 +5,8 @@
 	Description: Demonstrates the features of the Admin Page Framework class.
 	Author: Michael Uno
 	Author URI: http://michaeluno.jp
-	Version: 2.0.2
-	Requirements: PHP 5.2.4 or above, WordPress 3.2 or above.
+	Version: 2.1.2
+	Requirements: PHP 5.2.4 or above, WordPress 3.3 or above.
 */ 
 
 if ( ! class_exists( 'AdminPageFramework' ) )
@@ -50,7 +50,7 @@ class APF_Demo extends AdminPageFramework {
 			),
 			array(
 				'strPageTitle' => __( 'Read Me', 'admin-page-framework-demo' ),
-				'strPageSlug' => 'read_me',
+				'strPageSlug' => 'apf_read_me',
 				'strScreenIcon' => 'page',
 			),			
 			array(
@@ -131,30 +131,67 @@ class APF_Demo extends AdminPageFramework {
 			 * Read Me
 			 * */
 			array(
-				'strPageSlug'	=> 'read_me',
+				'strPageSlug'	=> 'apf_read_me',
 				'strTabSlug'	=> 'description',
 				'strTitle'		=> __( 'Description', 'admin-page-framework-demo' ),
 			),				
 			array(
-				'strPageSlug'	=> 'read_me',
+				'strPageSlug'	=> 'apf_read_me',
 				'strTabSlug'	=> 'installation',
 				'strTitle'		=> __( 'Installation', 'admin-page-framework-demo' ),
 			),	
 			array(
-				'strPageSlug'	=> 'read_me',
+				'strPageSlug'	=> 'apf_read_me',
 				'strTabSlug'	=> 'frequently_asked_questions',
 				'strTitle'		=> __( 'FAQ', 'admin-page-framework-demo' ),
 			),		
 			array(
-				'strPageSlug'	=> 'read_me',
+				'strPageSlug'	=> 'apf_read_me',
+				'strTabSlug'	=> 'other_notes',
+				'strTitle'		=> __( 'Other Notes', 'admin-page-framework-demo' ),
+			),					
+			array(
+				'strPageSlug'	=> 'apf_read_me',
 				'strTabSlug'	=> 'changelog',
 				'strTitle'		=> __( 'Change Log', 'admin-page-framework-demo' ),
 			),						
 			array()
 		);			
 		
+		// Page style.
 		$this->showPageHeadingTabs( false );		// disables the page heading tabs by passing false.
+		$this->showPageTitle( false, 'apf_read_me' );	// disable the page title of a specific page.
 		$this->setInPageTabTag( 'h2' );		
+		// $this->showInPageTabs( false, 'apf_read_me' );	// in-page tabs can be disabled like so.
+		
+		// Enqueue styles - $this->enqueueStyle(  'stylesheet url / relative path to the WordPress directory here' , 'page slug (optional)', 'tab slug (optional)', 'custom argument array(optional)' );
+		$strStyleHandle = $this->enqueueStyle(  plugins_url( 'asset/css/readme.css' , __FILE__ ) , 'apf_read_me' );
+		
+		// Enqueue scripts - $this->enqueueScript(  'script url / relative path to the WordPress directory here' , 'page slug (optional)', 'tab slug (optional)', 'custom argument array(optional)' );
+		$this->enqueueScript(  
+			plugins_url( 'asset/js/test.js' , __FILE__ ),	// source url or path
+			'apf_read_me', 	// page slug
+			'', 	// tab slug
+			array(
+				'strHandleID' => 'my_script',	// this handle ID also is used as the object name for the translation array below.
+				'arrTranslation' => array( 
+					'a' => 'hello world!',
+					'style_handle_id' => $strStyleHandle,	// check the enqueued style handle ID here.
+				),
+			)
+		);
+			
+		// Contextual help tabs.
+		$this->addHelpTab( 
+			array(
+				'strPageSlug'				=> 'first_page',	// ( mandatory )
+				// 'strPageTabSlug'			=> null,	// ( optional )
+				'strHelpTabTitle'			=> 'Admin Page Framework',
+				'strHelpTabID'				=> 'admin_page_framework',	// ( mandatory )
+				'strHelpTabContent'			=> __( 'This contextual help text can be set with the <em>addHelpTab()</em> method.', 'admin-page-framework' ),
+				'strHelpTabSidebarContent'	=> __( 'This is placed in the sidebar of the help pane.', 'admin-page-framework' ),
+			)
+		);
 		
 		// Add setting sections
 		$this->addSettingSections(
@@ -174,6 +211,12 @@ class APF_Demo extends AdminPageFramework {
 				'strDescription'	=> 'These are selector type options such as dropdown lists, radio buttons, and checkboxes',
 			),
 			array(
+				'strSectionID'		=> 'sizes',
+				'strPageSlug'		=> 'first_page',
+				'strTabSlug'		=> 'selectors',
+				'strTitle'			=> 'Sizes',
+			),			
+			array(
 				'strSectionID'		=> 'image_select',
 				'strPageSlug'		=> 'first_page',
 				'strTabSlug'		=> 'color_and_images',
@@ -191,7 +234,7 @@ class APF_Demo extends AdminPageFramework {
 				'strPageSlug'		=> 'first_page',
 				'strTabSlug'		=> 'checklist',
 				'strTitle'			=> 'Checklists',
-				'strDescription'	=> 'Post type and taxonomy checklists ( custom checkbox ) are supported.',
+				'strDescription'	=> 'Post type and taxonomy checklists ( custom checkbox ).',
 			),	
 			array(
 				'strSectionID'		=> 'date_pickers',
@@ -232,8 +275,7 @@ class APF_Demo extends AdminPageFramework {
 				'strSectionID'		=> 'submit_buttons_manage',
 				'strPageSlug'		=> 'second_page',
 				'strTabSlug'		=> 'delete_options',
-				'strTitle'			=> 'Submit Buttons',
-				'strDescription'	=> 'These are submit type options.',
+				'strTitle'			=> 'Reset Button',
 				'numOrder'			=> 10,
 			),			
 			array(
@@ -267,6 +309,7 @@ class APF_Demo extends AdminPageFramework {
 				'strSectionID' => 'text_fields',
 				'strTitle' => __( 'Text', 'admin-page-framework-demo' ),
 				'strDescription' => __( 'Type something here.', 'admin-page-framework-demo' ),	// additional notes besides the form field
+				'strHelp' => __( 'This is a text field and typed text will be saved.', 'admin-page-framework-demo' ),
 				'strType' => 'text',
 				'numOrder' => 1,
 				'vDefault' => 123456,
@@ -277,6 +320,7 @@ class APF_Demo extends AdminPageFramework {
 				'strSectionID' => 'text_fields',
 				'strTitle' => 'Multiple Text Fields',
 				'strDescription' => 'These are multiple text fields.',	// additional notes besides the form field
+				'strHelp' => __( 'Multiple text fields can be passed by setting an array to the vLabel key.', 'admin-page-framework-demo' ),
 				'strType' => 'text',
 				'numOrder' => 2,
 				'vDefault' => array(
@@ -301,6 +345,7 @@ class APF_Demo extends AdminPageFramework {
 				'strTitle' => 'Password',
 				'strTip' => 'This input will be masked.',
 				'strType' => 'password',
+				'strHelp' => __( 'This is a password type field; the user\'s entered input will be masked.', 'admin-page-framework-demo' ),	//'
 				'vSize' => 20,
 			),
 			array(	// Text Area
@@ -313,6 +358,20 @@ class APF_Demo extends AdminPageFramework {
 				'vRows' => 6,
 				'vCols' => 80,
 			),
+			array(	// Rich Text Editors
+				'strFieldID' => 'rich_textarea',
+				'strSectionID' => 'text_fields',
+				'strTitle' => 'Rich Text Area',
+				'strType' => 'textarea',
+				'vLabel' => array(
+					'default' => '',
+					'custom' => '',
+				),
+				'vRich' => array( 
+					'default' => true,	// just pass non empty value for the default rich editor.
+					'custom' => array( 'media_buttons' => false, 'tinymce' => false ),	// pass the setting array to customize the editor. For the setting argument, see http://codex.wordpress.org/Function_Reference/wp_editor.
+				),
+			),			
 			array(	// Multiple text areas
 				'strFieldID' => 'textarea_multiple',
 				'strSectionID' => 'text_fields',
@@ -345,6 +404,7 @@ class APF_Demo extends AdminPageFramework {
 				'strSectionID' => 'selectors',
 				'strTitle' => 'Dropdown List',
 				'strDescription' => 'This is a drop down list.',
+				'strHelp' => __( 'This is the <em>select</em> field type.', 'admin-page-framework' ),
 				'strType' => 'select',
 				'vDefault' => 2,
 				'vLabel' => array( 'red', 'blue', 'yellow', 'orange' )
@@ -354,6 +414,7 @@ class APF_Demo extends AdminPageFramework {
 				'strSectionID' => 'selectors',
 				'strTitle' => __( 'Dropdown List with Multiple Options', 'admin-page-framework-demo' ),
 				'strDescription' => __( 'Press the Shift key to select multiple items.', 'admin-page-framework-demo' ),
+				'strHelp' => __( 'This is the <em>select</em> field type with multiple elements.', 'admin-page-framework' ),
 				'strType' => 'select',
 				'vMultiple' => true,
 				'vDefault' => 2,
@@ -429,29 +490,31 @@ class APF_Demo extends AdminPageFramework {
 				'vDefault' => array( 'moon' => True, 'earth' => False, 'sun' => True, 'mars' => False ),
 			),
 			array(	// Size
-				'strFieldID' => 'size_filed',
-				'strSectionID' => 'selectors',
-				'strTitle' => __( 'Size', 'admin-page-framework-demo' ),
-				'strDescription' => __( 'The default units are the lengths for CSS.', 'admin-page-framework-demo' ),
-				'strType' => 'size',
+				'strFieldID'		=> 'size_filed',
+				'strSectionID'		=> 'sizes',
+				'strTitle'			=> __( 'Size', 'admin-page-framework-demo' ),
+				'strHelp'			=> __( 'In order to set a default value for the size field type, an array with the \'size\' and the \'unit\' keys needs to be passed.', 'admin-page-framework-demo' ),
+				'strDescription'	=> __( 'The default units are the lengths for CSS.', 'admin-page-framework-demo' ),
+				'strType'			=> 'size',
 				'vDefault'			=> array( 'size' => 5, 'unit' => '%' ),
 			),			
 			array(	// Size with custom units
-				'strFieldID' => 'size_custom_unit_filed',
-				'strSectionID' => 'selectors',
-				'strTitle' => __( 'Size with Custom Units', 'admin-page-framework-demo' ),
-				'strType' => 'size',
-				'vSizeUnits' => array(
+				'strFieldID'		=> 'size_custom_unit_filed',
+				'strSectionID'		=> 'sizes',
+				'strTitle'			=> __( 'Size with Custom Units', 'admin-page-framework-demo' ),
+				'strHelp'			=> __( 'The units can be specified so it can be quantity, length, or capacity etc.', 'admin-page-framework-demo' ),
+				'strType'			=> 'size',
+				'vSizeUnits'		=> array(
 					'grain'	=> 'grains',
 					'dram'	=> 'drams',
 					'ounce'	=> 'ounces',
 					'pounds'	=> 'pounds',
 				),
-				'vDefault'	=> array( 'size' => 200, 'unit' => 'ounce' ),
+				'vDefault'			=> array( 'size' => 200, 'unit' => 'ounce' ),
 			),						
 			array(	// Multiple Sizes
 				'strFieldID' => 'sizes_filed',
-				'strSectionID' => 'selectors',
+				'strSectionID' => 'sizes',
 				'strTitle' => __( 'Multiple Sizes', 'admin-page-framework-demo' ),
 				'strType' => 'size',
 				'vLabel' => array(
@@ -496,15 +559,23 @@ class APF_Demo extends AdminPageFramework {
 				'strSectionID' => 'checklists',
 				'strTitle' => 'Post Types',
 				'strType' => 'posttype',
-			),				
+			),											
 			array(
 				'strFieldID' => 'taxonomy_checklist',
 				'strSectionID' => 'checklists',
 				'strTitle' => __( 'Taxonomy Checklist', 'admin-page-framework-demo' ),
 				'strType' => 'taxonomy',
-				'vLabel' => $this->getTaxonomyLabels( 'menu_name' ),
-				'vTaxonomySlug' => get_taxonomies( '', 'names' ), // or simply 'category' to get a category list.
+				'strHeight' => '200px',
+				'vTaxonomySlug' => array( 'category', 'post_tag' ),
 			),				
+			array(
+				'strFieldID' => 'taxonomy_checklist_all',
+				'strSectionID' => 'checklists',
+				'strTitle' => __( 'All Taxonomies', 'admin-page-framework-demo' ),
+				'strType' => 'taxonomy',
+				'strHeight' => '200px',
+				'vTaxonomySlug' => get_taxonomies( '', 'names' ),
+			),			
 			array(	// Single date picker
 				'strFieldID' => 'date',
 				'strSectionID' => 'date_pickers',
@@ -586,6 +657,15 @@ class APF_Demo extends AdminPageFramework {
 				'vRedirect'	=> admin_url(),
 				'vClassAttribute' => 'button button-secondary',
 			),
+			array( // Reset Submit button
+				'strFieldID' => 'submit_button_reset',
+				'strSectionID' => 'submit_buttons',
+				'strTitle' => 'Reset Button',
+				'strType' => 'submit',
+				'vLabel' => __( 'Reset', 'admin-page-framework-demo' ),
+				'vReset' => true,
+				// 'vClassAttribute' => 'button button-secondary',
+			),			
 			array( // Delete Option Button
 				'strFieldID' => 'submit_manage',
 				'strSectionID' => 'submit_buttons_manage',
@@ -669,24 +749,12 @@ class APF_Demo extends AdminPageFramework {
 		
 		
     }
-	
-	// Custom helper function for the taxonomy check list.
-	private function getTaxonomyLabels( $strKey='name' ) {
-
-		$arrTaxonomies = array();
-		foreach( ( array ) get_taxonomies( '', 'objects' ) as $strSlug => $oDetail ) 
-			$arrTaxonomies[ $strSlug ] = $oDetail->labels->$strKey;
-		return $arrTaxonomies;
 		
-	}
-	
 	/*
 	 * First Page
 	 * */
 	public function do_first_page() {
-		
 		submit_button();
-			
 	}
 		
 	/*
@@ -726,6 +794,12 @@ class APF_Demo extends AdminPageFramework {
 	/*
 	 * Validation Callbacks
 	 * */
+public function validation_first_page_textfields( $arrInput, $arrOldInput ) {
+
+$this->oDebug->logArray( $arrInput );
+return $arrInput;
+		
+}
 	public function validation_first_page_verification( $arrInput, $arrOldPageOptions ) {	// valication_ + page slug + _ + tab slug
 				
 		// Set a flag.
@@ -756,7 +830,6 @@ class APF_Demo extends AdminPageFramework {
 			return $arrOldPageOptions;
 			
 		}
-		
 				
 		return $arrInput;
 		
@@ -789,56 +862,32 @@ class APF_Demo extends AdminPageFramework {
 	/*
 	 * Read Me
 	 * */ 
-	public function do_before_read_me() {		// do_before_ + page slug 
+	public function do_before_apf_read_me() {		// do_before_ + page slug 
 
 		include_once( dirname( __FILE__ ) . '/third-party/wordpress-plugin-readme-parser/parse-readme.php' );
 		$this->oWPReadMe = new WordPress_Readme_Parser;
 		$this->arrWPReadMe = $this->oWPReadMe->parse_readme( dirname( __FILE__ ) . '/readme.txt' );
-		
+	
 	}
-	public function do_read_me_description() {		// do_ + page slug + _ + tab slug
+	public function do_apf_read_me_description() {		// do_ + page slug + _ + tab slug
 		echo $this->arrWPReadMe['sections']['description'];
+// var_dump( $this->arrWPReadMe );
 	}
-	public function do_read_me_installation() {		// do_ + page slug + _ + tab slug
+	public function do_apf_read_me_installation() {		// do_ + page slug + _ + tab slug
 		// echo htmlspecialchars( $this->arrWPReadMe['sections']['installation'], ENT_QUOTES, bloginfo( 'charset' ) );
 		echo $this->arrWPReadMe['sections']['installation'];
 	}
-	public function do_read_me_frequently_asked_questions() {	// do_ + page slug + _ + tab slug
+	public function do_apf_read_me_frequently_asked_questions() {	// do_ + page slug + _ + tab slug
 		echo $this->arrWPReadMe['sections']['frequently_asked_questions'];
 	}
-	public function do_read_me_screenshots() {		// do_ + page slug + _ + tab slug
+	public function do_apf_read_me_other_notes() {
+		echo $this->arrWPReadMe['remaining_content'];
+	}
+	public function do_apf_read_me_screenshots() {		// do_ + page slug + _ + tab slug
 		echo $this->arrWPReadMe['sections']['screenshots'];
 	}	
-	public function do_read_me_changelog() {		// do_ + page slug + _ + tab slug
-		// echo var_dump( $this->arrWPReadMe['sections'] );
+	public function do_apf_read_me_changelog() {		// do_ + page slug + _ + tab slug
 		echo $this->arrWPReadMe['sections']['changelog'];
-	}
-	public function style_read_me( $strStyle ) {	// style_ + page slug
-		return $strStyle 
-			. "
-			.wrap .admin-page-framework-container h2 {
-				font-size: 18px;
-				line-height: 24px;				
-			}
-			.wrap p, .wrap ul, .wrap pre { 
-				margin-left: 2em;
-			}
-			pre {				
-				border: 1px solid #ededed;
-				margin: 24px 2em;
-				margin: 1.714285714rem 2em;
-				padding: 24px;
-				padding: 1.714285714rem;				
-				overflow-x: auto; 
-			}
-			pre code {
-				color: #666;
-				font-family: Consolas, Monaco, Lucida Console, monospace;
-				line-height: 1.714285714;
-				overflow: auto;
-				background-color: transparent;
-			}	
-			";
 	}
 	
 }
@@ -898,7 +947,7 @@ class APF_PostType extends AdminPageFramework_PostType {
 	 * Extensible methods
 	 */
 	public function setColumnHeader( $arrColumnHeader ) {
-		$this->arrColumnHeaders = array(
+		$arrColumnHeaders = array(
 			'cb'			=> '<input type="checkbox" />',	// Checkbox for bulk actions. 
 			'title'			=> __( 'Title', 'admin-page-framework' ),		// Post title. Includes "edit", "quick edit", "trash" and "view" links. If $mode (set from $_REQUEST['mode']) is 'excerpt', a post excerpt is included between the title and links.
 			'author'		=> __( 'Author', 'admin-page-framework' ),		// Post author.
@@ -908,11 +957,11 @@ class APF_PostType extends AdminPageFramework_PostType {
 			'date'			=> __( 'Date', 'admin-page-framework' ), 	// The date and publish status of the post. 
 			'samplecolumn'			=> __( 'Sample Column' ),
 		);		
-		return array_merge( $arrColumnHeader, $this->arrColumnHeaders );
+		return array_merge( $arrColumnHeader, $arrColumnHeaders );
 	}
-	public function setSortableColumns( $arrColumns ) {
-		return array_merge( $arrColumns, $this->arrColumnSortable );		
-	}	
+	// public function setSortableColumns( $arrColumns ) {
+		// return array_merge( $arrColumns, $this->oProp->arrColumnSortable );		
+	// }	
 	
 	/*
 	 * Callback methods
@@ -952,7 +1001,7 @@ new APF_PostType(
 		'has_archive' => true,
 		'show_admin_column' => true,
 	)		
-);	// should not use "if ( is_admin() )" for the this class because posts of custom post type can be accessed from the regular pages.
+);	// should not use "if ( is_admin() )" for the this class because posts of custom post type can be accessed from the front-end pages.
 	
 	
 
@@ -966,20 +1015,34 @@ class APF_MetaBox extends AdminPageFramework_MetaBox {
 	
 	public function setUp() {
 		
+		$this->addHelpText( 
+			__( 'This text will appear in the contextual help pane.', 'admin-page-framework-demo' ), 
+			__( 'This description goes to the sidebar of the help pane.', 'admin-page-framework-demo' )
+		);
+		
 		$this->addSettingFields(
 			array(
 				'strFieldID'		=> 'sample_metabox_text_field',
 				'strTitle'			=> 'Text Input',
 				'strDescription'	=> 'The description for the field.',
 				'strType'			=> 'text',
+				'strHelp'			=> 'This is help text.',
+				'strHelpAside'		=> 'This is additional help text which goes to the side bar of the help pane.',
 			),
 			array(
 				'strFieldID'		=> 'sample_metabox_textarea_field',
 				'strTitle'			=> 'Textarea',
 				'strDescription'	=> 'The description for the field.',
+				'strHelp'			=> __( 'This a <em>text area</em> input field, which is larger than the <em>text</em> input field.', 'admin-page-framework-demo' ),
 				'strType'			=> 'textarea',
 				'vDefault'			=> 'This is a default text.',
 			),
+			array(	// Rich Text Editor
+				'strFieldID' 		=> 'sample_rich_textarea',
+				'strTitle' 			=> 'Rich Text Editor',
+				'strType' 			=> 'textarea',
+				'vRich' 			=> true,	// array( 'media_buttons' => false )  <-- a setting array can be passed. For the specification of the array, see http://codex.wordpress.org/Function_Reference/wp_editor
+			),				
 			array(
 				'strFieldID'		=> 'checkbox_field',
 				'strTitle'			=> 'Checkbox Input',
@@ -1068,7 +1131,13 @@ class APF_MetaBox extends AdminPageFramework_MetaBox {
 					'length' => array( 'size' => 100, 'unit' => 'mm' ),
 					'capacity' => array( 'size' => 30, 'unit' => 'mb' ),
 				),				
-			),					
+			),		
+			array (
+				'strFieldID'		=> 'taxonomy_checklist',
+				'strTitle'			=> __( 'Taxonomy Checklist', 'admin-page-framework-demo' ),
+				'strType'			=> 'taxonomy',
+				'vTaxonomySlug' => get_taxonomies( '', 'names' ),
+			),				
 			array()
 		);		
 	}

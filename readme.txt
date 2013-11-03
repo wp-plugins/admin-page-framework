@@ -1,9 +1,9 @@
 === Admin Page Framework ===
 Contributors: Michael Uno, miunosoft
 Donate link: http://michaeluno.jp/en/donate
-Tags: admin, administration, administration panel, admin panel, admin pages, option page, option pages, option, options, setting, settings, Settings API, API, framework, library, class, classes, development tool, developers, developer tool, meta box, custom post type, utility, utilities
-Requires at least: 3.2
-Tested up to: 3.6
+Tags: admin, administration, administration panel, admin panel, admin page, admin pages, admin page framework, option page, option pages, option, options, setting, settings, Settings API, API, framework, library, class, classes, development tool, developers, developer tool, meta box, custom post type, utility, utilities
+Requires at least: 3.3
+Tested up to: 3.7.1
 Stable tag: 2.0.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -22,10 +22,13 @@ It provides plugin and theme developers with easier means of creating option pag
 * **Image Upload** - it lets the user easily upload images to the site or the user can choose from existent urls or already uploaded files.
 * **Date Picker** - it lets the user easily select dates.
 * **Color Picker** - it lets the user easily pick colors.
+* **Rich Text Editor** - supports the rich text editor form input.
+* **Reset Button** - create a reset button that lets your users to initialize the saved options.
 * **Settings API Implemented** - it uses the [WordPress Settings API](http://codex.wordpress.org/Settings_API) for creating the form so the standard option design will be employed.
 * **Validation and Error Messages** - with the pre-defined validation callbacks, the user's submitting data can be verified as a part of using the Settings API. Furthermore, by setting the error array, you can display the error message to the user.
 * **Custom Post Types** - the framework provides methods to create custom post types.
 * **Meta Boxes** - the framework provides methods to create custom meta boxes with form elements that you define.
+* **Contextual Help Tabs** - the contextual help pane can be easily added. 
 
 = Supported Field Types =
 * Text 
@@ -142,17 +145,84 @@ You are welcome to submit documentation. Please follow the [Documentation Guidli
 
 In addition, your tutorials and snippets for the framework can be listed in the manual. Let us know it [here](https://github.com/michaeluno/admin-page-framework/issues?direction=desc&labels=Documentation&page=1&sort=created&state=open).
 
-== Roadmap ==
-* Add the ability to set text in the screen help section.
+= What if other themes or plugins include a lesser version of this library than mine? =
+Let's say your plugin uses Admin Page Framework v2.1.0 and another plugin uses v2.0.0. If another plugin's library gets loaded earlier than yours, your library may not work property. 
 
-== Done ==
-* <s>Add: the date picker form field type.</s> Implemented in 2.0.0.
-* <s>Add: the color picker form field type.</s> Implemented in 2.0.0.
-* <s>Add: the ability to remove registered form elements.</s> Implemented in 2.0.0.
-* <s>Add: a custom input filed for category select checkboxes</s>. Implemented in 1.0.4.
-* <s>Add: the ability to specify a redirect page after the form data is successfully updated.</s> Implemented in 1.0.3.2.
+To work around it, rename all the class names used by the library in your library file. All the class name is prefixed with `AdminPageFramework` so change it to something like, for instance, `MyPlugin_AdminPageFramework`, then you are safe. 
+
+Most code editor supports "Replace All" functionality so just use that. By the time WordPress's minimum required PHP version becomes 3.3 or higher, we can use namespaces then this problem will be solved.
+
+== Other Notes ==
+
+= Tips =
+<h5>Use Unique Page Slug</h5>
+The framework internally uses the *add_submenu_page()* function to register sub menu pages. When the same page slug is registered for multiple root pages, only the last registered callback gets triggered. Other ones will be ignored.
+
+This means if you choose a very simple page slug such as <code>about</code> for your plugin/theme's information page and then if there is another plugin using same page slug, your user will have a problem loading the page.
+
+So just use a unique page slug. One way to do that is to add a prefix like <code>apf_about</code>. 
+
+<h5>Change Class Names</h5>
+When you include the library, change the class names that the library uses. This is because if there is a plugin that uses a lesser version of the library and it is loaded earlier than yours, your script may not work properly.
+
+All the class names have the prefix <code>AdminPageFramework_</code> so just change it to something like <code>MyPlugin_AdminPageFramework_</code>. 
+
+Most text editors supports the *Replace All* command so just use that. 
+
+
+= Roadmap =
+Check out [the issues](https://github.com/michaeluno/admin-page-framework/issues?labels=enhancement&page=1&state=open) on GitHub labelled *enhancement*.
 
 == Changelog ==
+
+= 2.1.2 - 11/3/2013 =
+* Added: the 'vRich' key to the `textarea` field type that enables rich text editor.
+* Added: the `vReset` key to the `submit` field type that performs resetting options. 
+* Added: class electors to the field elements.
+* Changed: ( *Breacking Change* ) the `field_description` class selector name to `admin-page-framework-fields-description`.
+* Changed: the *assets* folder name to *asset*.
+* Added: the `setDisallowedQueryKeys()` method that can define disallowed query keys to be embedded in the links of in-page tabs and page-heading tabs.
+* Fixed: a bug that the `settings-updated` query key string was embedded in the links of in-page tabs and page-heading tabs. 
+* Changed: the `showPageTitle()`, `showPageHeadingTabs()`, `showInPageTabs()`, `setInPageTabTag()`, and `setPageHeadingTabTag()` methods to be able to use after registering pages. That means it can be used in methods that are triggered after registering pages such as the `do_before_{page slug}` hook.
+* Changed: ( *Breacking Change* ) the key name of page property array `fPageHeadingTab` to `fShowPageHeadingTab`.
+* Added: the `setAdminNotice()` method which enables the user to add custom admin messages. 
+* Changed: the link class for custom post types to use a public property for the link title that appears in the plugin listing table so that the user can change the text.
+* Fixed: a bug that the link url automatically inserted in the plugin listing table was not correct when setting a custom root page slug.
+* Fixed: a bug that undefined index `typenow` warning occurred when a custom database query with the WP_Query class was performed in the edit.php admin page. 
+* Added: the `admin-page-framework-radio-label` and the `admin-page-framework-checkbox-label` class selectors for the elements enclosing radio and checkbox input labels and removed `display:inline-block` from the inline CSS rule of the elements.
+* Fixed: an undefined index warning to occur that appears when a non-existent parent tab slug is given to the `strParentTabSlug` in-page tab array element.
+* Added: the `getFieldValue()` method which retrieves the stored value in the option properties by specifying the field name. This is helpful when the section name is unknown.
+* Added: the `dumpArray()` method for the debug class.
+* Added: the `fHideTitleColumn` filed key for the meta box class's field array structure. This allows the user to disable the title column in the options table.
+* Added: the `addSettingSection()` method that only accepts one section array so that the user can use it in loops to pass multiple items. 
+* Added: the `addSettingField()` method that only accepts one field array so that the user can use it in loops to pass multiple items. 
+* Added: the `enqueueStyle()` method and the `enqueueScript()` method that enqueue script/style by page/tab slug.
+* Changed: the submit filed type with the `vRedirect` value not to be redirected when a field error array is set.
+* Fixed: a bug that hidden in-page tabs with the `fHide` value could not have associated callbacks such as `validation_{page slug}_{tab slug}`.
+* Changed: the `getParentTabSlug()` method to return an empty string if the parent slug has the fHide to be true.
+* Fixed: a bug that the redirect submit button did not work with a long page slug.
+* Added: the Other Notes section including tips in the demo plugin.
+* Added: the `setPageHeadingTabTag()` method that sets the page-heading tab's tag.
+* Added: the ability to set visibility of in-page tabs, page-heading tabs, and page title by page slug.
+
+= 2.1.1 - 10/08/2013 =
+* Added: the *for* attribute of the *label* tag for checklist input elements so that clicking on the label checks/unchecks the item.
+* Added: the *strWidth* and the *strHeight* field array keys for the *taxonomy* filed type.
+* Deprecated: the *numMaxWidth* and the *numMaxHeight* field array keys for the *taxonomy* field type.
+* Changed: the *taxonomy* field type to display the elements in a tabbed box.
+* Changed: the post type check list to display post types' labels instead of their slugs.
+* Changed: the *vDelimiter* elements to be inserted after the *vAfterInputTag* elements. 
+* Changed: the footer text links to have title attributes with script descriptions.
+* Removed: the script version number in the footer text link and moved it to be displayed in the title attribute.
+* Added: the *getCurrentAdminURL()* method.
+
+= 2.1.0 - 10/05/2013 =
+* Added: the *load_{extended class name}*, *load_{page slug}* and *load_{page slug}_{tab slug}* filters.
+* Fixed: a bug that saving options with a custom capability caused the Cheatin' Uh message.
+* Deprecated: ( ***Breaking Change*** ) the *setPageCapability()* method since it did not do anything.
+* Changed: ( ***Breaking Change*** ) the *AdminPageFramework_PostType* class properties and *AdminPageFramework_MetaBox* to be encapsulated into a class object each.
+* Added: the *strHelp* field key that adds a contextual help tab on the upper part of the admin page.
+* Fixed: the required WordPress version to 3.3 as some of the functionalities were relying on the screen object that has been implemented since WordPress 3.3.
 
 = 2.0.2 - 09/07/2013 =
 * Fixed: a bug in the demo plugin that custom taxonomies were not added.
