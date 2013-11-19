@@ -1,7 +1,7 @@
 === Admin Page Framework ===
 Contributors: Michael Uno, miunosoft
 Donate link: http://michaeluno.jp/en/donate
-Tags: admin, administration, administration panel, admin panel, admin page, admin pages, admin page framework, option page, option pages, option, options, setting, settings, Settings API, API, framework, library, class, classes, development tool, developers, developer tool, meta box, custom post type, utility, utilities
+Tags: admin, admin page framework, administration, administration panel, admin panel, admin page, admin pages, admin page framework, option page, option pages, option, options, setting, settings, Settings API, API, framework, library, class, classes, development tool, developers, developer tool, meta box, custom post type, utility, utilities
 Requires at least: 3.3
 Tested up to: 3.7.1
 Stable tag: 2.1.2
@@ -174,6 +174,17 @@ Most text editors supports the *Replace All* command so just use that.
 Check out [the issues](https://github.com/michaeluno/admin-page-framework/issues?labels=enhancement&page=1&state=open) on GitHub labelled *enhancement*.
 
 == Changelog ==
+
+= 2.1.3 = 
+* Added: the `screen_icon` key for the post type argument array that can set the screen icon of the post type pages.
+* Added: the `fAllowExternalSource` key for the `image` and `media` field types that enables to set external URLs via the media uploader. 
+* Added: the `media` field type.
+* Added: the `arrCaptureAttributes` key to save additional attributes of the image selected via the media uploader. 
+* Tweaked: the image fields' preview images to have the maximum width of 600px.
+* Added: the ability to select multiple image files for repeatable fields.
+* Added: the WordPress 3.5 uploader for the image field type.
+* Fixed: a bug that an image URL could not be inserted from the `From URL` tab of the image uploader.
+* Added: the `fRepeatable` key to the `text`,`textarea`, `image`, `date`, `color`, and `file` field types that make the fields to be repeatable.
 
 = 2.1.2 - 11/3/2013 =
 * Added: the 'vRich' key to the `textarea` field type that enables rich text editor.

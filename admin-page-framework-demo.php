@@ -5,7 +5,7 @@
 	Description: Demonstrates the features of the Admin Page Framework class.
 	Author: Michael Uno
 	Author URI: http://michaeluno.jp
-	Version: 2.1.2
+	Version: 2.1.3
 	Requirements: PHP 5.2.4 or above, WordPress 3.3 or above.
 */ 
 
@@ -77,8 +77,8 @@ class APF_Demo extends AdminPageFramework {
 			),					
 			array(
 				'strPageSlug'	=> 'first_page',
-				'strTabSlug'	=> 'color_and_images',
-				'strTitle'		=> __( 'Color and Images', 'admin-page-framework-demo' ),
+				'strTabSlug'	=> 'files',
+				'strTitle'		=> __( 'Files', 'admin-page-framework-demo' ),
 			),
 			array(
 				'strPageSlug'	=> 'first_page',
@@ -219,15 +219,22 @@ class APF_Demo extends AdminPageFramework {
 			array(
 				'strSectionID'		=> 'image_select',
 				'strPageSlug'		=> 'first_page',
-				'strTabSlug'		=> 'color_and_images',
+				'strTabSlug'		=> 'files',
 				'strTitle'			=> 'Image Selector',
 				'strDescription'	=> 'Set an image url with jQuwey based image selector.',
 			),
 			array(
 				'strSectionID'		=> 'color_picker',
 				'strPageSlug'		=> 'first_page',
-				'strTabSlug'		=> 'color_and_images',
+				'strTabSlug'		=> 'misc',
 				'strTitle'			=> __( 'Colors', 'admin-page-framework-demo' ),
+			),
+			array(
+				'strSectionID'		=> 'media_upload',
+				'strPageSlug'		=> 'first_page',
+				'strTabSlug'		=> 'files',
+				'strTitle'			=> __( 'Media Uploader', 'admin-page-framework-demo' ),
+				'strDescription'	=> __( 'Upload binary files in addition to images.', 'admin-page-framework-demo' ),
 			),
 			array(
 				'strSectionID'		=> 'checklists',
@@ -241,7 +248,7 @@ class APF_Demo extends AdminPageFramework {
 				'strPageSlug'		=> 'first_page',
 				'strTabSlug'		=> 'misc',
 				'strTitle'			=> __( 'Date Pickers', 'admin-page-framework' ),
-				'strDescription'	=> __( 'These are date pickers.', 'admin-page-framework' ),
+				'strDescription'	=> __( 'These are date pickers.', 'admin-page-framework-demo' ),
 			),				
 			array(
 				'strSectionID'		=> 'hidden_field',
@@ -251,25 +258,25 @@ class APF_Demo extends AdminPageFramework {
 				'strDescription'	=> 'These are hidden fields.',
 			),								
 			array(
-				'strSectionID'		=> 'files',
+				'strSectionID'		=> 'file_uploads',
 				'strPageSlug'		=> 'first_page',
-				'strTabSlug'		=> 'misc',
-				'strTitle'			=> 'File Uploads',
-				'strDescription'	=> 'These are upload fields.',
+				'strTabSlug'		=> 'files',
+				'strTitle'			=> __( 'File Uploads', 'admin-page-framework-demo' ),
+				'strDescription'	=> __( 'These are upload fields. Check the $_FILES variable in the validation callback method that indicates the temporary location of the uploaded files.', 'admin-page-framework-demo' ),
 			),			
 			array(
 				'strSectionID'		=> 'submit_buttons',
 				'strPageSlug'		=> 'first_page',
 				'strTabSlug'		=> 'misc',
-				'strTitle'			=> 'Submit Buttons',
-				'strDescription'	=> 'These are custom submit buttons.',
+				'strTitle'			=> __( 'Submit Buttons', 'admin-page-framework-demo' ),
+				'strDescription'	=> __( 'These are custom submit buttons.', 'admin-page-framework-demo' ),
 			),			
 			array(
 				'strSectionID'		=> 'verification',
 				'strPageSlug'		=> 'first_page',
 				'strTabSlug'		=> 'verification',
-				'strTitle'			=> 'Verify Submitted Data',
-				'strDescription'	=> 'Show error messages when the user submits improper option value.',
+				'strTitle'			=> __( 'Verify Submitted Data', 'admin-page-framework-demo' ),
+				'strDescription'	=> __( 'Show error messages when the user submits improper option value.', 'admin-page-framework-demo' ),
 			),			
 			array(
 				'strSectionID'		=> 'submit_buttons_manage',
@@ -315,14 +322,22 @@ class APF_Demo extends AdminPageFramework {
 				'vDefault' => 123456,
 				'vSize' => 40,
 			),	
+			array(	// Password Field
+				'strFieldID' => 'password',
+				'strSectionID' => 'text_fields',
+				'strTitle' => 'Password',
+				'strTip' => 'This input will be masked.',
+				'strType' => 'password',
+				'strHelp' => __( 'This is a password type field; the user\'s entered input will be masked.', 'admin-page-framework-demo' ),	//'
+				'vSize' => 20,
+			),			
 			array(	// Multiple text fields
 				'strFieldID' => 'text_multiple',
 				'strSectionID' => 'text_fields',
-				'strTitle' => 'Multiple Text Fields',
+				'strTitle' => __( 'Multiple Text Fields', 'admin-page-framework-demo' ),
 				'strDescription' => 'These are multiple text fields.',	// additional notes besides the form field
 				'strHelp' => __( 'Multiple text fields can be passed by setting an array to the vLabel key.', 'admin-page-framework-demo' ),
 				'strType' => 'text',
-				'numOrder' => 2,
 				'vDefault' => array(
 					'Hello World',
 					'Foo bar',
@@ -338,26 +353,37 @@ class APF_Demo extends AdminPageFramework {
 					60,
 					90,
 				),
-			),			
-			array(	// Password Field
-				'strFieldID' => 'password',
+			),		
+			array(	// Repeatable text fields
+				'strFieldID' => 'text_repeatable',
 				'strSectionID' => 'text_fields',
-				'strTitle' => 'Password',
-				'strTip' => 'This input will be masked.',
-				'strType' => 'password',
-				'strHelp' => __( 'This is a password type field; the user\'s entered input will be masked.', 'admin-page-framework-demo' ),	//'
-				'vSize' => 20,
-			),
+				'strTitle' => __( 'Repeatable Text Fields', 'admin-page-framework-demo' ),
+				'strDescription' => __( 'Press + / - to add / remove the fields.', 'admin-page-framework-demo' ),
+				'strType' => 'text',
+				'vDelimiter' => '',
+				'vSize' => 80,
+				'fRepeatable' => true,
+				'vDefault' => array( 'a', 'b', 'c', ),
+			),				
 			array(	// Text Area
 				'strFieldID' => 'textarea',
 				'strSectionID' => 'text_fields',
-				'strTitle' => 'Single Text Area',
-				'strDescription' => 'Type a text string here.',
+				'strTitle' => __( 'Single Text Area', 'admin-page-framework-demo' ),
+				'strDescription' => __( 'Type a text string here.', 'admin-page-framework-demo' ),
 				'strType' => 'textarea',
 				'vDefault' => 'Hello World! This is set as the default string.',
 				'vRows' => 6,
 				'vCols' => 80,
 			),
+			array(	// Repeatable Text Areas
+				'strFieldID' => 'textarea_repeatable',
+				'strSectionID' => 'text_fields',
+				'strTitle' => __( 'Repeatable Text Areas', 'admin-page-framework-demo' ),
+				'strType' => 'textarea',
+				'fRepeatable' => true,
+				'vDelimiter' => '',
+				'vRows' => 3,
+			),			
 			array(	// Rich Text Editors
 				'strFieldID' => 'rich_textarea',
 				'strSectionID' => 'text_fields',
@@ -469,6 +495,7 @@ class APF_Demo extends AdminPageFramework {
 					4,
 					8,
 				),
+				'vDelimiter' => '<br />',
 			),			
 			array(	// Single Checkbox
 				'strFieldID' => 'checkbox',
@@ -536,23 +563,70 @@ class APF_Demo extends AdminPageFramework {
 			array( // Image Selector
 				'strFieldID' => 'image_select_field',
 				'strSectionID' => 'image_select',
-				'strTitle' => 'Select an Image',
+				'strTitle' => __( 'Select an Image', 'admin-page-framework-demo' ),
 				'strType' => 'image',
 				'vLabel' => array( 'First Image', 'Second Image', 'Third Image' ),
 				'vDefault' => array( admin_url( 'images/wordpress-logo-2x.png' ) ), 
-			),				
-			array( // Color Picker
-				'strFieldID' => 'color_picker_field',
-				'strSectionID' => 'color_picker',
-				'strTitle' => __( 'Color Picker', 'admin-page-framework-demo' ),
-				'strType' => 'color',
+				'fAllowExternalSource' => false,
+			),		
+			array( // Image selector with additional attributes
+				'strFieldID' => 'image_with_attributes',
+				'strSectionID' => 'image_select',
+				'strTitle' => __( 'Save Image Attributes', 'admin-page-framework-demo' ),
+				'strType' => 'image',
+				'vDelimiter' => '',
+				'arrCaptureAttributes' => array( 'alt', 'id', 'title', 'caption', 'width', 'height', 'align', 'link' ),	// some attributes cannot be captured with external URLs and the old media uploader.
 			),					
-			array( // Multiple Color Pickers
-				'strFieldID' => 'multiple_color_picker_field',
-				'strSectionID' => 'color_picker',
-				'strTitle' => __( 'Multiple Color Pickers', 'admin-page-framework-demo' ),
-				'strType' => 'color',
-				'vLabel' => array( 'First Color', 'Second Color', 'Third Color' ),
+			array(	// Repeatable Image Fields
+				'strFieldID' => 'image_select_field_repeater',
+				'strSectionID' => 'image_select',
+				'strTitle' => __( 'Repeatable Image Fields', 'admin-page-framework-demo' ),
+				'vDelimiter' => '',
+				'fRepeatable' => true,
+				'strType' => 'image',
+			),
+			array( // Media File
+				'strFieldID' => 'media_field',
+				'strSectionID' => 'media_upload',
+				'strTitle' => __( 'Media File', 'admin-page-framework-demo' ),
+				'strType' => 'media',
+				'fAllowExternalSource' => false,
+			),	
+			array( // Media File with Attributes
+				'strFieldID' => 'media_with_attributes',
+				'strSectionID' => 'media_upload',
+				'strTitle' => __( 'Media File with Attributes', 'admin-page-framework-demo' ),
+				'strType' => 'media',
+				'arrCaptureAttributes' => array( 'id', 'caption', 'description' ),
+			),				
+			array( // Media Files
+				'strFieldID' => 'media_fields',
+				'strSectionID' => 'media_upload',
+				'strTitle' => __( 'Multiple Media Files', 'admin-page-framework-demo' ),
+				'strType' => 'media',
+				'fRepeatable' => true,
+			),				
+			array( // Single File Upload Field
+				'strFieldID' => 'file_single',
+				'strSectionID' => 'file_uploads',
+				'strTitle' => __( 'Single File Upload', 'admin-page-framework-demo' ),
+				'strType' => 'file',
+				'vLabel' => 'Select the file:',
+			),					
+			array( // Multiple File Upload Fields
+				'strFieldID' => 'file_multiple',
+				'strSectionID' => 'file_uploads',
+				'strTitle' => __( 'Multiple File Uploads', 'admin-page-framework-demo' ),
+				'strType' => 'file',
+				'vLabel' => array( 'Fist File:', 'Second File:', 'Third File:' ),
+				'vDelimiter' => '<br />',
+			),	
+			array( // Single File Upload Field
+				'strFieldID' => 'file_repeatable',
+				'strSectionID' => 'file_uploads',
+				'strTitle' => __( 'Repeatable File Uploads', 'admin-page-framework-demo' ),
+				'strType' => 'file',
+				'fRepeatable' => true,
 			),				
 			array(
 				'strFieldID' => 'post_type_checklist',
@@ -575,7 +649,27 @@ class APF_Demo extends AdminPageFramework {
 				'strType' => 'taxonomy',
 				'strHeight' => '200px',
 				'vTaxonomySlug' => get_taxonomies( '', 'names' ),
-			),			
+			),	
+			array( // Color Picker
+				'strFieldID' => 'color_picker_field',
+				'strSectionID' => 'color_picker',
+				'strTitle' => __( 'Color Picker', 'admin-page-framework-demo' ),
+				'strType' => 'color',
+			),					
+			array( // Multiple Color Pickers
+				'strFieldID' => 'multiple_color_picker_field',
+				'strSectionID' => 'color_picker',
+				'strTitle' => __( 'Multiple Color Pickers', 'admin-page-framework-demo' ),
+				'strType' => 'color',
+				'vLabel' => array( 'First Color', 'Second Color', 'Third Color' ),
+			),				
+			array( // Repeatable Color Pickers
+				'strFieldID' => 'color_picker_repeatable_field',
+				'strSectionID' => 'color_picker',
+				'strTitle' => __( 'Repeatable Color Picker Fields', 'admin-page-framework-demo' ),
+				'strType' => 'color',
+				'fRepeatable' => true,
+			),								
 			array(	// Single date picker
 				'strFieldID' => 'date',
 				'strSectionID' => 'date_pickers',
@@ -597,7 +691,15 @@ class APF_Demo extends AdminPageFramework {
 					'end'	=> __( 'End Date: ', 'amin-page-framework-demo' ),
 				),
 				'vDelimiter' => '&nbsp;&nbsp;&nbsp;&nbsp;',
-			),					
+			),	
+			array(	// Repeatable date picker fields
+				'strFieldID' => 'date_repeatable',
+				'strSectionID' => 'date_pickers',
+				'strTitle' => __( 'Repeatable Date Pickers', 'admin-page-framework-demo' ),
+				'strType' => 'date',
+				'fRepeatable' => true,
+				'vDateFormat' => 'yy/mm/dd',	// yy/mm/dd is the default format.
+			),		
 			array( // Single Hidden Field
 				'strFieldID' => 'hidden_single',
 				'strSectionID' => 'hidden_field',
@@ -613,22 +715,7 @@ class APF_Demo extends AdminPageFramework {
 				'strType' => 'hidden',
 				'vDefault' => array( 'a', 'b', 'c' ),
 				'vLabel' => array( 'Hidden Field 1', 'Hidden Field 2', 'Hidden Field 3' ),
-			),			
-			array( // Single File Upload Field
-				'strFieldID' => 'file_single',
-				'strSectionID' => 'files',
-				'strTitle' => 'Single File Upload',
-				'strType' => 'file',
-				'vLabel' => 'Select the file:',
-			),					
-			array( // Multiple File Upload Fields
-				'strFieldID' => 'file_multiple',
-				'strSectionID' => 'files',
-				'strTitle' => 'Multiple File Uploads',
-				'strType' => 'file',
-				'vLabel' => array( 'Fist File:', 'Second File:', 'Third File:' ),
-				'vDelimiter' => '<br />',
-			),			
+			),							
 			array( // Multiple File Upload Fields
 				'strFieldID' => 'verify_text_field',
 				'strSectionID' => 'verification',
@@ -794,12 +881,6 @@ class APF_Demo extends AdminPageFramework {
 	/*
 	 * Validation Callbacks
 	 * */
-public function validation_first_page_textfields( $arrInput, $arrOldInput ) {
-
-$this->oDebug->logArray( $arrInput );
-return $arrInput;
-		
-}
 	public function validation_first_page_verification( $arrInput, $arrOldPageOptions ) {	// valication_ + page slug + _ + tab slug
 				
 		// Set a flag.
@@ -834,14 +915,17 @@ return $arrInput;
 		return $arrInput;
 		
 	}
-	public function validation_first_page_misc( $arrInput, $arrOldPageOptions ) {	// validation_ + page slug + _ + tab slug
+	public function validation_first_page_files( $arrInput, $arrOldPageOptions ) {	// validation_ + page slug + _ + tab slug
 
 		// Display the uploaded file information.
 		$arrFileErrors = array();
-		$arrFileErrors[] = $_FILES[ $this->oProps->strOptionKey ]['error']['first_page']['files']['file_single'];
-		$arrFileErrors[] = $_FILES[ $this->oProps->strOptionKey ]['error']['first_page']['files']['file_multiple'][0];
-		$arrFileErrors[] = $_FILES[ $this->oProps->strOptionKey ]['error']['first_page']['files']['file_multiple'][1];
-		$arrFileErrors[] = $_FILES[ $this->oProps->strOptionKey ]['error']['first_page']['files']['file_multiple'][2];
+		$arrFileErrors[] = $_FILES[ $this->oProps->strOptionKey ]['error']['first_page']['file_uploads']['file_single'];
+		$arrFileErrors[] = $_FILES[ $this->oProps->strOptionKey ]['error']['first_page']['file_uploads']['file_multiple'][0];
+		$arrFileErrors[] = $_FILES[ $this->oProps->strOptionKey ]['error']['first_page']['file_uploads']['file_multiple'][1];
+		$arrFileErrors[] = $_FILES[ $this->oProps->strOptionKey ]['error']['first_page']['file_uploads']['file_multiple'][2];
+		foreach( $_FILES[ $this->oProps->strOptionKey ]['error']['first_page']['file_uploads']['file_repeatable'] as $arrFile )
+			$arrFileErrors[] = $arrFile;
+			
 		if ( in_array( 0, $arrFileErrors ) ) 
 			$this->setSettingNotice( '<h3>File(s) Uploaded</h3>' . $this->oDebug->getArray( $_FILES ), 'updated' );
 		
@@ -997,9 +1081,10 @@ new APF_PostType(
 		// 'supports' => array( 'title', 'editor', 'comments', 'thumbnail' ),	// 'custom-fields'
 		'supports' => array( 'title' ),
 		'taxonomies' => array( '' ),
-		'menu_icon' => null,
 		'has_archive' => true,
-		'show_admin_column' => true,
+		'show_admin_column' => true,	// ( framework specific key ) this is for custom taxonomies to automatically add the column in the listing table.
+		'menu_icon' => plugins_url( 'asset/image/wp-logo_16x16.png', __FILE__ ),
+		'screen_icon' => plugins_url( 'asset/image/wp-logo_32x32.png', __FILE__ ), // ( framework specific key ) this sets the screen icon for the post type.
 	)		
 );	// should not use "if ( is_admin() )" for the this class because posts of custom post type can be accessed from the front-end pages.
 	
@@ -1035,6 +1120,7 @@ class APF_MetaBox extends AdminPageFramework_MetaBox {
 				'strDescription'	=> 'The description for the field.',
 				'strHelp'			=> __( 'This a <em>text area</em> input field, which is larger than the <em>text</em> input field.', 'admin-page-framework-demo' ),
 				'strType'			=> 'textarea',
+				'vCols'				=> 60,
 				'vDefault'			=> 'This is a default text.',
 			),
 			array(	// Rich Text Editor
