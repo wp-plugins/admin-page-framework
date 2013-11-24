@@ -40,13 +40,14 @@ It provides plugin and theme developers with easier means of creating option pag
 * Buttons
 * Hidden Fields 
 * File Upload 
+* Media	(WordPress Media Library File Uploader)
 * Image Upload (Custom Text Field)
 * Color Picker (Custom Text Field)
 * Date Picker (Custom Text Field)
 * Option Export and Import (Custom File Upload and Submit Button)
 * Post Types (Custom Checkboxes)
 * Taxonomies (Custom Checkboxes)
-* Size ( Custom Text and Select Fields )
+* Size (Custom Text and Select Fields)
 
 = Necessary Files =
 * **`admin-page-framework.php`** is in the *class* folder.
@@ -150,19 +151,19 @@ Let's say your plugin uses Admin Page Framework v2.1.0 and another plugin uses v
 
 To work around it, rename all the class names used by the library in your library file. All the class name is prefixed with `AdminPageFramework` so change it to something like, for instance, `MyPlugin_AdminPageFramework`, then you are safe. 
 
-Most code editor supports "Replace All" functionality so just use that. By the time WordPress's minimum required PHP version becomes 3.3 or higher, we can use namespaces then this problem will be solved.
+Most code editor supports the *"Replace All"* functionality so just use that. By the time WordPress's minimum required PHP version becomes 5.3 or higher, we can use namespaces then this problem will be solved.
 
 == Other Notes ==
 
 = Tips =
-<h5>Use Unique Page Slug</h5>
+<h5><strong>Use Unique Page Slug</strong></h5>
 The framework internally uses the *add_submenu_page()* function to register sub menu pages. When the same page slug is registered for multiple root pages, only the last registered callback gets triggered. Other ones will be ignored.
 
 This means if you choose a very simple page slug such as <code>about</code> for your plugin/theme's information page and then if there is another plugin using same page slug, your user will have a problem loading the page.
 
 So just use a unique page slug. One way to do that is to add a prefix like <code>apf_about</code>. 
 
-<h5>Change Class Names</h5>
+<h5><strong>Change Class Names</strong></h5>
 When you include the library, change the class names that the library uses. This is because if there is a plugin that uses a lesser version of the library and it is loaded earlier than yours, your script may not work properly.
 
 All the class names have the prefix <code>AdminPageFramework_</code> so just change it to something like <code>MyPlugin_AdminPageFramework_</code>. 
@@ -175,7 +176,17 @@ Check out [the issues](https://github.com/michaeluno/admin-page-framework/issues
 
 == Changelog ==
 
-= 2.1.3 = 
+= 2.1.4 - 11/24/2013 =
+* Changed: the output of each field to have enclosing `fieldset` tag to be compatible with WordPress v3.8.
+* Changed: ( *Minor Breaking Change* ) the default value of all the `vDelimiter` key to be an empty string as some input types' default values were `<br />`.
+* Changed: ( *Minor Breaking Change* ) the structure of input field elements to enclose input elements in the `label` tag to make it compatible with the WordPress v3.8 admin style. Accordingly, those who are using the `vBeforeInputTag` and the `vAfterinputTag` keys should make sure that block elements are not passed to those outputs.
+* Fixed: a bug that enqueuing multiple scripts/styles with the `enqueueStyle()`/`enqueueScript()` method did not take effect.
+* Changed: some menu item labels in the demo plugin.
+* Added: sample pages that demonstrate the use of hidden pages with the `fShowInMenu` key in the demo plugin.
+* Added: the `fShowInMenu` key for the sub-menu page array which will add the ability to hide the page from the sidebar menu.
+
+= 2.1.3 - 11/19/2013 = 
+* Fixed: a bug that the style of the Iris color picker had a conflict with the date picker. 
 * Added: the `screen_icon` key for the post type argument array that can set the screen icon of the post type pages.
 * Added: the `fAllowExternalSource` key for the `image` and `media` field types that enables to set external URLs via the media uploader. 
 * Added: the `media` field type.
@@ -190,7 +201,7 @@ Check out [the issues](https://github.com/michaeluno/admin-page-framework/issues
 * Added: the 'vRich' key to the `textarea` field type that enables rich text editor.
 * Added: the `vReset` key to the `submit` field type that performs resetting options. 
 * Added: class electors to the field elements.
-* Changed: ( *Breacking Change* ) the `field_description` class selector name to `admin-page-framework-fields-description`.
+* Changed: ( *Minor Breacking Change* ) the `field_description` class selector name to `admin-page-framework-fields-description`.
 * Changed: the *assets* folder name to *asset*.
 * Added: the `setDisallowedQueryKeys()` method that can define disallowed query keys to be embedded in the links of in-page tabs and page-heading tabs.
 * Fixed: a bug that the `settings-updated` query key string was embedded in the links of in-page tabs and page-heading tabs. 
@@ -204,11 +215,11 @@ Check out [the issues](https://github.com/michaeluno/admin-page-framework/issues
 * Fixed: an undefined index warning to occur that appears when a non-existent parent tab slug is given to the `strParentTabSlug` in-page tab array element.
 * Added: the `getFieldValue()` method which retrieves the stored value in the option properties by specifying the field name. This is helpful when the section name is unknown.
 * Added: the `dumpArray()` method for the debug class.
-* Added: the `fHideTitleColumn` filed key for the meta box class's field array structure. This allows the user to disable the title column in the options table.
+* Added: the `fHideTitleColumn` field key for the meta box class's field array structure. This allows the user to disable the title column in the options table.
 * Added: the `addSettingSection()` method that only accepts one section array so that the user can use it in loops to pass multiple items. 
 * Added: the `addSettingField()` method that only accepts one field array so that the user can use it in loops to pass multiple items. 
 * Added: the `enqueueStyle()` method and the `enqueueScript()` method that enqueue script/style by page/tab slug.
-* Changed: the submit filed type with the `vRedirect` value not to be redirected when a field error array is set.
+* Changed: the submit field type with the `vRedirect` value not to be redirected when a field error array is set.
 * Fixed: a bug that hidden in-page tabs with the `fHide` value could not have associated callbacks such as `validation_{page slug}_{tab slug}`.
 * Changed: the `getParentTabSlug()` method to return an empty string if the parent slug has the fHide to be true.
 * Fixed: a bug that the redirect submit button did not work with a long page slug.
@@ -218,7 +229,7 @@ Check out [the issues](https://github.com/michaeluno/admin-page-framework/issues
 
 = 2.1.1 - 10/08/2013 =
 * Added: the *for* attribute of the *label* tag for checklist input elements so that clicking on the label checks/unchecks the item.
-* Added: the *strWidth* and the *strHeight* field array keys for the *taxonomy* filed type.
+* Added: the *strWidth* and the *strHeight* field array keys for the *taxonomy* field type.
 * Deprecated: the *numMaxWidth* and the *numMaxHeight* field array keys for the *taxonomy* field type.
 * Changed: the *taxonomy* field type to display the elements in a tabbed box.
 * Changed: the post type check list to display post types' labels instead of their slugs.
@@ -352,7 +363,7 @@ Check out [the issues](https://github.com/michaeluno/admin-page-framework/issues
 * Added: the *AddSettingsError()* and the *ShowSettingsErrors()* methods to be alternated with the settings_errors() and the add_settings_error() functions to prevent multiple duplicate messages to be displayed.
 * Added: the ability to automatically insert anchor links to each section and field of form elements.
 * Added: the *readonly* field key for text and textarea input fields that inserts the readonly attribute to the input tag.
-* Added: the *pre_field* and *post_field* filed keys that adds HTML code right before/after the input element.
+* Added: the *pre_field* and *post_field* field keys that adds HTML code right before/after the input element.
 * Fixed: a minor bug in the method that merges arrays that did not merge correctly with keys with a null value.
 
 = 1.0.2.3 - 03/17/2013 =

@@ -5,7 +5,7 @@
 	Description: Demonstrates the features of the Admin Page Framework class.
 	Author: Michael Uno
 	Author URI: http://michaeluno.jp
-	Version: 2.1.3
+	Version: 2.1.4
 	Requirements: PHP 5.2.4 or above, WordPress 3.3 or above.
 */ 
 
@@ -38,7 +38,7 @@ class APF_Demo extends AdminPageFramework {
 				'numOrder' => 1,
 			),
 			array(
-				'strPageTitle' => 'Manage Options',
+				'strPageTitle' => __( 'Manage Options', 'admin-page-framework-demo' ),
 				'strPageSlug' => 'second_page',
 				'strScreenIcon' => 'link-manager',
 				/*	Screen Types:
@@ -48,6 +48,17 @@ class APF_Demo extends AdminPageFramework {
 				*/				
 				'numOrder' => 2,
 			),
+			array(
+				'strPageTitle' => __( 'Sample Page', 'admin-page-framework-demo' ),
+				'strPageSlug' => 'apf_sample_page',
+				'strScreenIcon' => 'index',
+			),					
+			array(
+				'strPageTitle' => __( 'Hidden Page', 'admin-page-framework-demo' ),
+				'strPageSlug' => 'apf_hidden_page',
+				'strScreenIcon' => 'index',
+				'fShowInMenu' => false,
+			),						
 			array(
 				'strPageTitle' => __( 'Read Me', 'admin-page-framework-demo' ),
 				'strPageSlug' => 'apf_read_me',
@@ -262,7 +273,7 @@ class APF_Demo extends AdminPageFramework {
 				'strPageSlug'		=> 'first_page',
 				'strTabSlug'		=> 'files',
 				'strTitle'			=> __( 'File Uploads', 'admin-page-framework-demo' ),
-				'strDescription'	=> __( 'These are upload fields. Check the $_FILES variable in the validation callback method that indicates the temporary location of the uploaded files.', 'admin-page-framework-demo' ),
+				'strDescription'	=> __( 'These are upload fields. Check the <code>$_FILES</code> variable in the validation callback method that indicates the temporary location of the uploaded files.', 'admin-page-framework-demo' ),
 			),			
 			array(
 				'strSectionID'		=> 'submit_buttons',
@@ -349,10 +360,11 @@ class APF_Demo extends AdminPageFramework {
 					'Third Item: ' 
 				),
 				'vSize' => array(
-					30,
+					20,
+					40,
 					60,
-					90,
 				),
+				'vDelimiter' => '<br />',
 			),		
 			array(	// Repeatable text fields
 				'strFieldID' => 'text_repeatable',
@@ -361,7 +373,7 @@ class APF_Demo extends AdminPageFramework {
 				'strDescription' => __( 'Press + / - to add / remove the fields.', 'admin-page-framework-demo' ),
 				'strType' => 'text',
 				'vDelimiter' => '',
-				'vSize' => 80,
+				'vSize' => 60,
 				'fRepeatable' => true,
 				'vDefault' => array( 'a', 'b', 'c', ),
 			),				
@@ -373,7 +385,7 @@ class APF_Demo extends AdminPageFramework {
 				'strType' => 'textarea',
 				'vDefault' => 'Hello World! This is set as the default string.',
 				'vRows' => 6,
-				'vCols' => 80,
+				'vCols' => 60,
 			),
 			array(	// Repeatable Text Areas
 				'strFieldID' => 'textarea_repeatable',
@@ -383,6 +395,7 @@ class APF_Demo extends AdminPageFramework {
 				'fRepeatable' => true,
 				'vDelimiter' => '',
 				'vRows' => 3,
+				'vCols' => 60,
 			),			
 			array(	// Rich Text Editors
 				'strFieldID' => 'rich_textarea',
@@ -420,10 +433,11 @@ class APF_Demo extends AdminPageFramework {
 					2,
 				),
 				'vCols' => array(
-					90,
 					60,
-					30,
+					40,
+					20,
 				),
+				'vDelimiter' => '<br />',
 			),
 			array(	// Single Drop-down List
 				'strFieldID' => 'select',
@@ -458,6 +472,11 @@ class APF_Demo extends AdminPageFramework {
 					array( 'dark', 'light' ),
 					array( 'river', 'mountain', 'sky', ),
 					array( 'Monday', 'Tuesday', 'Wednessday', 'Thursday', 'Friday', 'Saturday', 'Sunday' ),
+				),
+				'vSize' => array(
+					1,
+					1,
+					5,
 				),
 				'vDefault' => array(
 					1,
@@ -558,7 +577,8 @@ class APF_Demo extends AdminPageFramework {
 					'weight' => array( 'size' => 15, 'unit' => 'g' ),
 					'length' => array( 'size' => 100, 'unit' => 'mm' ),
 					'capacity' => array( 'size' => 30, 'unit' => 'mb' ),
-				),					
+				),		
+				'vDelimiter' => '<br />',
 			),			
 			array( // Image Selector
 				'strFieldID' => 'image_select_field',
@@ -662,6 +682,7 @@ class APF_Demo extends AdminPageFramework {
 				'strTitle' => __( 'Multiple Color Pickers', 'admin-page-framework-demo' ),
 				'strType' => 'color',
 				'vLabel' => array( 'First Color', 'Second Color', 'Third Color' ),
+				'vDelimiter' => '<br />',
 			),				
 			array( // Repeatable Color Pickers
 				'strFieldID' => 'color_picker_repeatable_field',
@@ -683,14 +704,10 @@ class APF_Demo extends AdminPageFramework {
 				'strTitle' => __( 'Dates', 'admin-page-framework-demo' ),
 				'strType' => 'date',
 				'vLabel' => array( 
-					'start' => '', 
-					'end' => '' 
-				),	// indicates two elements.
-				'vBeforeInputTag' => array(
-					'start'	=> __( 'Start Date: ', 'amin-page-framework-demo' ),
-					'end'	=> __( 'End Date: ', 'amin-page-framework-demo' ),
+					'start' => __( 'Start Date: ', 'amin-page-framework-demo' ), 
+					'end' => __( 'End Date: ', 'amin-page-framework-demo' ), 
 				),
-				'vDelimiter' => '&nbsp;&nbsp;&nbsp;&nbsp;',
+				'vDelimiter' => '<br />',
 			),	
 			array(	// Repeatable date picker fields
 				'strFieldID' => 'date_repeatable',
@@ -703,7 +720,7 @@ class APF_Demo extends AdminPageFramework {
 			array( // Single Hidden Field
 				'strFieldID' => 'hidden_single',
 				'strSectionID' => 'hidden_field',
-				'strTitle' => 'Single Hidden Field',
+				'strTitle' => __( 'Single Hidden Field', 'admin-page-framework-demo' ),
 				'strType' => 'hidden',
 				'vDefault' => 'test value',
 				'vLabel' => 'Test label.',
@@ -861,6 +878,24 @@ class APF_Demo extends AdminPageFramework {
 	}
 	
 	/*
+	 * The sample page and the hidden page
+	 */
+	public function do_apf_sample_page() {
+		
+		echo "<p>" . __( 'This is a sample page that has a link to a hidden page created by the framework.', 'admin-page-framework-demo' ) . "</p>";
+		$strLinkToHiddenPage = $this->oUtil->getQueryAdminURL( array( 'page' => 'apf_hidden_page' ) );
+		echo "<a href='{$strLinkToHiddenPage}'>" . __( 'Go to Hidden Page', 'admin-page-framework-demo' ). "</a>";
+	
+	}
+	public function do_apf_hidden_page() {
+		
+		echo "<p>" . __( 'This is a hidden page', 'admin-page-framework-demo' ) . "</p>";
+		$strLinkToGoBack = $this->oUtil->getQueryAdminURL( array( 'page' => 'apf_sample_page' ) );
+		echo "<a href='{$strLinkToGoBack}'>" . __( 'Go Back', 'admin-page-framework-demo' ). "</a>";
+		
+	}
+	
+	/*
 	 * Import and Export Callbacks
 	 * */
 	public function export_format_second_page_export_import( $strFormatType, $strFieldID ) {	// import_format_ + page slug + _ + tab slug
@@ -988,10 +1023,10 @@ class APF_PostType extends AdminPageFramework_PostType {
 		$this->setAutoSave( false );
 		$this->setAuthorTableFilter( true );
 		$this->addTaxonomy( 
-			'sample_taxonomy', // taxonomy slug
+			'apf_sample_taxonomy', // taxonomy slug
 			array(			// argument - for the argument array keys, refer to : http://codex.wordpress.org/Function_Reference/register_taxonomy#Arguments
 				'labels' => array(
-					'name' => 'Genre',
+					'name' => 'Sample Genre',
 					'add_new_item' => 'Add New Genre',
 					'new_item_name' => "New Genre"
 				),
@@ -1001,11 +1036,11 @@ class APF_PostType extends AdminPageFramework_PostType {
 				'show_admin_column' => true,
 				'show_in_nav_menus' => true,
 				'show_table_filter' => true,	// framework specific key
-				'show_in_sidebar_menus' => false,	// framework specific key
+				'show_in_sidebar_menus' => true,	// framework specific key
 			)
 		);
 		$this->addTaxonomy( 
-			'second_taxonomy', 
+			'apf_second_taxonomy', 
 			array(
 				'labels' => array(
 					'name' => 'Non Hierarchical',
@@ -1063,6 +1098,7 @@ new APF_PostType(
 	array(			// argument - for the array structure, refer to http://codex.wordpress.org/Function_Reference/register_post_type#Arguments
 		'labels' => array(
 			'name' => 'Admin Page Framework',
+			'all_items' => __( 'Sample Posts', 'admin-page-framework-demo' ),
 			'singular_name' => 'Admin Page Framework',
 			'add_new' => 'Add New',
 			'add_new_item' => 'Add New APF Post',
