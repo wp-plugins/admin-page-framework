@@ -1,7 +1,7 @@
 === Admin Page Framework ===
 Contributors: Michael Uno, miunosoft
 Donate link: http://michaeluno.jp/en/donate
-Tags: admin, admin page framework, administration, administration panel, admin panel, admin page, admin pages, admin page framework, option page, option pages, option, options, setting, settings, Settings API, API, framework, library, class, classes, development tool, developers, developer tool, meta box, custom post type, utility, utilities
+Tags: admin, administration, administration panel, admin panel, admin page, admin pages, admin page framework, option page, option pages, option, options, options framework, setting, settings, Settings API, API, framework, library, class, classes, development tool, developers, developer tool, meta box, custom post type, utility, utilities
 Requires at least: 3.3
 Tested up to: 3.7.1
 Stable tag: 2.1.4
@@ -29,6 +29,7 @@ It provides plugin and theme developers with easier means of creating option pag
 * **Custom Post Types** - the framework provides methods to create custom post types.
 * **Meta Boxes** - the framework provides methods to create custom meta boxes with form elements that you define.
 * **Contextual Help Tabs** - the contextual help pane can be easily added. 
+* **Custom Field Types** - your own field type can be registered. 
 
 = Supported Field Types =
 * Text 
@@ -61,10 +62,13 @@ Visit [Admin Page Framework Documentation](http://admin-page-framework.michaelun
 == Screenshots ==
 1. **Text Fields**
 2. **Selector and Checkboxes**
-3. **Image and Upload and Color Picker**
-4. **Form Verification**
+3. **Image, Media, and File Upload**
+4. **Form Input Verification**
 5. **Import and Export**
 6. **Taxonomy and Post Type Checklists**
+7. **Color and Date Pickers and Buttons**
+8. **Custom Post Type and Meta Box**
+9. **Contextual Help Pane**
 
 == Installation ==
 
@@ -166,7 +170,7 @@ So just use a unique page slug. One way to do that is to add a prefix like <code
 <h5><strong>Change Class Names</strong></h5>
 When you include the library, change the class names that the library uses. This is because if there is a plugin that uses a lesser version of the library and it is loaded earlier than yours, your script may not work properly.
 
-All the class names have the prefix <code>AdminPageFramework_</code> so just change it to something like <code>MyPlugin_AdminPageFramework_</code>. 
+All the class names have the prefix <code>AdminPageFramework</code> so just change it to something like <code>MyPlugin_AdminPageFramework</code>. 
 
 Most text editors supports the *Replace All* command so just use that. 
 
@@ -175,6 +179,26 @@ Most text editors supports the *Replace All* command so just use that.
 Check out [the issues](https://github.com/michaeluno/admin-page-framework/issues?labels=enhancement&page=1&state=open) on GitHub labelled *enhancement*.
 
 == Changelog ==
+
+= 2.1.5 - 12/08/2013 =
+* Changed: ( *Minor Breaking Change* ) the format of the `id` and `for` attributes of the input and label tags of the `taxonomy` field type.
+* Fixed: a bug that caused a name collisions with the `for` attribute of label tags in the `taxonomy` field type.
+* Added: the `field_{extended class name}_{field id}` and `section_{extended class name}_{section id}` filters. 
+* Added: the `export_{extended class name}_{field id}`, `export_{extended class name}_{input id}` filters.
+* Added: the `import_{extended class name}_{field id}`, `import_{extended class name}_{input id}` filters.
+* Added: an example to retrieve the saved options from the front end in the demo plugin.
+* Added: the ability for the `enqueueScript()` and `enqueueStyle()` methods to accept absolute file paths.
+* Introduced: a new class `AdminPageFramework_CustomFieldType`.
+* Added: a sample custom field type, `geometry`, in the demo plugin.
+* Fixed: a bug that the `enqueueScripts()` method caused infinite loops.
+* Added: the `field_types_{extended class name}` filter that receives the field type defining array so that the user can return custom field types by adding a definition array to it.
+* Added: the `vClassAttributeUpload` key for the `import` field type that defines the class attribute of the custom file input tag in the field output.
+* Added: the `vUnitSize` key for the `size` field type that indicates the `size` attribute of the select(unit) input field.</li>
+* Added: the `vMerge` key for the `import` field type that determines whether the imported data should be merged with the existing options.
+* Changed: admin settings notifications with `setSettingNotice()` not to have multiple messages with the same id.
+* Added: the `validation_{extended class name}_{field id}` and the `validation_{extended class name}_{input id}` filters. 
+* Fixed: a bug in the demo plugin that the `size` fields were not displayed properly.
+* Fixed: a bug that menu positions could not be set with the `setRootMenuPage()` method.
 
 = 2.1.4 - 11/24/2013 =
 * Changed: the output of each field to have enclosing `fieldset` tag to be compatible with WordPress v3.8.

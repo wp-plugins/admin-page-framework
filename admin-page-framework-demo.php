@@ -5,13 +5,13 @@
 	Description: Demonstrates the features of the Admin Page Framework class.
 	Author: Michael Uno
 	Author URI: http://michaeluno.jp
-	Version: 2.1.4
+	Version: 2.1.5
 	Requirements: PHP 5.2.4 or above, WordPress 3.3 or above.
 */ 
 
 if ( ! class_exists( 'AdminPageFramework' ) )
     include_once( dirname( __FILE__ ) . '/class/admin-page-framework.php' );
-    
+	
 class APF_Demo extends AdminPageFramework {
 
     public function setUp() {
@@ -106,6 +106,11 @@ class APF_Demo extends AdminPageFramework {
 				'strTabSlug'	=> 'verification',
 				'strTitle'		=> 'Verification',	
 			),	
+			array(
+				'strPageSlug'	=> 'first_page',
+				'strTabSlug'	=> 'custom',
+				'strTitle'		=> __( 'Custom', 'admin-page-framework-demo' ),	
+			),			
 			/*
 			 * Second Page
 			 * */
@@ -288,7 +293,18 @@ class APF_Demo extends AdminPageFramework {
 				'strTabSlug'		=> 'verification',
 				'strTitle'			=> __( 'Verify Submitted Data', 'admin-page-framework-demo' ),
 				'strDescription'	=> __( 'Show error messages when the user submits improper option value.', 'admin-page-framework-demo' ),
-			),			
+			),		
+			array(
+				'strSectionID'		=> 'geometry',
+				'strPageSlug'		=> 'first_page',
+				'strTabSlug'		=> 'custom',
+				'strTitle'			=> __( 'Geometry', 'admin-page-framework-demo' ),
+				'strDescription'	=> __( 'This is a custom field type defined externally.', 'admin-page-framework-demo' ),
+			),					
+			array()
+		);
+		
+		$this->addSettingSections(	
 			array(
 				'strSectionID'		=> 'submit_buttons_manage',
 				'strPageSlug'		=> 'second_page',
@@ -342,6 +358,12 @@ class APF_Demo extends AdminPageFramework {
 				'strHelp' => __( 'This is a password type field; the user\'s entered input will be masked.', 'admin-page-framework-demo' ),	//'
 				'vSize' => 20,
 			),			
+			array(	// number Field
+				'strFieldID' => 'number',
+				'strSectionID' => 'text_fields',
+				'strTitle' => __( 'Number', 'admin-page-framework-demo' ),
+				'strType' => 'number',
+			),					
 			array(	// Multiple text fields
 				'strFieldID' => 'text_multiple',
 				'strSectionID' => 'text_fields',
@@ -438,7 +460,9 @@ class APF_Demo extends AdminPageFramework {
 					20,
 				),
 				'vDelimiter' => '<br />',
-			),
+			)
+		);
+		$this->addSettingFields(
 			array(	// Single Drop-down List
 				'strFieldID' => 'select',
 				'strSectionID' => 'selectors',
@@ -579,7 +603,9 @@ class APF_Demo extends AdminPageFramework {
 					'capacity' => array( 'size' => 30, 'unit' => 'mb' ),
 				),		
 				'vDelimiter' => '<br />',
-			),			
+			)
+		);
+		$this->addSettingFields(			
 			array( // Image Selector
 				'strFieldID' => 'image_select_field',
 				'strSectionID' => 'image_select',
@@ -647,7 +673,9 @@ class APF_Demo extends AdminPageFramework {
 				'strTitle' => __( 'Repeatable File Uploads', 'admin-page-framework-demo' ),
 				'strType' => 'file',
 				'fRepeatable' => true,
-			),				
+			)
+		);
+		$this->addSettingFields(			
 			array(
 				'strFieldID' => 'post_type_checklist',
 				'strSectionID' => 'checklists',
@@ -669,7 +697,9 @@ class APF_Demo extends AdminPageFramework {
 				'strType' => 'taxonomy',
 				'strHeight' => '200px',
 				'vTaxonomySlug' => get_taxonomies( '', 'names' ),
-			),	
+			)
+		);
+		$this->addSettingFields(			
 			array( // Color Picker
 				'strFieldID' => 'color_picker_field',
 				'strSectionID' => 'color_picker',
@@ -733,13 +763,6 @@ class APF_Demo extends AdminPageFramework {
 				'vDefault' => array( 'a', 'b', 'c' ),
 				'vLabel' => array( 'Hidden Field 1', 'Hidden Field 2', 'Hidden Field 3' ),
 			),							
-			array( // Multiple File Upload Fields
-				'strFieldID' => 'verify_text_field',
-				'strSectionID' => 'verification',
-				'strTitle' => 'Verify Text Input',
-				'strType' => 'text',
-				'strDescription' => 'Enter a non numeric value here.',
-			),						
 			array( // Submit button as a link
 				'strFieldID' => 'submit_button_link',
 				'strSectionID' => 'submit_buttons',
@@ -769,7 +792,37 @@ class APF_Demo extends AdminPageFramework {
 				'vLabel' => __( 'Reset', 'admin-page-framework-demo' ),
 				'vReset' => true,
 				// 'vClassAttribute' => 'button button-secondary',
-			),			
+			)
+		);
+		$this->addSettingFields(			
+			array(
+				'strFieldID' => 'verify_text_field',
+				'strSectionID' => 'verification',
+				'strTitle' => __( 'Verify Text Input', 'admin-page-framework-demo' ),
+				'strType' => 'text',
+				'strDescription' => __( 'Enter a non numeric value here.', 'admin-page-framework-demo' ),
+			),
+			array(
+				'strFieldID' => 'verify_text_field_submit',	// this submit field ID can be used in a validation callback method
+				'strSectionID' => 'verification',
+				'strType' => 'submit',		
+				'vLabel' => __( 'Verify', 'admin-page-framework-demo' ),
+			)
+		);	
+		$this->addSettingFields(			
+			array(
+				'strFieldID' => 'geometrical_coordinates',
+				'strSectionID' => 'geometry',
+				'strTitle' => __( 'Geometrical Coordinates', 'admin-page-framework-demo' ),
+				'strType' => 'geometry',
+				'strDescription' => __( 'Get the coordinates from the map.', 'admin-page-framework-demo' ),
+				'vDefault' => array(
+					'latitude' => 20,
+					'longitude' => 20,
+				),
+			)
+		);
+		$this->addSettingFields(			
 			array( // Delete Option Button
 				'strFieldID' => 'submit_manage',
 				'strSectionID' => 'submit_buttons_manage',
@@ -800,7 +853,7 @@ class APF_Demo extends AdminPageFramework {
 			array(	// Single Export Button
 				'strFieldID' => 'export_single',
 				'strSectionID' => 'exports',
-				'strTitle' => 'Single Export Button',
+				// 'strTitle' => 'Single Export Button',
 				'strType' => 'export',
 				'strDescription' => __( 'Download the saved option data.', 'admin-page-framework-demo' ),
 				'vLabel' => 'Export Options',
@@ -851,7 +904,6 @@ class APF_Demo extends AdminPageFramework {
 			"<a href='http://www.wordpress.org'>WordPress</a>"
 		);
 		
-		
     }
 		
 	/*
@@ -898,7 +950,7 @@ class APF_Demo extends AdminPageFramework {
 	/*
 	 * Import and Export Callbacks
 	 * */
-	public function export_format_second_page_export_import( $strFormatType, $strFieldID ) {	// import_format_ + page slug + _ + tab slug
+	public function export_format_APF_Demo_export_single( $strFormatType, $strFieldID ) {	// export_format_ + {extended class name} + _ + {field id}
 		
 		return isset( $_POST[ $this->oProps->strOptionKey ]['second_page']['exports']['export_format_type'] ) 
 			? $_POST[ $this->oProps->strOptionKey ]['second_page']['exports']['export_format_type']
@@ -912,12 +964,23 @@ class APF_Demo extends AdminPageFramework {
 			: $strFormatType;
 		
 	}
+	public function import_APF_Demo_import_single( $vData, $arrOldOptions, $strFieldID, $strInputID, $strImportFormat, $strOptionKey ) {	// import_ + {extended class name} + _ + {field id}
+
+		if ( $strImportFormat == 'text' ) {
+			$this->setSettingNotice( __( 'The text import type is not supported.', 'admin-page-framework-demo' ) );
+			return $arrOldOptions;
+		}
+		
+		$this->setSettingNotice( __( 'Importing options are validated.', 'admin-page-framework-demo' ), 'updated' );
+		return $vData;
+		
+	}
 	
 	/*
 	 * Validation Callbacks
 	 * */
-	public function validation_first_page_verification( $arrInput, $arrOldPageOptions ) {	// valication_ + page slug + _ + tab slug
-				
+	public function validation_APF_Demo_verify_text_field_submit( $arrNewInput, $arrOldOptions ) {	// validation_ + {extended class name} + _ + {field ID}
+		
 		// Set a flag.
 		$fVerified = true;
 		
@@ -927,12 +990,12 @@ class APF_Demo extends AdminPageFramework {
 		// The library class will search for this transient when it renders the form fields 
 		// and if it is found, it will display the error message set in the field array. 
 		$arrErrors = array();
-		
+
 		// Check if the submitted value meets your criteria. As an example, here a numeric value is expected.
-		if ( isset( $arrInput['first_page']['verification']['verify_text_field'] ) && ! is_numeric( $arrInput['first_page']['verification']['verify_text_field'] ) ) {
+		if ( ! is_numeric( $arrNewInput['first_page']['verification']['verify_text_field'] ) ) {
 			
 			// Start with the section key in $arrErrors, not the key of page slug.
-			$arrErrors['verification']['verify_text_field'] = 'The value must be numeric: ' . $arrInput['first_page']['verification']['verify_text_field'];	
+			$arrErrors['verification']['verify_text_field'] = 'The value must be numeric: ' . $arrNewInput['first_page']['verification']['verify_text_field'];	
 			$fVerified = false;
 			
 		}
@@ -943,11 +1006,11 @@ class APF_Demo extends AdminPageFramework {
 			// Set the error array for the input fields.
 			$this->setFieldErrors( $arrErrors );		
 			$this->setSettingNotice( 'There was an error in your input.' );
-			return $arrOldPageOptions;
+			return $arrOldOptions;
 			
 		}
 				
-		return $arrInput;
+		return $arrNewInput;		
 		
 	}
 	public function validation_first_page_files( $arrInput, $arrOldPageOptions ) {	// validation_ + page slug + _ + tab slug
@@ -990,7 +1053,7 @@ class APF_Demo extends AdminPageFramework {
 	}
 	public function do_apf_read_me_description() {		// do_ + page slug + _ + tab slug
 		echo $this->arrWPReadMe['sections']['description'];
-// var_dump( $this->arrWPReadMe );
+		// var_dump( $this->arrWPReadMe );
 	}
 	public function do_apf_read_me_installation() {		// do_ + page slug + _ + tab slug
 		// echo htmlspecialchars( $this->arrWPReadMe['sections']['installation'], ENT_QUOTES, bloginfo( 'charset' ) );
@@ -1009,9 +1072,29 @@ class APF_Demo extends AdminPageFramework {
 		echo $this->arrWPReadMe['sections']['changelog'];
 	}
 	
+	/*
+	 * Custom field type - this method gets fired when the framework tries to define field types.
+	 */
+	public function field_types_APF_Demo( $arrFieldTypeDefinitions ) {	// field_types_ + {extended class name}
+				
+		// 1. Include the file that defines the custom field type. 
+		// This class should extend the predefined abstract class that the library prepares already with necessary methods.
+		if ( ! class_exists( 'GeometryCustomFieldType' ) )
+			include_once( dirname( __FILE__ ) . '/third-party/geometry-custom-field-type/GeometryCustomFieldType.php' );
+		
+		// 2. Instantiate the class - use the getDefinitionArray() method to get the field type definition array.
+		// And assign it to the filtering array with the key of the field type slug, in this case, geometry. 
+		$oGeometryField = new GeometryCustomFieldType( 'APF_Demo', 'geometry' );
+		$arrFieldTypeDefinitions['geometry'] = $oGeometryField->getDefinitionArray();
+		
+		// 3. Return the modified array.
+		return $arrFieldTypeDefinitions;
+		
+	}
+	
 }
-if ( is_admin() )
-	new APF_Demo;
+if ( is_admin() ) 
+	new APF_Demo;	// instantiate the main framework class
 
 	
 class APF_PostType extends AdminPageFramework_PostType {
@@ -1252,7 +1335,8 @@ class APF_MetaBox extends AdminPageFramework_MetaBox {
 					'weight' => array( 'size' => 15, 'unit' => 'g' ),
 					'length' => array( 'size' => 100, 'unit' => 'mm' ),
 					'capacity' => array( 'size' => 30, 'unit' => 'mb' ),
-				),				
+				),		
+				'vDelimiter' => '<br />',
 			),		
 			array (
 				'strFieldID'		=> 'taxonomy_checklist',
@@ -1266,13 +1350,24 @@ class APF_MetaBox extends AdminPageFramework_MetaBox {
 	
 	public function printMetaFieldValues( $strContent ) {
 		
-		if ( get_post_type() != 'apf_posts'  ) return $strContent;
-								
-		// get_post_meta( $post->ID ) will return an array of all the meta field values.
-		// or if you know the field id of the value you want, you can do
-		// $value = get_post_meta( $post->ID, $field_id, true );
-		return "<h3>Saved Meta Field Values</h3>" 
-			. $this->oDebug->getArray( get_post_meta( $GLOBALS['post']->ID ) );
+		if ( ! isset( $GLOBALS['post']->ID ) || get_post_type() != 'apf_posts' ) return $strContent;
+			
+		// 1. To retrieve the meta box data	- get_post_meta( $post->ID ) will return an array of all the meta field values.
+		// or if you know the field id of the value you want, you can do $value = get_post_meta( $post->ID, $field_id, true );
+		$intPostID = $GLOBALS['post']->ID;
+		$arrPostData = array();
+		foreach( ( array ) get_post_custom_keys( $intPostID ) as $strKey ) 	// This way, array will be unserialized; easier to view.
+			$arrPostData[ $strKey ] = get_post_meta( $intPostID, $strKey, true );
+		
+		// 2. To retrieve the saved options in the setting pages created by the framework - use the get_option() function.
+		// The key name is the class name by default. This can be changed by passing an arbitrary string 
+		// to the first parameter of the constructor of the AdminPageFramework class.		
+		$arrSavedOptions = get_option( 'APF_Demo' );
+			
+		return "<h3>" . __( 'Saved Meta Field Values', 'admin-page-framework-demo' ) . "</h3>" 
+			. $this->oDebug->getArray( $arrPostData )
+			. "<h3>" . __( 'Saved Setting Options', 'admin-page-framework-demo' ) . "</h3>" 
+			. $this->oDebug->getArray( $arrSavedOptions );
 
 	}
 	
