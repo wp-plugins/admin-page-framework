@@ -51,6 +51,7 @@ It provides plugin and theme developers with easier means of creating option pag
 
 = Custom Field Types = 
 You can include your own custom field types when they are necessary. This enables to keep the main library file to be minimum as possible. The sample custom field types are included in the demo plugin.
+
 * `geometry` - a location selector with the Google map.
 * `date`, `time`, `date_time` - date and time fields with the date picker.
 * `dial` - a dial input field.
