@@ -1,5 +1,10 @@
 # [Admin Page Framework](http://wordpress.org/plugins/admin-page-framework/) #
 
+### Welcome to our GitHub Repository
+
+Admin Page Framework is an open source library for WordPress developed under GPL v2, consisting of a set of PHP classes that provides theme and plugin developers with simpler means of creating administration pages of WordPress.
+
+## Screenshots ##
 [![Admin Page Framework - Text, Password, and Textarea](https://lh3.googleusercontent.com/-yOvkGL-66O8/UpGkdtWTAUI/AAAAAAAABak/rOXgreTXm-A/s600/admin_page_framework_v2.1.4.png)](https://lh3.googleusercontent.com/-yOvkGL-66O8/UpGkdtWTAUI/AAAAAAAABak/rOXgreTXm-A/s0/admin_page_framework_v2.1.4.png "Text, Password, and Textarea")
 
 [![Admin Page Framework - Selectors](https://lh4.googleusercontent.com/-P0RF0dGZFHo/UpGprGzqSKI/AAAAAAAABb0/_gSdd0hw8PU/s288/admin_page_framework_v2.1.4_selectors.png)](https://lh4.googleusercontent.com/-P0RF0dGZFHo/UpGprGzqSKI/AAAAAAAABb0/_gSdd0hw8PU/s0/admin_page_framework_v2.1.4_selectors.png "Selectors")
@@ -17,10 +22,6 @@
 [![Admin Page Framework - Contextual Help Pane](https://lh3.googleusercontent.com/-5JqO4RmvSHw/UpGpqNGZacI/AAAAAAAABbY/OlErWQXTmJg/s288/admin_page_framework_v2.1.4_help_pane.png)](https://lh3.googleusercontent.com/-5JqO4RmvSHw/UpGpqNGZacI/AAAAAAAABbY/OlErWQXTmJg/s0/admin_page_framework_v2.1.4_help_pane.png "Contextual Help Pane")
 
 [![Admin Page Framework - Custom Post Type and Meta Box](https://lh6.googleusercontent.com/-e15sSujnoL4/UpGpqWnbLII/AAAAAAAABbg/mSBYMf5e5t8/s288/admin_page_framework_v2.1.4_post_type_and_meta_box.png)](https://lh6.googleusercontent.com/-e15sSujnoL4/UpGpqWnbLII/AAAAAAAABbg/mSBYMf5e5t8/s0/admin_page_framework_v2.1.4_post_type_and_meta_box.png "Custom Post Type and Meta Box")
-
-### Welcome to our GitHub Repository
-
-Admin Page Framework is a set of PHP classes that provides theme and plugin developers with simpler means of creating administration pages of WordPress.
 
 ## Installation ##
 
@@ -43,3 +44,22 @@ There are various ways you can contribute:
 2. Send us a Pull Request with your bug fixes and/or new features.
 3. Provide feedback and suggestions on [enhancements](https://github.com/michaeluno/admin-page-framework/issues?direction=desc&labels=Enhancement&page=1&sort=created&state=open).
 4. Improve the [documentation](https://github.com/michaeluno/admin-page-framework/blob/master/documentation_guideline.md).
+
+## Copyright and License ##
+Released under the [GPL v2](license.txt) or later.
+Copyright © 2013 Michael Uno
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+

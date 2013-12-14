@@ -15,14 +15,14 @@
  * @remarks				To use the framework, 1. Extend the class 2. Override the setUp() method. 3. Use the hook functions.
  * @remarks				Requirements: WordPress 3.3 or above, PHP 5.2.4 or above.
  * @remarks				The documentation employs the <a href="http://en.wikipedia.org/wiki/PHPDoc">PHPDOc(DocBlock)</a> syntax.
- * @version				2.1.5
+ * @version				2.1.6
  */
 /*
 	Library Name: Admin Page Framework
 	Library URI: http://wordpress.org/extend/plugins/admin-page-framework/
 	Author:  Michael Uno
 	Author URI: http://michaeluno.jp
-	Version: 2.1.5
+	Version: 2.1.6
 	Requirements: WordPress 3.3 or above, PHP 5.2.4 or above.
 	Description: Provides simpler means of building administration pages for plugin and theme developers.
 */
@@ -331,6 +331,33 @@ abstract class AdminPageFramework_WPUtilities {
 		return $strHref;
 		
 	}	
+
+	/**
+	 * Resolves the given src.
+	 * 
+	 * Checks if the given string is a url, a relative path, or an absolute path and returns the url if it's not a relative path.
+	 * 
+	 * @since			2.1.5
+	 * @since			2.1.6			Moved from the AdminPageFramework_HeadTag_Base class. Added the $fReturnNullIfNotExist parameter.
+	 */
+	static public function resolveSRC( $strSRC, $fReturnNullIfNotExist=false ) {	
+		
+		// It is a url
+		if ( filter_var( $strSRC, FILTER_VALIDATE_URL ) )
+			return $strSRC;
+
+		// If the file exists, it means it is an absolute path. If so, calculate the URL from the path.
+		if ( file_exists( realpath( $strSRC ) ) )
+			return self::getSRCFromPath( $strSRC );
+		
+		if ( $fReturnNullIfNotExist )
+			return null;
+		
+		// Otherwise, let's assume the string is a relative path 'to the WordPress installed absolute path'.
+		return $strSRC;
+		
+	}	
+	
 }
 endif;
 
@@ -835,29 +862,7 @@ abstract class AdminPageFramework_HeadTag_Base {
 	/*
 	 * Shared methods
 	 */
-	
-	/**
-	 * Resolves the given src.
-	 * 
-	 * Checks if the given string is a url, a relative path, or absolute path.
-	 * 
-	 * @since			2.1.5
-	 */
-	protected function resolveSRC( $strSRC ) {	
 		
-		// It is a url
-		if ( filter_var( $strSRC, FILTER_VALIDATE_URL ) )
-			return $strSRC;
-
-		// If the file exists, it means it is an absolute path. If so, calculate the URL from the path.
-		if ( file_exists( realpath( $strSRC ) ) )
-			return $this->oUtil->getSRCFromPath( $strSRC );
-		
-		// Otherwise, let's assume the string is a relative path to the WordPress installed absolute path.
-		return $strSRC;
-		
-	}
-	
 	/**
 	 * Performs actual enqueuing items. 
 	 * 
@@ -1077,7 +1082,7 @@ class AdminPageFramework_HeadTag_Pages extends AdminPageFramework_HeadTag_Base {
 		if ( empty( $strSRC ) ) return '';
 		if ( isset( $this->oProps->arrEnqueuingScripts[ md5( $strSRC ) ] ) ) return '';	// if already set
 		
-		$strSRC = $this->resolveSRC( $strSRC );
+		$strSRC = $this->oUtil->resolveSRC( $strSRC );
 		
 		$strSRCHash = md5( $strSRC );	// setting the key based on the url prevents duplicate items
 		$this->oProps->arrEnqueuingStyles[ $strSRCHash ] = $this->oUtil->uniteArrays( 
@@ -1150,7 +1155,7 @@ class AdminPageFramework_HeadTag_Pages extends AdminPageFramework_HeadTag_Base {
 		if ( empty( $strSRC ) ) return '';
 		if ( isset( $this->oProps->arrEnqueuingScripts[ md5( $strSRC ) ] ) ) return '';	// if already set
 		
-		$strSRC = $this->resolveSRC( $strSRC );
+		$strSRC = $this->oUtil->resolveSRC( $strSRC );
 		
 		$strSRCHash = md5( $strSRC );	// setting the key based on the url prevents duplicate items
 		$this->oProps->arrEnqueuingScripts[ $strSRCHash ] = $this->oUtil->uniteArrays( 
@@ -1357,7 +1362,7 @@ class AdminPageFramework_HeadTag_MetaBox extends AdminPageFramework_HeadTag_Base
 		if ( empty( $strSRC ) ) return '';
 		if ( isset( $this->oProps->arrEnqueuingScripts[ md5( $strSRC ) ] ) ) return '';	// if already set
 		
-		$strSRC = $this->resolveSRC( $strSRC );
+		$strSRC = $this->oUtil->resolveSRC( $strSRC );
 		
 		$strSRCHash = md5( $strSRC );	// setting the key based on the url prevents duplicate items
 		$this->oProps->arrEnqueuingStyles[ $strSRCHash ] = $this->oUtil->uniteArrays( 
@@ -1417,7 +1422,7 @@ class AdminPageFramework_HeadTag_MetaBox extends AdminPageFramework_HeadTag_Base
 		if ( empty( $strSRC ) ) return '';
 		if ( isset( $this->oProps->arrEnqueuingScripts[ md5( $strSRC ) ] ) ) return '';	// if already set
 		
-		$strSRC = $this->resolveSRC( $strSRC );
+		$strSRC = $this->oUtil->resolveSRC( $strSRC );
 		
 		$strSRCHash = md5( $strSRC );	// setting the key based on the url prevents duplicate items
 		$this->oProps->arrEnqueuingScripts[ $strSRCHash ] = $this->oUtil->uniteArrays( 
@@ -2191,10 +2196,11 @@ abstract class AdminPageFramework_Menu extends AdminPageFramework_Pages {
 	 * );</code>
 	 * 
 	 * @since			2.0.0
+	 * @since			2.1.6			The $strURLIcon16x16 parameter accepts a file path.
 	 * @remark			Only one root page can be set per one class instance.
 	 * @param			string			$strRootMenuLabel			If the method cannot find the passed string from the following listed items, it will create a top level menu item with the passed string. ( case insensitive )
 	 * <blockquote>Dashboard, Posts, Media, Links, Pages, Comments, Appearance, Plugins, Users, Tools, Settings, Network Admin</blockquote>
-	 * @param			string			$strURLIcon16x16			( optional ) the URL of the menu icon. The size should be 16 by 16 in pixel.
+	 * @param			string			$strURLIcon16x16			( optional ) the URL or the file path of the menu icon. The size should be 16 by 16 in pixel.
 	 * @param			string			$intMenuPosition			( optional ) the position number that is passed to the <var>$position</var> parameter of the <a href="http://codex.wordpress.org/Function_Reference/add_menu_page">add_menu_page()</a> function.
 	 * @return			void
 	 */
@@ -2205,7 +2211,7 @@ abstract class AdminPageFramework_Menu extends AdminPageFramework_Pages {
 		$this->oProps->arrRootMenu = array(
 			'strTitle'			=> $strRootMenuLabel,
 			'strPageSlug' 		=> $strSlug ? $strSlug : $this->oProps->strClassName,	
-			'strURLIcon16x16'	=> filter_var( $strURLIcon16x16, FILTER_VALIDATE_URL) ? $strURLIcon16x16 : null,
+			'strURLIcon16x16'	=> $this->oUtil->resolveSRC( $strURLIcon16x16, true ),
 			'intPosition'		=> $intMenuPosition,
 			'fCreateRoot'		=> $strSlug ? false : true,
 		);	
@@ -2265,10 +2271,11 @@ abstract class AdminPageFramework_Menu extends AdminPageFramework_Pages {
 	 * 
 	 * @since			2.0.0
 	 * @since			2.1.2			The key name fPageHeadingTab was changed to fShowPageHeadingTab
+	 * @since			2.1.6			$strScreenIcon accepts a file path.
 	 * @remark			The sub menu page slug should be unique because add_submenu_page() can add one callback per page slug.
 	 * @param			string			$strPageTitle			The title of the page.
 	 * @param			string			$strPageSlug			The slug of the page.
-	 * @param			string			$strScreenIcon			( optional ) Either a screen icon ID or a url of the icon with the size of 32 by 32 in pixel. The accepted icon IDs are as follows.
+	 * @param			string			$strScreenIcon			( optional ) Either a screen icon ID, a url of the icon, or a file path to the icon, with the size of 32 by 32 in pixel. The accepted icon IDs are as follows.
 	 * <blockquote>edit, post, index, media, upload, link-manager, link, link-category, edit-pages, page, edit-comments, themes, plugins, users, profile, user-edit, tools, admin, options-general, ms-admin, generic</blockquote>
 	 * <strong>Note:</strong> the <em>generic</em> ID is available since WordPress 3.5.
 	 * @param			string			$strCapability			( optional ) The <a href="http://codex.wordpress.org/Roles_and_Capabilities">access level</a> to the page.
@@ -2288,7 +2295,7 @@ abstract class AdminPageFramework_Menu extends AdminPageFramework_Pages {
 			'strPageTitle'				=> $strPageTitle,
 			'strPageSlug'				=> $strPageSlug,
 			'strType'					=> 'page',	// this is used to compare with the link type.
-			'strURLIcon32x32'			=> filter_var( $strScreenIcon, FILTER_VALIDATE_URL) ? $strScreenIcon : null,
+			'strURLIcon32x32'			=> $this->oUtil->resolveSRC( $strScreenIcon, true ),
 			'strScreenIconID'			=> in_array( $strScreenIcon, self::$arrScreenIconIDs ) ? $strScreenIcon : null,
 			'strCapability'				=> isset( $strCapability ) ? $strCapability : $this->oProps->strCapability,
 			'numOrder'					=> is_numeric( $numOrder ) ? $numOrder : $intCount + 10,
@@ -2888,14 +2895,6 @@ abstract class AdminPageFramework_SettingsAPI extends AdminPageFramework_Menu {
 	* 			<li><strong>vMaxLength</strong> - ( optional, integer|array ) the number that indicates the <em>maxlength</em> attribute of the input field.</li>
 	* 			<li><strong>fRepeatable</strong> - [2.1.3+] ( optional, boolean|array ) whether the fields should be repeatable. If is true, the plus and the minus buttons appear next to each field that lets the user add/remove the fields.</li>
 	* 		</ul>
-	* 	<li><strong>date</strong> - a date picker input field. This is a custom text field with a JavaScript script.</li>
-	* 		<ul>
-	*			<li><strong>vReadOnly</strong> - ( optional, boolean|array ) if this is set to true, the <em>readonly</em> attribute will be inserted into the field input tag.</li>
-	* 			<li><strong>vSize</strong> - ( optional, integer|array ) the number that indicates the size of the input field.</li>
-	* 			<li><strong>vMaxLength</strong> - ( optional, integer|array ) the number that indicates the <em>maxlength</em> attribute of the input field.</li>
-	* 			<li><strong>vDateFormat</strong> - ( optional, string|array ) the date format. The syntax follows the one used <a href="http://api.jqueryui.com/datepicker/#utility-formatDate">here</a>.</li>
-	* 			<li><strong>fRepeatable</strong> - [2.1.3+] ( optional, boolean|array ) whether the fields should be repeatable. If is true, the plus and the minus buttons appear next to each field that lets the user add/remove the fields.</li>
-	* 		</ul>
 	* 	<li><strong>taxonomy</strong> - a taxonomy check list. This is a set of check boxes listing a specified taxonomy. This does not accept to create multiple fields by passing an array of labels.</li>
 	* 		<ul>
 	*			<li><strong>vTaxonomySlug</strong> - ( optional, string|array ) the taxonomy slug to list.</li>
@@ -3104,13 +3103,13 @@ abstract class AdminPageFramework_SettingsAPI extends AdminPageFramework_Menu {
 		
 		// Set up the field error array.
 		$arrErrors = array();
-		$arrErrors[ $strSectionID ][ $strFieldID ] = __( 'Are you sure you want to reset the options?', 'admin-page-framework' );
+		$arrErrors[ $strSectionID ][ $strFieldID ] = $this->oMsg->___( 'reset_options' );
 		$this->setFieldErrors( $arrErrors );
 		
 		// Set a flag that the confirmation is displayed
 		set_transient( md5( "reset_confirm_" . $strPressedFieldName ), $strPressedFieldName, 60*2 );
 		
-		$this->setSettingNotice( __( 'Please confirm if you want to perform the specified task.', 'admin-page-framework' ) );
+		$this->setSettingNotice( $this->oMsg->___( 'confirm_perform_task' ) );
 		
 		return $this->getPageOptions( $strPageSlug ); 			
 		
@@ -3125,15 +3124,15 @@ abstract class AdminPageFramework_SettingsAPI extends AdminPageFramework_Menu {
 		
 		if ( $strKeyToReset == 1 or $strKeyToReset === true ) {
 			delete_option( $this->oProps->strOptionKey );
-			$this->setSettingNotice( __( 'The options have been reset.', 'admin-page-framework' ) );
+			$this->setSettingNotice( $this->oMsg->___( 'option_been_reset' ) );
 			return array();
 		}
 		
 		unset( $this->oProps->arrOptions[ trim( $strKeyToReset ) ] );
 		unset( $arrInput[ trim( $strKeyToReset ) ] );
 		update_option( $this->oProps->strOptionKey, $this->oProps->arrOptions );
-		$this->setSettingNotice( __( 'The specified options have been deleted.', 'admin-page-framework' ) );
-		
+		$this->setSettingNotice( $this->oMsg->___( 'specified_option_been_deleted' ) );
+	
 		return $arrInput;	// the returned array will be saved with the Settings API.
 	}
 	
@@ -3426,7 +3425,7 @@ abstract class AdminPageFramework_SettingsAPI extends AdminPageFramework_Menu {
 			? $arrField['strType']
 			: 'default';	// the predefined reserved field type is applied if the parsing field type is not defined(not found).
 
-		$oField = new AdminPageFramework_InputField( $arrField, $this->oProps->arrOptions, $this->arrFieldErrors, $this->oProps->arrFieldTypeDefinitions[ $strFieldType ] );
+		$oField = new AdminPageFramework_InputField( $arrField, $this->oProps->arrOptions, $this->arrFieldErrors, $this->oProps->arrFieldTypeDefinitions[ $strFieldType ], $this->oMsg );
 		$strFieldOutput = $oField->getInputField( $strFieldType );	// field output
 		unset( $oField );	// release the object for PHP 5.2.x or below.
 
@@ -3583,11 +3582,11 @@ abstract class AdminPageFramework_SettingsAPI extends AdminPageFramework_Menu {
 				
 		// Define field types.
 		// This class adds filters for the field type definitions so that framework's default field types will be added.
-		new AdminPageFramework_InputFieldTypeDefinitions( $this->oProps->strClassName, $this->oMsg );		
+		new AdminPageFramework_BuiltinInputFieldTypeDefinitions( $this->oProps->arrFieldTypeDefinitions, $this->oProps->strClassName, $this->oMsg );
 		$this->oProps->arrFieldTypeDefinitions = $this->oUtil->addAndApplyFilter(		// Parameters: $oCallerObject, $strFilter, $vInput, $vArgs...
 			$this,
 			self::$arrPrefixesForCallbacks['field_types_'] . $this->oProps->strClassName,	// 'field_types_' . {extended class name}
-			array()
+			$this->oProps->arrFieldTypeDefinitions
 		);		
 		
 		// Register settings sections 
@@ -4100,21 +4099,21 @@ abstract class AdminPageFramework extends AdminPageFramework_SettingsAPI {
 	 * @param			string		$strOptionKey			( optional ) specifies the option key name to store in the options table. If this is not set, the extended class name will be used.
 	 * @param			string		$strCallerPath			( optional ) used to retrieve the plugin/theme details to auto-insert the information into the page footer.
 	 * @param			string		$strCapability			( optional ) sets the overall access level to the admin pages created by the framework. The used capabilities are listed here( http://codex.wordpress.org/Roles_and_Capabilities ). If not set, <strong>manage_options</strong> will be assigned by default. The capability can be set per page, tab, setting section, setting field.
-	 * @param			string		$strTextDomain			( optional ) the text domain( http://codex.wordpress.org/I18n_for_WordPress_Developers#Text_Domains ) used for the framework's text strings.
+	 * @param			string		$strTextDomain			( optional ) the text domain( http://codex.wordpress.org/I18n_for_WordPress_Developers#Text_Domains ) used for the framework's text strings. Default: admin-page-framework.
 	 * @remark			the scope is public because often <code>parent::__construct()</code> is used.
 	 * @return			void		returns nothing.
 	 */
-	public function __construct( $strOptionKey=null, $strCallerPath=null, $strCapability=null, $strTextDomain=null ){
+	public function __construct( $strOptionKey=null, $strCallerPath=null, $strCapability=null, $strTextDomain='admin-page-framework' ){
 				 
 		// Variables
 		$strClassName = get_class( $this );
 		
 		// Objects
 		$this->oProps = new AdminPageFramework_Properties( $this, $strClassName, $strOptionKey, $strCapability );
-		$this->oMsg = new AdminPageFramework_Messages( $strTextDomain );
+		$this->oMsg = AdminPageFramework_Messages::instantiate( $strTextDomain );
 		$this->oUtil = new AdminPageFramework_Utilities;
 		$this->oDebug = new AdminPageFramework_Debug;
-		$this->oLink = new AdminPageFramework_Link( $this->oProps, $strCallerPath );
+		$this->oLink = new AdminPageFramework_Link( $this->oProps, $strCallerPath, $this->oMsg );
 		$this->oHeadTag = new AdminPageFramework_HeadTag_Pages( $this->oProps );
 								
 		if ( is_admin() ) {
@@ -4638,41 +4637,107 @@ if ( ! class_exists( 'AdminPageFramework_Messages' ) ) :
  * Provides methods for text messages.
  *
  * @since			2.0.0
+ * @since			2.1.6			Multiple instances of this class are disallowed.
  * @extends			n/a
  * @package			Admin Page Framework
  * @subpackage		Admin Page Framework - Property
  */
 class AdminPageFramework_Messages {
 
-	// The user can modify this property directly.
-	public $arrMessages = array(
-		'option_updated'	=> 'The options have been updated.',
-		'option_cleared'	=> 'The options have been cleared.',
-		'export_options'	=> 'Export Options',
-		'import_options'	=> 'Import Options',
-		'submit'			=> 'Submit',
-		'import_error'		=> 'An error occurred while uploading the import file.',
-		'uploaded_file_type_not_supported'	=> 'The uploaded file type is not supported.',
-		'could_not_load_importing_data' => 'Could not load the importing data.',
-		'imported_data'		=> 'The uploaded file has been imported.',
-		'not_imported_data' => 'No data could be imported.',
-	);
+	/**
+	 * Stores the framework's messages.
+	 * 
+	 * @remark			The user can modify this property directly.
+	 */ 
+	public $arrMessages = array();
 
+	/**
+	 * 
+	 * 
+	 */
+	private static $oInstance;
+	
+	/**
+	 * Ensures that only one instance of this class object exists. ( no multiple instances of this object ) 
+	 * 
+	 * @since			2.1.6
+	 * @remark			This class should be instantiated via this method.
+	 */
+	public static function instantiate( $strTextDomain='admin-page-framework' ) {
+		
+		if ( ! isset( self::$oInstance ) && ! ( self::$oInstance instanceof AdminPageFramework_Messages ) ) 
+			self::$oInstance = new AdminPageFramework_Messages( $strTextDomain );
+		return self::$oInstance;
+		
+	}	
+	
 	public function __construct( $strTextDomain='admin-page-framework' ) {
+		
 		$this->strTextDomain = $strTextDomain;
+		$this->arrMessages = array(
+			
+			// AdminPageFramework
+			'option_updated'		=> __( 'The options have been updated.', 'admin-page-framework' ),
+			'option_cleared'		=> __( 'The options have been cleared.', 'admin-page-framework' ),
+			'export_options'		=> __( 'Export Options', 'admin-page-framework' ),
+			'import_options'		=> __( 'Import Options', 'admin-page-framework' ),
+			'submit'				=> __( 'Submit', 'admin-page-framework' ),
+			'import_error'			=> __( 'An error occurred while uploading the import file.', 'admin-page-framework' ),
+			'uploaded_file_type_not_supported'	=> __( 'The uploaded file type is not supported.', 'admin-page-framework' ),
+			'could_not_load_importing_data' => __( 'Could not load the importing data.', 'admin-page-framework' ),
+			'imported_data'			=> __( 'The uploaded file has been imported.', 'admin-page-framework' ),
+			'not_imported_data' 	=> __( 'No data could be imported.', 'admin-page-framework' ),
+			'add'					=> __( 'Add', 'admin-page-framework' ),
+			'remove'				=> __( 'Remove', 'admin-page-framework' ),
+			'upload_image'			=> __( 'Upload Image', 'admin-page-framework' ),
+			'use_this_image'		=> __( 'Use This Image', 'admin-page-framework' ),
+			'reset_options'			=> __( 'Are you sure you want to reset the options?', 'admin-page-framework' ),
+			'confirm_perform_task'	=> __( 'Please confirm if you want to perform the specified task.', 'admin-page-framework' ),
+			'option_been_reset'		=> __( 'The options have been reset.', 'admin-page-framework' ),
+			'specified_option_been_deleted'	=> __( 'The specified options have been deleted.', 'admin-page-framework' ),
+			
+			// AdminPageFramework_PostType
+			'title'			=> __( 'Title', 'admin-page-framework' ),	
+			'author'		=> __( 'Author', 'admin-page-framework' ),	
+			'categories'	=> __( 'Categories', 'admin-page-framework' ),
+			'tags'			=> __( 'Tags', 'admin-page-framework' ),
+			'comments' 		=> __( 'Comments', 'admin-page-framework' ),
+			'date'			=> __( 'Date', 'admin-page-framework' ), 
+			'show_all'		=> __( 'Show All', 'admin-page-framework' ),
+			
+			// For the meta box class
+			
+			// AdminPageFramework_LinkBase
+			'powered_by'	=> __( 'Powered by', 'admin-page-framework' ),
+			
+			// AdminPageFramework_Link
+			'settings'		=> __( 'Settings', 'admin-page-framework' ),
+			
+			// AdminPageFramework_LinkForPostType
+			'manage'		=> __( 'Manage', 'admin-page-framework' ),
+			
+			// AdminPageFramework_InputFieldTypeDefinition_Base
+			'select_image'			=> __( 'Select Image', 'admin-page-framework' ),
+			'upload_file'			=> __( 'Upload File', 'admin-page-framework' ),
+			'use_this_file'			=> __( 'Use This File', 'admin-page-framework' ),
+			'select_file'			=> __( 'Select File', 'admin-page-framework' ),
+			
+		);		
+		
 	}
 	public function ___( $strKey ) {
 		
 		return isset( $this->arrMessages[ $strKey ] )
 			? __( $this->arrMessages[ $strKey ], $this->strTextDomain )
 			: '';
-		
+			
 	}
+	
 	public function __e( $strKey ) {
 		
 		if ( isset( $this->arrMessages[ $strKey ] ) )
 			_e( $this->arrMessages[ $strKey ], $this->strTextDomain );
-		
+			
 	}
 	
 }
@@ -6022,7 +6087,7 @@ abstract class AdminPageFramework_LinkBase extends AdminPageFramework_Utilities 
 	 * @since			2.1.1
 	 */	
 	protected function setFooterInfoRight( $arrScriptInfo, &$strFooterInfoRight ) {
-
+	
 		$strDescription = empty( $arrScriptInfo['strDescription'] ) 
 			? ""
 			: "&#13;{$arrScriptInfo['strDescription']}";
@@ -6032,7 +6097,7 @@ abstract class AdminPageFramework_LinkBase extends AdminPageFramework_Utilities 
 		$strLibraryInfo = empty( $arrScriptInfo['strURI'] ) 
 			? $arrScriptInfo['strName'] 
 			: "<a href='{$arrScriptInfo['strURI']}' target='_blank' title='{$arrScriptInfo['strName']}{$strVersion}{$strDescription}'>{$arrScriptInfo['strName']}</a>";			
-		$strFooterInfoRight = __( 'Powered by', 'admin-page-framework' ) . '&nbsp;' 
+		$strFooterInfoRight = $this->oMsg->___( 'powered_by' ) . '&nbsp;' 
 			. $strLibraryInfo
 			. ", <a href='http://wordpress.org' target='_blank' title='WordPress {$GLOBALS['wp_version']}'>WordPress</a>";
 		
@@ -6061,7 +6126,7 @@ class AdminPageFramework_LinkForPostType extends AdminPageFramework_LinkBase {
 		'strRight' => '',
 	);
 	
-	public function __construct( $strPostTypeSlug, $strCallerPath=null ) {
+	public function __construct( $strPostTypeSlug, $strCallerPath=null, $oMsg=null ) {
 		
 		if ( ! is_admin() ) return;
 		
@@ -6070,7 +6135,9 @@ class AdminPageFramework_LinkForPostType extends AdminPageFramework_LinkBase {
 		$this->arrScriptInfo = $this->getCallerInfo( $this->strCallerPath ); 
 		$this->arrLibraryInfo = $this->getLibraryInfo();
 		
-		$this->strSettingPageLinkTitle = __( 'Manage', 'admin-page-framework' );
+		$this->oMsg = $oMsg;
+		
+		$this->strSettingPageLinkTitle = $this->oMsg->___( 'manage' );
 		
 		// Add script info into the footer 
 		add_filter( 'update_footer', array( $this, 'addInfoInFooterRight' ), 11 );
@@ -6170,7 +6237,7 @@ class AdminPageFramework_Link extends AdminPageFramework_LinkBase {
 	 */ 
 	private $oProps;
 	
-	public function __construct( &$oProps, $strCallerPath=null ) {
+	public function __construct( &$oProps, $strCallerPath=null, $oMsg=null ) {
 		
 		if ( ! is_admin() ) return;
 		
@@ -6178,6 +6245,7 @@ class AdminPageFramework_Link extends AdminPageFramework_LinkBase {
 		$this->strCallerPath = file_exists( $strCallerPath ) ? $strCallerPath : $this->getCallerPath();
 		$this->oProps->arrScriptInfo = $this->getCallerInfo( $this->strCallerPath ); 
 		$this->oProps->arrLibraryInfo = $this->getLibraryInfo();
+		$this->oMsg = $oMsg;
 		
 		// Add script info into the footer 
 		add_filter( 'update_footer', array( $this, 'addInfoInFooterRight' ), 11 );
@@ -6294,7 +6362,7 @@ class AdminPageFramework_Link extends AdminPageFramework_LinkBase {
 		
 		array_unshift(	
 			$arrLinks,
-			'<a href="' . $strLinkURL . '">' . __( 'Settings', 'admin-page-framework' ) . '</a>'
+			'<a href="' . $strLinkURL . '">' . $this->oMsg->___( 'settings' ) . '</a>'
 		); 
 		return $arrLinks;
 		
@@ -6348,13 +6416,21 @@ class AdminPageFramework_Debug {
 		
 	}
 	
-	public function getArray( $arr, $strFilePath=null ) {
+	/**
+	 * 
+	 * @since			2.1.6			The $fEncloseInTag parameter is added.
+	 */
+	public function getArray( $arr, $strFilePath=null, $fEncloseInTag=true ) {
 			
 		if ( $strFilePath ) 
 			self::logArray( $arr, $strFilePath );			
 			
 		// esc_html() has a bug that breaks with complex HTML code.
-		return "<pre class='dump-array'>" . htmlspecialchars( print_r( $arr, true ) ) . "</pre>";		
+		$strResult = htmlspecialchars( print_r( $arr, true ) );
+		return $fEncloseInTag
+			? "<pre class='dump-array'>" . $strResult . "</pre>"
+			: $strResult;
+		
 	}	
 	
 	/**
@@ -6363,10 +6439,10 @@ class AdminPageFramework_Debug {
 	 * @since			2.1.1
 	 */
 	static public function logArray( $arr, $strFilePath=null ) {
-								
+		
 		file_put_contents( 
 			$strFilePath ? $strFilePath : dirname( __FILE__ ) . '/array_log.txt', 
-			date( "Y/m/d H:i:s" ) . PHP_EOL
+			date( "Y/m/d H:i:s", current_time( 'timestamp' ) ) . PHP_EOL
 			. print_r( $arr, true ) . PHP_EOL . PHP_EOL
 			, FILE_APPEND 
 		);					
@@ -6408,13 +6484,17 @@ abstract class AdminPageFramework_InputFieldTypeDefinition_Base extends AdminPag
 		'strAfterField' => null,	
 	);	
 	
-	function __construct( $strClassName, $strFieldTypeSlug, $oMsg=null ) {
+	protected $oMsg;
+	
+	function __construct( $strClassName, $strFieldTypeSlug, $oMsg=null, $fAutoRegister=true ) {
 			
 		$this->strFieldTypeSlug = $strFieldTypeSlug;
 		$this->strClassName = $strClassName;
 		$this->oMsg	= $oMsg;
 		
-		add_filter( "field_types_{$strClassName}", array( $this, 'replyToRegisterInputFieldType' ) );
+		// This automatically registers the field type. The build-in ones will be registered manually so it will be skipped.
+		if ( $fAutoRegister )
+			add_filter( "field_types_{$strClassName}", array( $this, 'replyToRegisterInputFieldType' ) );
 	
 	}	
 	
@@ -6571,7 +6651,7 @@ if ( ! class_exists( 'AdminPageFramework_InputFieldType_text' ) ) :
 /**
  * Defines the text field type.
  * 
- * Also the field types of 'password', 'datetime', 'datetime-local', 'email', 'month', 'search', 'tel', 'time', 'url', and 'week' are defeined.
+ * Also the field types of 'password', 'datetime', 'datetime-local', 'email', 'month', 'search', 'tel', 'url', and 'week' are defeined.
  * 
  * @package			Admin Page Framework
  * @subpackage		Admin Page Framework - Setting
@@ -6588,7 +6668,7 @@ class AdminPageFramework_InputFieldType_text extends AdminPageFramework_InputFie
 	 */
 	public function replyToRegisterInputFieldType( $arrFieldDefinitions ) {
 		
-		foreach ( array( 'text', 'password', 'datetime', 'datetime-local', 'email', 'month', 'search', 'tel', 'time', 'url', 'week', ) as $strTextTypeSlug )
+		foreach ( array( 'text', 'password', 'date', 'datetime', 'datetime-local', 'email', 'month', 'search', 'tel', 'url', 'week', ) as $strTextTypeSlug )
 			$arrFieldDefinitions[ $strTextTypeSlug ] = $this->getDefinitionArray();
 		
 		return $arrFieldDefinitions;
@@ -7075,136 +7155,6 @@ class AdminPageFramework_InputFieldType_color extends AdminPageFramework_InputFi
 }
 endif;
 
-if ( ! class_exists( 'AdminPageFramework_InputFieldType_date' ) ) :
-/**
- * Defines the date field type.
- * 
- * @package			Admin Page Framework
- * @subpackage		Admin Page Framework - Setting
- * @since			2.1.5
- */
-class AdminPageFramework_InputFieldType_date extends AdminPageFramework_InputFieldTypeDefinition_Base {
-	
-	/**
-	 * Returns the array of the field type specific default keys.
-	 */
-	protected function getDefaultKeys() { 
-		return array(
-			'vSize'					=> 10,
-			'vDateFormat'	 		=> 'yy/mm/dd',				// ( array or string ) This is for the date field type that specifies the date format.
-			'vMaxLength'			=> 400,
-		);	
-	}
-
-	/**
-	 * Loads the field type necessary components.
-	 * 
-	 * Loads necessary files of the date field type.
-	 * @since			2.0.0
-	 * @simce			2.1.5			Moved from AdminPageFrameworkMeta. Changed the name from enqueueDateFieldScript().
-	 */ 
-	public function replyToFieldLoader() {
-
-		wp_enqueue_script( 'jquery-ui-datepicker' );
-		wp_enqueue_style( 'jquery-style', 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/themes/smoothness/jquery-ui.css' );
-		
-	}	
-	
-	/**
-	 * Returns the field type specific JavaScript script.
-	 * 
-	 * Returns the date picker JavaScript script loaded in the head tag of the created admin pages.
-	 * @access			public	
-	 * @internal
-	 * @return			string			The date picker script.
-	 */ 
-	public function replyToGetInputScripts() {
-		return "";		
-	}	
-	
-	/**
-	 * Returns the field type specific CSS rules.
-	 */ 
-	public function replyToGetInputStyles() {
-		return 
-		"/* Data Picker */
-		.ui-datepicker.ui-widget.ui-widget-content.ui-helper-clearfix.ui-corner-all {
-			display: none;
-		}		
-		" . PHP_EOL;		
-	}		
-	
-	/**
-	 * Returns the output of the field type.
-	 * 
-	 * @since			2.1.5
-	 */
-	public function replyToGetInputField( $vValue, $arrField, $arrOptions, $arrErrors, $arrFieldDefinition ) {
-
-		$arrOutput = array();
-		$strFieldName = $arrField['strFieldName'];
-		$strTagID = $arrField['strTagID'];
-		$strFieldClassSelector = $arrField['strFieldClassSelector'];
-		$arrDefaultKeys = $arrFieldDefinition['arrDefaultKeys'];	
-		
-		$arrFields = $arrField['fRepeatable'] ? 
-			( empty( $vValue ) ? array( '' ) : ( array ) $vValue )
-			: $arrField['vLabel'];		
-		
-		foreach( ( array ) $arrFields as $strKey => $strLabel ) 
-			$arrOutput[] = 
-				"<div class='{$strFieldClassSelector}' id='field-{$strTagID}_{$strKey}'>"
-					. "<div class='admin-page-framework-input-label-container'>"
-						. "<label for='{$strTagID}_{$strKey}'>"
-							. $this->getCorrespondingArrayValue( $arrField['vBeforeInputTag'], $strKey, $arrDefaultKeys['vBeforeInputTag'] ) 
-							. ( $strLabel && ! $arrField['fRepeatable']
-								? "<span class='admin-page-framework-input-label-string' style='min-width:" . $this->getCorrespondingArrayValue( $arrField['vLabelMinWidth'], $strKey, $arrDefaultKeys['vLabelMinWidth'] ) . "px;'>" . $strLabel . "</span>"
-								: "" 
-							)
-							. "<!-- testing -->"
-							. "<input id='{$strTagID}_{$strKey}' "
-								. "class='datepicker " . $this->getCorrespondingArrayValue( $arrField['vClassAttribute'], $strKey, $arrDefaultKeys['vClassAttribute'] ) . "' "
-								. "size='" . $this->getCorrespondingArrayValue( $arrField['vSize'], $strKey, $arrDefaultKeys['vSize'] ) . "' "
-								. "maxlength='" . $this->getCorrespondingArrayValue( $arrField['vMaxLength'], $strKey, $arrDefaultKeys['vMaxLength'] ) . "' "
-								. "type='text' "	// text, password, etc.
-								. "name=" . ( is_array( $arrFields ) ? "'{$strFieldName}[{$strKey}]' " : "'{$strFieldName}' " )
-								. "value='" . $this->getCorrespondingArrayValue( $vValue, $strKey, null ) . "' "
-								. ( $this->getCorrespondingArrayValue( $arrField['vDisable'], $strKey ) ? "disabled='Disabled' " : '' )
-								. ( $this->getCorrespondingArrayValue( $arrField['vReadOnly'], $strKey ) ? "readonly='readonly' " : '' )
-							. "/>"
-							. $this->getCorrespondingArrayValue( $arrField['vAfterInputTag'], $strKey, $arrDefaultKeys['vAfterInputTag'] )
-						. "</label>"
-					. "</div>"	// end of label container
-					. $this->getDatePickerEnablerScript( "{$strTagID}_{$strKey}", $this->getCorrespondingArrayValue( $arrField['vDateFormat'], $strKey, $arrDefaultKeys['vDateFormat'] ) )
-				. "</div>"	// end of admin-page-framework-field
-				. ( ( $strDelimiter = $this->getCorrespondingArrayValue( $arrField['vDelimiter'], $strKey, $arrDefaultKeys['vDelimiter'], true ) )
-					? "<div class='delimiter' id='delimiter-{$strTagID}_{$strKey}'>" . $strDelimiter . "</div>"
-					: ""
-				);
-				
-		return "<div class='admin-page-framework-field-date' id='{$strTagID}'>" 
-				. implode( '', $arrOutput ) 
-			. "</div>";
-		
-	}
-		/**
-		 * A helper function for the above getDateField() method.
-		 * 
-		 */
-		private function getDatePickerEnablerScript( $strID, $strDateFormat ) {
-			return 
-				"<script type='text/javascript' class='date-picker-enabler-script' data-id='{$strID}' data-date_format='{$strDateFormat}'>
-					jQuery( document ).ready( function() {
-						jQuery( '#{$strID}' ).datepicker({
-							dateFormat : '{$strDateFormat}'
-						});
-					})
-				</script>";
-		}
-	
-}
-endif;
-
 if ( ! class_exists( 'AdminPageFramework_InputFieldType_image' ) ) :
 /**
  * Defines the image field type.
@@ -7278,14 +7228,14 @@ class AdminPageFramework_InputFieldType_image extends AdminPageFramework_InputFi
 	/**
 	 * Returns the field type specific JavaScript script.
 	 */ 
-	public function replyToGetInputScripts() {
+	public function replyToGetInputScripts() {		
 		return $this->getScript_CustomMediaUploaderObject()	. PHP_EOL	
 			. $this->getScript_ImageSelector( 
 				"admin_page_framework", 
-				__( 'Upload Image', 'admin-page-framework' ),
-				__( 'Use This Image', 'admin-page-framework' )
+				$this->oMsg->___( 'upload_image' ),
+				$this->oMsg->___( 'use_this_image' )
 		);
-	}	
+	}
 		/**
 		 * Returns the JavaScript script that creates a custom media uploader object.
 		 * 
@@ -7861,14 +7811,13 @@ class AdminPageFramework_InputFieldType_image extends AdminPageFramework_InputFi
 		 */
 		private function getImageUploaderButtonScript( $strInputID, $fRpeatable, $fExternalSource ) {
 			
-			$strSelectImage = __( 'Select Image', 'admin-page-framework' );
 			$strButton ="<a id='select_image_{$strInputID}' "
 						. "href='#' "
 						. "class='select_image button button-small'"
 						. "data-uploader_type='" . ( function_exists( 'wp_enqueue_media' ) ? 1 : 0 ) . "'"
 						. "data-enable_external_source='" . ( $fExternalSource ? 1 : 0 ) . "'"
 					. ">"
-						. $strSelectImage 
+						. $this->oMsg->___( 'select_image' )
 				."</a>";
 			
 			$strScript = "
@@ -7927,8 +7876,8 @@ class AdminPageFramework_InputFieldType_media extends AdminPageFramework_InputFi
 		return $this->getScript_CustomMediaUploaderObject()	. PHP_EOL	// defined in the parent class
 			. $this->getScript_MediaUploader(
 				"admin_page_framework", 
-				__( 'Upload File', 'admin-page-framework' ),
-				__( 'Use This File', 'admin-page-framework' )			
+				$this->oMsg->___( 'upload_file' ),
+				$this->oMsg->___( 'use_this_file' )
 			);
 	}	
 		/**
@@ -8179,14 +8128,13 @@ class AdminPageFramework_InputFieldType_media extends AdminPageFramework_InputFi
 		 */
 		private function getMediaUploaderButtonScript( $strInputID, $fRpeatable, $fExternalSource ) {
 			
-			$strSelectImage = __( 'Select File', 'admin-page-framework' );
 			$strButton ="<a id='select_media_{$strInputID}' "
 						. "href='#' "
 						. "class='select_media button button-small'"
 						. "data-uploader_type='" . ( function_exists( 'wp_enqueue_media' ) ? 1 : 0 ) . "'"
 						. "data-enable_external_source='" . ( $fExternalSource ? 1 : 0 ) . "'"
 					. ">"
-						. $strSelectImage 
+						. $this->oMsg->___( 'select_file' )
 				."</a>";
 			
 			$strScript = "
@@ -8604,7 +8552,11 @@ class AdminPageFramework_InputFieldType_size extends AdminPageFramework_InputFie
 		"/* Size Field Type */
 		.admin-page-framework-field-size input {
 			text-align: right;
-		}" . PHP_EOL;
+		}
+		.admin-page-framework-field-size select.size-field-select {
+			vertical-align: 0px;			
+		}
+		" . PHP_EOL;
 	}
 	
 	/**
@@ -8653,7 +8605,8 @@ class AdminPageFramework_InputFieldType_size extends AdminPageFramework_InputFie
 							. "max='" . $this->getCorrespondingArrayValue( $arrField['vMax'], $strKey, $arrDefaultKeys['vMax'] ) . "' "
 							. "step='" . $this->getCorrespondingArrayValue( $arrField['vStep'], $strKey, $arrDefaultKeys['vStep'] ) . "' "					
 						. "/>"
-						. "<select id='{$strTagID}_{$strKey}' "	// select field
+					. "</label>"
+						. "<select id='{$strTagID}_{$strKey}' class='size-field-select'"	// select field
 							. "class='" . $this->getCorrespondingArrayValue( $arrField['vClassAttribute'], $strKey, $arrDefaultKeys['vClassAttribute'] ) . "' "
 							. "type='{$arrField['strType']}' "
 							. ( ( $fMultipleOptions = $this->getCorrespondingArrayValue( $arrField['vMultiple'], $strKey, $arrDefaultKeys['vMultiple'] ) ) ? "multiple='Multiple' " : '' )
@@ -8662,17 +8615,16 @@ class AdminPageFramework_InputFieldType_size extends AdminPageFramework_InputFie
 							. "size=" . ( $this->getCorrespondingArrayValue( $arrField['vUnitSize'], $strKey, $arrDefaultKeys['vUnitSize'] ) ) . " "
 							. ( ( $strWidth = $this->getCorrespondingArrayValue( $arrField['vWidth'], $strKey, $arrDefaultKeys['vWidth'] ) ) ? "style='width:{$strWidth};' " : "" )
 						. ">"
-							. $this->getOptionTags( 
-								$fSingle ? $arrSizeUnits : $this->getCorrespondingArrayValue( $arrField['vSizeUnits'], $strKey, $arrSizeUnits ),
-								$fSingle ? $this->getCorrespondingArrayValue( $vValue['unit'], $strKey, 'px' ) : $this->getCorrespondingArrayValue( $this->getCorrespondingArrayValue( $vValue, $strKey, array() ), 'unit', 'px' ),
-								$strTagID,
-								$strKey, 
-								true, 	// since the above value is directly passed, call the function as a single element.
-								$fMultipleOptions 
-							)
-						. "</select>"
-						. $this->getCorrespondingArrayValue( $arrField['vAfterInputTag'], $strKey, $arrDefaultKeys['vAfterInputTag'] )
-					. "</label>"
+						. $this->getOptionTags( 
+							$fSingle ? $arrSizeUnits : $this->getCorrespondingArrayValue( $arrField['vSizeUnits'], $strKey, $arrSizeUnits ),
+							$fSingle ? $this->getCorrespondingArrayValue( $vValue['unit'], $strKey, 'px' ) : $this->getCorrespondingArrayValue( $this->getCorrespondingArrayValue( $vValue, $strKey, array() ), 'unit', 'px' ),
+							$strTagID,
+							$strKey, 
+							true, 	// since the above value is directly passed, call the function as a single element.
+							$fMultipleOptions 
+						)
+					. "</select>"
+					. $this->getCorrespondingArrayValue( $arrField['vAfterInputTag'], $strKey, $arrDefaultKeys['vAfterInputTag'] )
 				. "</div>"	// end of admin-page-framework-field
 				. ( ( $strDelimiter = $this->getCorrespondingArrayValue( $arrField['vDelimiter'], $strKey, $arrDefaultKeys['vDelimiter'], true ) )
 					? "<div class='delimiter' id='delimiter-{$strTagID}_{$strKey}'>" . $strDelimiter . "</div>"
@@ -8882,7 +8834,7 @@ class AdminPageFramework_InputFieldType_file extends AdminPageFramework_InputFie
 								. "accept='" . $this->getCorrespondingArrayValue( $arrField['vAcceptAttribute'], $strKey, $arrDefaultKeys['vAcceptAttribute'] ) . "' "
 								. "type='{$arrField['strType']}' "	// file
 								. "name=" . ( is_array( $arrFields ) ? "'{$strFieldName}[{$strKey}]' " : "'{$strFieldName}' " )
-								. "value='" . $this->getCorrespondingArrayValue( $arrFields, $strKey, __( 'Submit', 'admin-page-framework' ) ) . "' "
+								. "value='" . $this->getCorrespondingArrayValue( $arrFields, $strKey ) . "' "
 								. ( $this->getCorrespondingArrayValue( $arrField['vDisable'], $strKey ) ? "disabled='Disabled' " : '' )
 							. "/>"
 							. $this->getCorrespondingArrayValue( $arrField['vAfterInputTag'], $strKey, $arrDefaultKeys['vAfterInputTag'] )
@@ -9777,15 +9729,16 @@ class AdminPageFramework_InputFieldType_import extends AdminPageFramework_InputF
 }
 endif;
 
-if ( ! class_exists( 'AdminPageFramework_InputFieldTypeDefinitions' ) ) :
+if ( ! class_exists( 'AdminPageFramework_BuiltinInputFieldTypeDefinitions' ) ) :
 /**
  * Provides means to define custom input fields not only by the framework but also by the user.
  * 
  * @package			Admin Page Framework
  * @subpackage		Admin Page Framework - Setting
  * @since			2.1.5
+ * @since			2.1.6			Changed the name from AdminPageFramework_InputFieldTypeDefinitions
  */
-class AdminPageFramework_InputFieldTypeDefinitions  {
+class AdminPageFramework_BuiltinInputFieldTypeDefinitions  {
 	
 	/**
 	 * Holds the default input field labels
@@ -9794,7 +9747,7 @@ class AdminPageFramework_InputFieldTypeDefinitions  {
 	 */
 	protected static $arrDefaultFieldTypeSlugs = array(
 		'default',		// undefined ones will be applied 
-		'text', //	'password', 'datetime', 'datetime-local', 'email', 'month', 'search', 'tel', 'time', 'url', 'week',
+		'text', //	'password', 'date', 'datetime', 'datetime-local', 'email', 'month', 'search', 'tel', 'time', 'url', 'week',
 		'number', 	// 'range',
 		'textarea',
 		'radio',
@@ -9808,22 +9761,20 @@ class AdminPageFramework_InputFieldTypeDefinitions  {
 		'image',
 		'media',
 		'color',
-		'date',
 		'taxonomy',
 		'posttype',
 		'size',
 	);	
 	
-	function __construct( $strExtendedClassName, $oMsg ) {
-		
+	function __construct( &$arrFieldTypeDefinitions, $strExtendedClassName, $oMsg ) {
 		foreach( self::$arrDefaultFieldTypeSlugs as $strFieldTypeSlug ) {
 			$strInstantiatingClassName = "AdminPageFramework_InputFieldType_{$strFieldTypeSlug}";
-			if ( class_exists( $strInstantiatingClassName ) )
-				new $strInstantiatingClassName( $strExtendedClassName, $strFieldTypeSlug, $oMsg );
+			if ( class_exists( $strInstantiatingClassName ) ) {
+				$oFieldType = new $strInstantiatingClassName( $strExtendedClassName, $strFieldTypeSlug, $oMsg, false );	// passing false for the forth parameter disables auto-registering.
+				$arrFieldTypeDefinitions[ $strFieldTypeSlug ] = $oFieldType->getDefinitionArray();
+			}
 		}
-		
 	}
-	
 }
 
 
@@ -9847,13 +9798,24 @@ class AdminPageFramework_InputField extends AdminPageFramework_Utilities {
 	 */
 	private $fIsMetaBox = false;
 		
+	protected static $arrStructure_FieldDefinition = array(
+		'callRenderField' => null,
+		'callGetScripts' => null,
+		'callGetStyles' => null,
+		'callGetIEStyles' => null,
+		'callFieldLoader' => null,
+		'arrEnqueueScripts' => null,
+		'arrEnqueueStyles' => null,
+		'arrDefaultKeys' => null,
+	);
 	
-	public function __construct( &$arrField, &$arrOptions, $arrErrors, &$arrFieldDefinition ) {
+	public function __construct( &$arrField, &$arrOptions, $arrErrors, &$arrFieldDefinition, &$oMsg ) {
 			
-		$this->arrField = $arrField + $arrFieldDefinition['arrDefaultKeys'];	// better not to merge recursively because some elements are array by default, not as multiple elements.
+		$this->arrField = $arrField + $arrFieldDefinition['arrDefaultKeys'] + self::$arrStructure_FieldDefinition;	// better not to merge recursively because some elements are array by default, not as multiple elements.
 		$this->arrFieldDefinition = $arrFieldDefinition;
 		$this->arrOptions = $arrOptions;
 		$this->arrErrors = $arrErrors ? $arrErrors : array();
+		$this->oMsg = $oMsg;
 			
 		$this->strFieldName = $this->getInputFieldName();
 		$this->strTagID = $this->getInputTagID( $arrField );
@@ -9960,6 +9922,7 @@ class AdminPageFramework_InputField extends AdminPageFramework_Utilities {
 	/** 
 	 * Retrieves the input field HTML output.
 	 * @since			2.0.0
+	 * @since			2.1.6			Moved the repeater script outside the fieldset tag.
 	 */ 
 	public function getInputField( $strFieldType ) {
 		
@@ -9994,8 +9957,8 @@ class AdminPageFramework_InputField extends AdminPageFramework_Utilities {
 			? $this->getRepeaterScript( $this->strTagID, count( ( array ) $this->vValue ) )
 			: '';
 			
-		return 
-			"<fieldset>"
+		return $this->getRepeaterScriptGlobal( $this->strTagID )
+			. "<fieldset>"
 				. "<div class='admin-page-framework-fields'>"
 					. $this->arrField['strBeforeField'] 
 					. $strOutput
@@ -10026,7 +9989,7 @@ class AdminPageFramework_InputField extends AdminPageFramework_Utilities {
 	 * 
 	 * @since			2.1.3
 	 */
-	private $fIsRepeatableScriptCaleld = false;
+	private $fIsRepeatableScriptCalled = false;
 	
 	/**
 	 * Returns the repeatable fields script.
@@ -10035,9 +9998,8 @@ class AdminPageFramework_InputField extends AdminPageFramework_Utilities {
 	 */
 	private function getRepeaterScript( $strTagID, $intFieldCount ) {
 
-		
-		$strAdd = __( 'Add', 'admin-page-framework' );
-		$strRemove = __( 'Remove', 'admin-page-framework' );
+		$strAdd = $this->oMsg->___( 'add' );
+		$strRemove = $this->oMsg->___( 'remove' );
 		$strVisibility = $intFieldCount <= 1 ? " style='display:none;'" : "";
 		$strButtons = 
 			"<div class='admin-page-framework-repeatable-field-buttons'>"
@@ -10045,24 +10007,18 @@ class AdminPageFramework_InputField extends AdminPageFramework_Utilities {
 				. "<a class='repeatable-field-remove button-secondary repeatable-field-button button button-small' href='#' title='{$strRemove}' {$strVisibility} data-id='{$strTagID}'>-</a>"
 			. "</div>";
 
-		$strUploadImage = __( 'Upload Image', 'admin-page-framework' );
-		$strUseThisImage = __( 'Use This Image', 'admin-page-framework' );	
-		
-		$strScript = $this->fIsRepeatableScriptCaleld ? "" : $this->getRepeaterScriptGlobal( $strTagID );
-		$this->fIsRepeatableScriptCaleld = true;
-		
-		return $strScript . 
-		"<script type='text/javascript'>
-			jQuery( document ).ready( function() {
-			
-				// Adds the buttons
-				jQuery( '#{$strTagID} .admin-page-framework-field' ).append( \"{$strButtons}\" );
+		return
+			"<script type='text/javascript'>
+				jQuery( document ).ready( function() {
 				
-				// Update the fields
-				updateAPFRepeatableFields( '{$strTagID}' );
-				
-			});
-		</script>";
+					// Adds the buttons
+					jQuery( '#{$strTagID} .admin-page-framework-field' ).append( \"{$strButtons}\" );
+					
+					// Update the fields
+					updateAPFRepeatableFields( '{$strTagID}' );
+					
+				});
+			</script>";
 		
 	}
 
@@ -10071,6 +10027,9 @@ class AdminPageFramework_InputField extends AdminPageFramework_Utilities {
 	 * since			2.1.3
 	 */
 	private function getRepeaterScriptGlobal( $strID ) {
+
+		if ( $this->fIsRepeatableScriptCalled ) return '';
+		$this->fIsRepeatableScriptCalled = true;
 		return 
 		"<script type='text/javascript'>
 			jQuery( document ).ready( function() {
@@ -10409,17 +10368,20 @@ abstract class AdminPageFramework_PostType {
 	* 	)		
 	* );</code>
 	* @since			2.0.0
+	* @since			2.1.6			Added the $strTextDomain parameter.
 	* @see				http://codex.wordpress.org/Function_Reference/register_post_type#Arguments
 	* @param			string			$strPostType			The post type slug.
 	* @param			array			$arrArgs				The <a href="http://codex.wordpress.org/Function_Reference/register_post_type#Arguments">argument array</a> passed to register_post_type().
 	* @param			string			$strCallerPath			The path of the caller script. This is used to retrieve the script information to insert it into the footer. If not set, the framework tries to detect it.
+	* @param			string			$strTextDomain			The text domain of the caller script.
 	* @return			void
 	*/
-	public function __construct( $strPostType, $arrArgs=array(), $strCallerPath=null ) {
+	public function __construct( $strPostType, $arrArgs=array(), $strCallerPath=null, $strTextDomain='admin-page-framework' ) {
 		
 		// Objects
 		$this->oUtil = new AdminPageFramework_Utilities;
 		$this->oProps = new AdminPageFramework_PostType_Properties( $this );
+		$this->oMsg = AdminPageFramework_Messages::instantiate( $strTextDomain );
 		
 		// Properties
 		$this->oProps->strPostType = $this->oUtil->sanitizeSlug( $strPostType );
@@ -10427,13 +10389,13 @@ abstract class AdminPageFramework_PostType {
 		$this->oProps->strClassName = get_class( $this );
 		$this->oProps->strClassHash = md5( $this->oProps->strClassName );
 		$this->oProps->arrColumnHeaders = array(
-			'cb'			=> '<input type="checkbox" />',	// Checkbox for bulk actions. 
-			'title'			=> __( 'Title', 'admin-page-framework' ),		// Post title. Includes "edit", "quick edit", "trash" and "view" links. If $mode (set from $_REQUEST['mode']) is 'excerpt', a post excerpt is included between the title and links.
-			'author'		=> __( 'Author', 'admin-page-framework' ),		// Post author.
-			// 'categories'	=> __( 'Categories', 'admin-page-framework' ),	// Categories the post belongs to. 
-			// 'tags'		=> __( 'Tags', 'admin-page-framework' ),	// Tags for the post. 
+			'cb'			=> '<input type="checkbox" />',		// Checkbox for bulk actions. 
+			'title'			=> $this->oMsg->___( 'title' ),		// Post title. Includes "edit", "quick edit", "trash" and "view" links. If $mode (set from $_REQUEST['mode']) is 'excerpt', a post excerpt is included between the title and links.
+			'author'		=> $this->oMsg->___( 'author' ), 	// Post author.
+			// 'categories'	=> $this->oMsg->___( 'categories' ),	// Categories the post belongs to. 
+			// 'tags'		=> $this->oMsg->___( 'tags' ), 		//	Tags for the post. 
 			'comments' 		=> '<div class="comment-grey-bubble"></div>', // Number of pending comments. 
-			'date'			=> __( 'Date', 'admin-page-framework' ), 	// The date and publish status of the post. 
+			'date'			=> $this->oMsg->___( 'date' ), 		// The date and publish status of the post. 
 		);			
 		$this->oProps->strCallerPath = $strCallerPath;
 		
@@ -10457,7 +10419,7 @@ abstract class AdminPageFramework_PostType {
 			add_action( 'admin_head', array( $this, 'addStyle' ) );
 			
 			// Links
-			$this->oLink = new AdminPageFramework_LinkForPostType( $this->oProps->strPostType, $this->oProps->strCallerPath );
+			$this->oLink = new AdminPageFramework_LinkForPostType( $this->oProps->strPostType, $this->oProps->strCallerPath, $this->oMsg );
 			
 			add_action( 'wp_loaded', array( $this, 'setUp' ) );
 		}
@@ -10654,10 +10616,13 @@ abstract class AdminPageFramework_PostType {
 	 * Sets the given screen icon to the post type screen icon.
 	 * 
 	 * @since			2.1.3
+	 * @since			2.1.6				The $strSRC parameter can accept file path.
 	 */
-	private function getStylesForPostTypeScreenIcon( $strURL ) {
+	private function getStylesForPostTypeScreenIcon( $strSRC ) {
 		
 		$strNone = 'none';
+		
+		$strSRC = $this->oUtil->resolveSRC( $strSRC );
 		
 		return "#post-body-content {
 				margin-bottom: 10px;
@@ -10666,7 +10631,7 @@ abstract class AdminPageFramework_PostType {
 				display: {$strNone};
 			}
 			#icon-edit.icon32.icon32-posts-" . $this->oProps->strPostType . " {
-				background: url('" . $strURL . "') no-repeat;
+				background: url('" . $strSRC . "') no-repeat;
 				background-size: 32px 32px;
 			}			
 		";		
@@ -10777,7 +10742,7 @@ abstract class AdminPageFramework_PostType {
 
 			// This function will echo the drop down list based on the passed array argument.
 			wp_dropdown_categories( array(
-				'show_option_all' => __( 'Show All', 'admin-page-framework' ) . ' ' . $oTaxonomy->label,
+				'show_option_all' => $this->oMsg->___( 'show_all' ) . ' ' . $oTaxonomy->label,
 				'taxonomy' 	  => $strTaxonomySulg,
 				'name' 		  => $oTaxonomy->name,
 				'orderby' 	  => 'name',
@@ -10907,7 +10872,7 @@ abstract class AdminPageFramework_MetaBox extends AdminPageFramework_MetaBox_Hel
 		
 		// Objects
 		$this->oUtil = new AdminPageFramework_Utilities;
-		$this->oMsg = new AdminPageFramework_Messages( $strTextDomain );
+		$this->oMsg = AdminPageFramework_Messages::instantiate( $strTextDomain );
 		$this->oDebug = new AdminPageFramework_Debug;
 		$this->oProps = new AdminPageFramework_MetaBox_Properties( $this );
 		$this->oHeadTag = new AdminPageFramework_HeadTag_MetaBox( $this->oProps );
@@ -10951,11 +10916,11 @@ abstract class AdminPageFramework_MetaBox extends AdminPageFramework_MetaBox_Hel
 	public function replyToLoadDefaultFieldTypeDefinitions() {
 		
 		// This class adds filters for the field type definitions so that framework's default field types will be added.
-		new AdminPageFramework_InputFieldTypeDefinitions( $this->oProps->strClassName, $this->oMsg );		
+		new AdminPageFramework_BuiltinInputFieldTypeDefinitions( $this->oProps->arrFieldTypeDefinitions, $this->oProps->strClassName, $this->oMsg );		
 		$this->oProps->arrFieldTypeDefinitions = $this->oUtil->addAndApplyFilter(		// Parameters: $oCallerObject, $strFilter, $vInput, $vArgs...
 			$this,
 			'field_types_' . $this->oProps->strClassName,	// 'field_types_' . {extended class name}
-			array()
+			$this->oProps->arrFieldTypeDefinitions
 		);				
 		
 	}
@@ -11047,7 +11012,7 @@ abstract class AdminPageFramework_MetaBox extends AdminPageFramework_MetaBox_Hel
 		// If a custom condition is set and it's not true, skip.
 		if ( ! $arrField['fIf'] ) return;
 							
-		// If it's the image, color, or date type field, extra jQuery scripts need to be loaded.
+		// Load head tag elements for fields.
 		if ( 
 			in_array( $GLOBALS['pagenow'], array( 'post.php', 'post-new.php', ) ) 
 			&& ( 
@@ -11141,7 +11106,7 @@ abstract class AdminPageFramework_MetaBox extends AdminPageFramework_MetaBox_Hel
 		
 		if ( isset( $_GET['button_label'] ) ) return $_GET['button_label'];
 
-		return $this->oProps->strThickBoxButtonUseThis ?  $this->oProps->strThickBoxButtonUseThis : __( 'Use This Image', 'admin-page-framework' );
+		return $this->oProps->strThickBoxButtonUseThis ?  $this->oProps->strThickBoxButtonUseThis : $this->oMsg->___( 'use_this_image' );
 		
 	}
 	
@@ -11248,7 +11213,7 @@ abstract class AdminPageFramework_MetaBox extends AdminPageFramework_MetaBox_Hel
 		$strFieldType = isset( $this->oProps->arrFieldTypeDefinitions[ $arrField['strType'] ]['callRenderField'] ) && is_callable( $this->oProps->arrFieldTypeDefinitions[ $arrField['strType'] ]['callRenderField'] )
 			? $arrField['strType']
 			: 'default';	// the predefined reserved field type is applied if the parsing field type is not defined(not found).
-		$oField = new AdminPageFramework_InputField( $arrField, $this->oProps->arrOptions, array(), $this->oProps->arrFieldTypeDefinitions[ $strFieldType ] );	// currently the error array is not supported for meta-boxes
+		$oField = new AdminPageFramework_InputField( $arrField, $this->oProps->arrOptions, array(), $this->oProps->arrFieldTypeDefinitions[ $strFieldType ], $this->oMsg );	// currently the error array is not supported for meta-boxes
 		$oField->isMetaBox( true );
 		$strFieldOutput = $oField->getInputField( $strFieldType );	// field output
 		unset( $oField );	// release the object for PHP 5.2.x or below.
