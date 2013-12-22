@@ -185,6 +185,13 @@ Check out [the issues](https://github.com/michaeluno/admin-page-framework/issues
 
 == Changelog ==
 
+= 2.1.7 - 12/23/2013 =
+* Fixed a bug that the screen icon could not be retrieved when the `strScreenIcon` key was not set (started to occur around v2.1.6).
+* Added: the `import_mime_types_{...}` filter that receives the array holding allowed MIME types so that the user can add custom MIME types for the imported files.
+* Added: the `enqueueScript()` and the `enqueueStyle()` methods for the post type class.
+* Added: the ability to automatically insert page load information in the admin footer if the `WPDEBUG` constant is true.
+* Fixed: a bug that the `password` field type could not be defined as of v2.1.6.
+
 = 2.1.6 - 12/14/2013 = 
 * Fixed: a bug that the focus of a drop-down list of the `size` field type got stolen when the user tries to select a unit.
 * Added: another example to define custom field types in the demo plugin.
