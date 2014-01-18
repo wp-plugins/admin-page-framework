@@ -37,7 +37,7 @@ It provides plugin and theme developers with easier means of creating option pag
 * `radio` - a set of radio buttons.
 * `checkbox` - a check box.
 * `select` - a dropdown list.
-* `submit` - a submit field that the user  
+* `submit` - a submit field that the user can send the form inputs.
 * `hidden` - a hidden field that is useful to embed hidden values. 
 * `file` - a file field that lets the user upload files.
 * `media` - a custom text field with the media uploader that sets the file URL.
@@ -184,6 +184,10 @@ If you want to change it to something else, modify the `oMsg` object. It has the
 Check out [the issues](https://github.com/michaeluno/admin-page-framework/issues?labels=enhancement&page=1&state=open) on GitHub labelled *enhancement*.
 
 == Changelog ==
+
+= 2.1.7.2 - 01/18/2014 =
+* Fixed: a bug that the `for` attribute of the `label` tag was not updated in repeatable fields.
+* Fixed: the warning: `Strict standards: Declaration of ... should be compatible with ...`.
 
 = 2.1.7.1 - 12/25/2013 =
 * Added: an example of basic usage of creating a page group as well as specifying a dashicon. 
