@@ -1,5 +1,5 @@
-Admin Page Framework - A PHP library that enables to create WordPress admin pages
-Copyright (C) 2013 Michael Uno
+Admin Page Framework Demp Plugin - A demo plugin that demonstrates the use of the Admin Page Framework library.
+Copyright (C) 2014 Michael Uno
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -15,14 +15,12 @@ You should have received a copy of the GNU General Public License along
 with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-This program is contributed by the following users:
+The demo plugin incorporates work covered by the following copyright:
 
-- tormjens
-
-for more information: https://github.com/michaeluno/admin-page-framework/graphs/contributors
-
-
-This program incorporates work covered by the following copyright:
+Admin Page Framework
+Copyright (c) 2004-2013 Michael Uno
+Licensed MIT
+<http://en.michaeluno.jp/admin-page-framework>
 
 PHP Markdown Lib 
 Copyright (c) 2004-2013 Michel Fortin
@@ -64,7 +62,27 @@ Copyright (c) 2013 Trent Richardson; Licensed MIT
 jQuery UI Slider Access
 Copyright (c) Trent Richardson; Licensed MIT and GPL
 <http://trentrichardson.com>
- 
+
+Gridster
+Copyright (c) 2012 Ducksboard
+Licensed MIT
+<https://github.com/ducksboard/gridster.js>
+
+Tokenizing Autocomplete Text Entry
+Copyright (c) 2009 James Smith (http://loopj.com)
+Licensed MIT 
+<https://github.com/loopj>
+
+The documentation component of the demo plugin incorporates work covered by the following copyright:
+
+ApiGen
+Copyright © 2010-2011 David Grudl
+Copyright © 2011-2012 Jaroslav Hanslík
+Copyright © 2011-2012 Ondřej Nešpor
+All rights reserved.
+Licensed the New BSD License or the GNU General Public License (GPL) version 2 or 3.
+<http://apigen.org/>
+
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
                     GNU GENERAL PUBLIC LICENSE
