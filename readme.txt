@@ -4,7 +4,7 @@ Donate link: http://michaeluno.jp/en/donate
 Tags: admin, administration, administration panel, admin panel, admin page, admin pages, admin page framework, option page, option pages, option, options, options framework, setting, settings, Settings API, API, framework, library, class, classes, development tool, developers, developer tool, meta box, custom post type, utility, utilities
 Requires at least: 3.3
 Tested up to: 3.8.1
-Stable tag: 3.0.0.1
+Stable tag: 3.0.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -22,6 +22,7 @@ It provides plugin and theme developers with easier means of creating option pag
 * **Image Upload** - it lets the user easily upload images to the site or the user can choose from existent urls or already uploaded files.
 * **Color Picker** - it lets the user easily pick colors.
 * **Rich Text Editor** - supports the rich text editor form input.
+* **Section Tabs** - Form sections can be displayed in a tabbed box.
 * **Repeatable Sections and Fields** - supports repeatable form sections and fields.
 * **Sortable Fields** - supports sortable fields.
 * **Reset Button** - create a reset button that lets your users to initialize the saved options.
@@ -29,7 +30,7 @@ It provides plugin and theme developers with easier means of creating option pag
 * **Custom Post Types** - the framework provides methods to create custom post types.
 * **Meta Boxes** - the framework provides methods to create custom meta boxes with form elements that you define.
 * **Taxonomy Fields** - the framework provides methods to add fields in the taxonomy definition page.
-* **Contextual Help Tabs** - the contextual help pane can be easily added. 
+* **Contextual Help Pane** - help contents can be added to the contextual help pane that appears at the top right of each screen.
 * **Custom Field Types** - your own field type can be registered. 
 
 = Built-in Field Types =
@@ -68,6 +69,7 @@ You can include your own custom field types when they are necessary. This enable
 
 = Documentation =
 The HTML documentation is included in the distribution package and can be accessed via the sidebar menu that the demo plugin creates.
+
 * [Online Documentation](http://admin-page-framework.michaeluno.jp/en/v3/)
 
 = Tutorials = 
@@ -213,6 +215,11 @@ In addition, your tutorials and snippets for the framework can be listed in the 
 = Does my commercial product which incorporates your framework library have to be released under GPL? =
 No. The demo plugin is released under GPLv2 or later but the library itself is released under MIT. 
 
+= How do I retrieve the stored options? =
+The framework stores them as an organized multidimensional array in the options table in a single row. So use the `get_option()` function and pass the extended class name as the key or if you specify a custom key in the constructor, use it. 
+
+For instance, if your extended class name is `APF` then the code would be `get_option( 'APF' );` Alternatively, use the `[AdminPageFramework::getOption()](http://admin-page-framework.michaeluno.jp/en/v3/class-AdminPageFramework.html#_getOption)` static method.
+
 == Other Notes ==
 
 = Tips =
@@ -239,6 +246,11 @@ If you want to change it to something else, modify the `oMsg` object. It has the
 Check out [the issues](https://github.com/michaeluno/admin-page-framework/issues?labels=enhancement&page=1&state=open) on GitHub labeled *enhancement*.
 
 == Changelog ==
+ 
+= 3.0.1 - 02/26/2014 =
+* Added the `AdminPageFramework::getOption()` method that can be used from the front-end to retrieve saved option values. 
+* Fixed a bug that the plus(+) field repeater button got inserted when a section is repeated in WordPress 3.5.x or below.
+* Tweaked the styling of section tabs to prevent small dots from appearing when activating a tab. 
  
 = 3.0.0.1 - 02/24/2014 =
 * Tweaked the styling of section tabs with `section_title` type fields.
