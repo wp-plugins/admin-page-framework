@@ -24,8 +24,8 @@ class AdminPageFramework_Debug {
 	 * 
 	 * @since			unknown
 	 */
-	static public function dumpArray( $arr, $sFilePath=null ) {
-		echo self::getArray( $arr, $sFilePath );
+	static public function dumpArray( $asArray, $sFilePath=null ) {
+		echo self::getArray( $asArray, $sFilePath );
 	}
 	
 	/**
@@ -36,13 +36,13 @@ class AdminPageFramework_Debug {
 	 * @since			2.1.6			The $bEncloseInTag parameter is added.
 	 * @since			3.0.0			Changed the $bEncloseInTag parameter to bEscape.
 	 */
-	static public function getArray( $arr, $sFilePath=null, $bEscape=true ) {
+	static public function getArray( $asArray, $sFilePath=null, $bEscape=true ) {
 			
-		if ( $sFilePath ) self::logArray( $arr, $sFilePath );			
+		if ( $sFilePath ) self::logArray( $asArray, $sFilePath );			
 		
 		return $bEscape
-			? "<pre class='dump-array'>" . htmlspecialchars( print_r( $arr, true ) ) . "</pre>"	// esc_html() has a bug that breaks with complex HTML code.
-			: print_r( $arr, true );	// non-escape is used for exporting data into file.
+			? "<pre class='dump-array'>" . htmlspecialchars( print_r( $asArray, true ) ) . "</pre>"	// esc_html() has a bug that breaks with complex HTML code.
+			: print_r( $asArray, true );	// non-escape is used for exporting data into file.
 		
 	}	
 	
@@ -51,17 +51,20 @@ class AdminPageFramework_Debug {
 	 * 
 	 * @since			2.1.1
 	 */
-	static public function logArray( $arr, $sFilePath=null ) {
+	static public function logArray( $asArray, $sFilePath=null ) {
+		
+		static $_iPageLoadID;
+		$_iPageLoadID = $_iPageLoadID ? $_iPageLoadID : uniqid();		
 		
 		$oCallerInfo = debug_backtrace();
 		$sCallerFunction = $oCallerInfo[ 1 ]['function'];
 		$sCallerClasss = $oCallerInfo[ 1 ]['class'];
 		file_put_contents( 
 			$sFilePath ? $sFilePath : dirname( __FILE__ ) . '/array_log.txt', 
-			date( "Y/m/d H:i:s", current_time( 'timestamp' ) ) . ' ' . "{$sCallerClasss}::{$sCallerFunction} " . AdminPageFramework_Utility::getCurrentURL() . PHP_EOL
-			. print_r( $arr, true ) . PHP_EOL . PHP_EOL
-			, FILE_APPEND 
-		);					
+			date( "Y/m/d H:i:s", current_time( 'timestamp' ) ) . ' ' . "{$_iPageLoadID} {$sCallerClasss}::{$sCallerFunction} " . AdminPageFramework_Utility::getCurrentURL() . PHP_EOL	
+			. print_r( $asArray, true ) . PHP_EOL . PHP_EOL,
+			FILE_APPEND 
+		);			
 							
 	}	
 }

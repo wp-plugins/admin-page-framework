@@ -1,7 +1,7 @@
 === Admin Page Framework ===
 Contributors: Michael Uno, miunosoft
 Donate link: http://michaeluno.jp/en/donate
-Tags: admin, administration, administration panel, admin panel, admin page, admin pages, admin page framework, option page, option pages, option, options, options framework, setting, settings, Settings API, API, framework, library, class, classes, development tool, developers, developer tool, meta box, custom post type, utility, utilities
+Tags: admin, administration, admin panel, option, options, setting, settings, Settings API, API, framework, library, class, classes, development tool, developers, developer tool, meta box, custom post type, utility, utilities, field, fields, custom field, custom fields
 Requires at least: 3.3
 Tested up to: 3.8.1
 Stable tag: 3.0.1
@@ -54,7 +54,7 @@ It provides plugin and theme developers with easier means of creating option pag
 * `section_title` - a text field type that will be placed in the section title so that it lets the user set the section title.
 
 = Custom Field Types = 
-You can include your own custom field types when they are necessary. This enables to keep the main library file to be minimum as possible. The sample custom field types are included in the demo plugin.
+You can include your own custom field types when they are necessary. The reason that they are not built-in is to keep the library size as small as possible. The example custom field types are included in the demo plugin.
 
 * `geometry` - a location selector with the Google map.
 * `date`, `time`, `date_time` - date and time fields with the date picker.
@@ -65,12 +65,12 @@ You can include your own custom field types when they are necessary. This enable
 * `autocomplete` - a custom text field that shows a predefined pop-up autocomplete list.
 
 = Necessary Files =
-* **`admin-page-framework.min.php`** is in the *library* folder. Alternatively you may use **`admin-page-framework.php` ** located in the *development* folder. In that case, all the class files in the sub-folders need to be copied.
+* **`admin-page-framework.min.php`** is in the *library* folder. Alternatively you may use **`admin-page-framework.php`** located in the *development* folder. In that case, all the class files in the sub-folders need to be copied.
 
 = Documentation =
 The HTML documentation is included in the distribution package and can be accessed via the sidebar menu that the demo plugin creates.
 
-* [Online Documentation](http://admin-page-framework.michaeluno.jp/en/v3/)
+* [Online Documentation](http://admin-page-framework.michaeluno.jp/en/v3/class-AdminPageFramework.html)
 
 = Tutorials = 
 * [Tutorials](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/)
@@ -218,7 +218,7 @@ No. The demo plugin is released under GPLv2 or later but the library itself is r
 = How do I retrieve the stored options? =
 The framework stores them as an organized multidimensional array in the options table in a single row. So use the `get_option()` function and pass the extended class name as the key or if you specify a custom key in the constructor, use it. 
 
-For instance, if your extended class name is `APF` then the code would be `get_option( 'APF' );` Alternatively, use the `[AdminPageFramework::getOption()](http://admin-page-framework.michaeluno.jp/en/v3/class-AdminPageFramework.html#_getOption)` static method.
+For instance, if your extended class name is `APF` then the code would be `get_option( 'APF' );` Alternatively, use the [AdminPageFramework::getOption()](http://admin-page-framework.michaeluno.jp/en/v3/class-AdminPageFramework.html#_getOption) static method.
 
 == Other Notes ==
 
@@ -246,6 +246,11 @@ If you want to change it to something else, modify the `oMsg` object. It has the
 Check out [the issues](https://github.com/michaeluno/admin-page-framework/issues?labels=enhancement&page=1&state=open) on GitHub labeled *enhancement*.
 
 == Changelog ==
+
+= 3.0.1.1 - 03/01/2014 =
+* Fixed a bug that `taxonomy` field type fields could not be properly repeated.
+* Tweaked the styling of the `taxonomy` field type fields.
+* Tweaked the styling of horizonatal alignment of th and td form elements.
  
 = 3.0.1 - 02/26/2014 =
 * Added the `AdminPageFramework::getOption()` method that can be used from the front-end to retrieve saved option values. 

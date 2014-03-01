@@ -88,34 +88,33 @@ class AdminPageFramework_FieldType_taxonomy extends AdminPageFramework_FieldType
 			
 						/* If it is not the color field type, do nothing. */
 						if ( jQuery.inArray( sFieldType, {$aJSArray} ) <= -1 ) return;
+
+						node.nextAll().andSelf().each( function() {							
+							jQuery( this ).find( 'div' ).incrementIDAttribute( 'id' );
+							jQuery( this ).find( 'li.tab-box-tab a' ).incrementIDAttribute( 'href' );
+							jQuery( this ).find( 'li.category-list' ).incrementIDAttribute( 'id' );
+							jQuery( this ).find( 'input' ).decrementNameAttribute( 'name' );	// the framework increments the last found digit by default so revert it
+							jQuery( this ).find( 'input' ).incrementNameAttribute( 'name', -1 );	// now increment the second found digit from the end 
+							enableAPFTabbedBox( jQuery( this ).find( '.tab-box-container' ) );
+						});						
 						
-						var fIncrementOrDecrement = 1;
-						var updateID = function( index, name ) {
-							
-							if ( typeof name === 'undefined' ) {
-								return name;
-							}
-							return name.replace( /_((\d+))(?=(_|$))/, function ( fullMatch, n ) {						
-								return '_' + ( Number(n) + ( fIncrementOrDecrement == 1 ? 1 : -1 ) );
-							});
-							
-						}
-						var updateName = function( index, name ) {
-							
-							if ( typeof name === 'undefined' ) {
-								return name;
-							}
-							return name.replace( /\[((\d+))(?=\])/, function ( fullMatch, n ) {				
-								return '[' + ( Number(n) + ( fIncrementOrDecrement == 1 ? 1 : -1 ) );
-							});
-							
-						}
-						node.find( 'div' ).attr( 'id', function( index, name ){ return updateID( index, name ) } );
-						node.find( 'li.tab-box-tab a' ).attr( 'href', function( index, name ){ return updateID( index, name ) } );
+					},
+					removed_repeatable_field: function( node, sFieldType, sFieldTagID ) {
+			
+						/* If it is not the color field type, do nothing. */
+						if ( jQuery.inArray( sFieldType, {$aJSArray} ) <= -1 ) return;
+	
+						node.nextAll().each( function() {
+							jQuery( this ).find( 'div' ).decrementIDAttribute( 'id' );
+							jQuery( this ).find( 'li.tab-box-tab a' ).decrementIDAttribute( 'href' );
+							jQuery( this ).find( 'li.category-list' ).decrementIDAttribute( 'id' );
+							jQuery( this ).find( 'input' ).incrementNameAttribute( 'name' );	// the framework decrements the last found digit by default so revert it
+							jQuery( this ).find( 'input' ).decrementNameAttribute( 'name', -1 );	// now decrement the second found digit from the end 
+						});	
 						
-						enableAPFTabbedBox( node.find( '.tab-box-container' ) );
+						// enableAPFTabbedBox( node.find( '.tab-box-container' ) );
 						
-					}
+					},					
 				});
 			});			
 		";
@@ -143,7 +142,8 @@ class AdminPageFramework_FieldType_taxonomy extends AdminPageFramework_FieldType
 			}
 			.admin-page-framework-field .taxonomy-checklist-label {
 				/* margin-left: 0.5em; */
-			}		
+				white-space: nowrap;			
+			}	
 		/* Tabbed box */
 			.admin-page-framework-field .tab-box-container.categorydiv {
 				max-height: none;
@@ -154,14 +154,17 @@ class AdminPageFramework_FieldType_taxonomy extends AdminPageFramework_FieldType
 			.admin-page-framework-field .tab-box-tabs {
 				line-height: 12px;
 				margin-bottom: 0;
-			
 			}
+			/* .admin-page-framework-field .tab-box-tab {		
+vertical-align: top;
+			} */
 			.admin-page-framework-field .tab-box-tabs .tab-box-tab.active {
 				display: inline;
 				border-color: #dfdfdf #dfdfdf #fff;
-				margin-bottom: 0;
-				padding-bottom: 1px;
+				margin-bottom: 0px;
+				padding-bottom: 2px;
 				background-color: #fff;
+				
 			}
 			.admin-page-framework-field .tab-box-container { 
 				position: relative; 
@@ -171,7 +174,8 @@ class AdminPageFramework_FieldType_taxonomy extends AdminPageFramework_FieldType
 			}
 			.admin-page-framework-field .tab-box-tabs li a { color: #333; text-decoration: none; }
 			.admin-page-framework-field .tab-box-contents-container {  
-				padding: 0 2em 0 1.8em;
+				padding: 0 0 0 1.8em;
+				padding: 0.55em 0.5em 0.55em 1.8em;
 				border: 1px solid #dfdfdf; 
 				background-color: #fff;
 			}
@@ -183,12 +187,16 @@ class AdminPageFramework_FieldType_taxonomy extends AdminPageFramework_FieldType
 				height: 300px;  
 			}
 			.admin-page-framework-field .tab-box-content { 
-				height: 300px;
+
+				/* height: 300px; */
 				display: none; 
 				overflow: auto; 
 				display: block; 
 				position: relative; 
 				overflow-x: hidden;
+			}
+			.admin-page-framework-field .tab-box-content .taxonomychecklist {
+				margin-right: 3.2em;
 			}
 			.admin-page-framework-field .tab-box-content:target, 
 			.admin-page-framework-field .tab-box-content:target, 
@@ -245,7 +253,7 @@ class AdminPageFramework_FieldType_taxonomy extends AdminPageFramework_FieldType
 						. wp_list_categories( array(
 							'walker' => new AdminPageFramework_WalkerTaxonomyChecklist,	// the walker class instance
 							'name'     => is_array( $aField['taxonomy_slugs'] ) ? "{$aField['_input_name']}[{$sTaxonomySlug}]" : $aField['_input_name'],   // name of the input
-							'selected' => $this->_getSelectedKeyArray( $aField['value'], $sKey ), 		// checked items ( term IDs )	e.g.  array( 6, 10, 7, 15 ), 
+							'selected' => $this->_getSelectedKeyArray( $aField['value'], $sTaxonomySlug ), 		// checked items ( term IDs )	e.g.  array( 6, 10, 7, 15 ), 
 							'title_li'	=> '',	// disable the Categories heading string 
 							'hide_empty' => 0,	
 							'echo'	=> false,	// returns the output
@@ -286,19 +294,16 @@ class AdminPageFramework_FieldType_taxonomy extends AdminPageFramework_FieldType
 		 * @since			2.0.0
 		 * @param			array			$vValue			This can be either an one-dimensional array ( for single field ) or a two-dimensional array ( for multiple fields ).
 		 * @param			string			$sKey			
-		 * @return			array			Returns an array consisting of keys whose value is true.
+		 * @return			array			Returns an numerically indexed array holding the keys that yield true as the value.
 		 */ 
-		private function _getSelectedKeyArray( $vValue, $sKey ) {
-					
-			$vValue = ( array ) $vValue;	// cast array because the initial value (null) may not be an array.
-			$iArrayDimension = $this->getArrayDimension( $vValue );
-					
-			if ( $iArrayDimension == 1 )
-				$aKeys = $vValue;
-			else if ( $iArrayDimension == 2 )
-				$aKeys = ( array ) $this->getCorrespondingArrayValue( $vValue, $sKey, false );
+		private function _getSelectedKeyArray( $vValue, $sTaxonomySlug ) {
 
-			return array_keys( $aKeys, true );
+			$vValue = ( array ) $vValue;	// cast array because the initial value (null) may not be an array.
+			
+			if ( ! isset( $vValue[ $sTaxonomySlug ] ) ) return array();
+			if ( ! is_array( $vValue[ $sTaxonomySlug ] ) ) return array();
+			
+			return array_keys( $vValue[ $sTaxonomySlug ], true );
 		
 		}
 	
