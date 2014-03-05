@@ -1,7 +1,7 @@
 === Admin Page Framework ===
 Contributors: Michael Uno, miunosoft
 Donate link: http://michaeluno.jp/en/donate
-Tags: admin, administration, admin panel, option, options, setting, settings, Settings API, API, framework, library, class, classes, development tool, developers, developer tool, meta box, custom post type, utility, utilities, field, fields, custom field, custom fields
+Tags: admin, administration, admin panel, option, options, setting, settings, Settings API, API, framework, library, class, classes, developers, developer tool, meta box, custom post type, utility, utilities, field, fields, custom field, custom fields
 Requires at least: 3.3
 Tested up to: 3.8.1
 Stable tag: 3.0.1.1
@@ -216,7 +216,7 @@ In addition, your tutorials and snippets for the framework can be listed in the 
 No. The demo plugin is released under GPLv2 or later but the library itself is released under MIT. 
 
 = How do I retrieve the stored options? =
-The framework stores them as an organized multidimensional array in the options table in a single row. So use the `get_option()` function and pass the extended class name as the key or if you specify a custom key in the constructor, use it. 
+The framework stores them as an organized multidimensional array in the options table in a single row. So use the `get_option()` function and pass the extended class name as the key or the custom key if you specify one in the constructor. 
 
 For instance, if your extended class name is `APF` then the code would be `get_option( 'APF' );` Alternatively, use the [AdminPageFramework::getOption()](http://admin-page-framework.michaeluno.jp/en/v3/class-AdminPageFramework.html#_getOption) static method.
 
@@ -242,15 +242,32 @@ The default messages defined by the framework can be changed. For example when y
 
 If you want to change it to something else, modify the `oMsg` object. It has the `aMessages` public property array which holds all the messages that the library uses.
 
+<h5><strong>Change Preview Image Size of the `image` Field Type</strong></h5>
+To specify a custom size to the preview element of the `image` field type, set an attribute array like the below, where 300px is the max width.
+
+`array(
+	'field_id'	=>	'my_image_field_id',
+	'title'	=>	__( 'Image', 'admin-page-framework-demo' ),
+	'type'	=>	'image',
+	'attributes'	=>	array(
+		'style'	=>	'max-width:300px;',
+	),
+),`
+
 = Roadmap =
 Check out [the issues](https://github.com/michaeluno/admin-page-framework/issues?labels=enhancement&page=1&state=open) on GitHub labeled *enhancement*.
 
 == Changelog ==
 
+= 3.0.1.2 - 03/04/2014 = 
+* Fixed a bug that repeatable field buttons did not add/remove when a section is repeated with a new ID due to non-assigned options.
+* Fixed a bug that sortable fields of a repeated section could not be sorted.
+* Fixed a bug that `image` and `media` field type fields could not be repeated properly in repeatable sections.
+
 = 3.0.1.1 - 03/01/2014 =
 * Fixed a bug that `taxonomy` field type fields could not be properly repeated.
 * Tweaked the styling of the `taxonomy` field type fields.
-* Tweaked the styling of horizonatal alignment of th and td form elements.
+* Tweaked the styling of horizontal alignment of `th` and `td` form elements.
  
 = 3.0.1 - 02/26/2014 =
 * Added the `AdminPageFramework::getOption()` method that can be used from the front-end to retrieve saved option values. 
