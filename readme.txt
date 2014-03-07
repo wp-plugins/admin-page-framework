@@ -1,10 +1,10 @@
 === Admin Page Framework ===
 Contributors: Michael Uno, miunosoft
 Donate link: http://michaeluno.jp/en/donate
-Tags: admin, administration, admin panel, option, options, setting, settings, Settings API, API, framework, library, class, classes, developers, developer tool, meta box, custom post type, utility, utilities, field, fields, custom field, custom fields
+Tags: admin, administration, admin panel, option, options, setting, settings, Settings API, API, framework, library, class, classes, developers, developer tool, meta box, custom post type, utility, utilities, field, fields, custom field, custom fields, tool, tools
 Requires at least: 3.3
 Tested up to: 3.8.1
-Stable tag: 3.0.1.2
+Stable tag: 3.0.1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -72,8 +72,15 @@ The HTML documentation is included in the distribution package and can be access
 
 * [Online Documentation](http://admin-page-framework.michaeluno.jp/en/v3/class-AdminPageFramework.html)
 
-= Tutorials = 
-* [Tutorials](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/)
+= Tutorials =
+[Index](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/)
+
+1. [Create an Admin Page](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/01-create-an-admin-page/)
+2. [Create a Form](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/02-create-a-form/)
+3. [Create a Page Group](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/03-create-a-page-group/)
+4. [Create In-page Tabs](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/04-create-inpage-tabs/)
+5. [Organize a Form with Sections](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/05-organize-a-form-with-sections/)
+6. [Use Section Tabs and Repeatable Sections](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/use-section-tabs-and-repeatable-sections/)
 
 == Screenshots ==
 1. **Text Fields**
@@ -258,6 +265,10 @@ To specify a custom size to the preview element of the `image` field type, set a
 Check out [the issues](https://github.com/michaeluno/admin-page-framework/issues?labels=enhancement&page=1&state=open) on GitHub labeled *enhancement*.
 
 == Changelog ==
+
+= 3.0.1.3 =
+* Fixed a bug that custom columns could not be updated properly in the taxonomy definition page (edit-tags.php).
+* Added `class_exists()` checks for sample custom field type classes for the demo plugin.
 
 = 3.0.1.2 - 03/04/2014 = 
 * Fixed a bug that repeatable field buttons did not add/remove when a section is repeated with a new ID due to non-assigned options.
