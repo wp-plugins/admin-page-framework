@@ -6,7 +6,7 @@
  * Copyright (c) 2013-2014 Michael Uno; Licensed MIT
  * 
  */
-if ( ! class_exists( 'AdminPageFramework_MetaBox' ) ) :
+if ( ! class_exists( 'AdminPageFramework_MetaBox_Base' ) ) :
 /**
  * @abstract
  * @since			2.0.0
@@ -82,27 +82,24 @@ abstract class AdminPageFramework_MetaBox_Base {
 		$this->oProp = isset( $this->oProp )
 			? $this->oProp
 			: new AdminPageFramework_Property_MetaBox( $this, get_class( $this ), $sCapability );
+			
 		$this->oProp->sMetaBoxID = $this->oUtil->sanitizeSlug( $sMetaBoxID );
 		$this->oProp->sTitle = $sTitle;
 		$this->oProp->sContext = $sContext;	//  'normal', 'advanced', or 'side' 
 		$this->oProp->sPriority = $sPriority;	// 	'high', 'core', 'default' or 'low'	
-		
+
 		if ( $this->oProp->bIsAdmin ) {
 			
-			add_action( 'wp_loaded', array( $this, '_replyToLoadDefaultFieldTypeDefinitions' ), 10 );	// should be loaded before the setUp() method.
-			add_action( 'wp_loaded', array( $this, 'setUp' ), 11 );
-			add_action( 'current_screen', array( $this, '_replyToRegisterFormElements' ) );	// the screen object should be established to detect the loaded page. 
-			add_action( 'add_meta_boxes', array( $this, '_replyToAddMetaBox' ) );
-			add_action( 'save_post', array( $this, '_replyToSaveMetaBoxFields' ) );
+			add_action( 'wp_loaded', array( $this, '_replyToDetermineToLoad' ) );	
 								
 		}		
 	}
-
+				
 	/*
 	 * Should be extended
 	 */
 	public function setUp() {}
-	
+		
 	/*
 	 * Help Pane
 	 */
@@ -137,6 +134,32 @@ abstract class AdminPageFramework_MetaBox_Base {
 	 */
 	public function _replyToAddMetaBox() {}
 	public function _replyToRegisterFormElements() {}
+
+	/**
+	 * Determines whether the meta box should be loaded in the currently loading page.
+	 * 
+	 * 
+	 * @since			3.0.3
+	 */
+	public function _replyToDetermineToLoad() {
+		
+		if ( ! $this->_isInThePage() ) return;
+		
+		$this->_loadDefaultFieldTypeDefinitions();
+		$this->setUp();
+		add_action( 'current_screen', array( $this, '_replyToRegisterFormElements' ) );	// the screen object should be established to detect the loaded page. 
+		add_action( 'add_meta_boxes', array( $this, '_replyToAddMetaBox' ) );
+		add_action( 'save_post', array( $this, '_replyToSaveMetaBoxFields' ) );
+		
+	}	
+	
+	/**
+	 * Determines whether the meta box belongs to the loading page.
+	 * 
+	 * @since			3.0.3
+	 * @internal
+	 */
+	protected function _isInThePage() { return true; }		
 	
 	/**
 	 * Loads the default field type definition.
@@ -144,14 +167,21 @@ abstract class AdminPageFramework_MetaBox_Base {
 	 * @since			2.1.5
 	 * @internal
 	 */
-	public function _replyToLoadDefaultFieldTypeDefinitions() {
+	public function _loadDefaultFieldTypeDefinitions() {
 		
-		// This class adds filters for the field type definitions so that framework's default field types will be added.
-		new AdminPageFramework_FieldTypeRegistration( $this->oProp->aFieldTypeDefinitions, $this->oProp->sClassName, $this->oMsg );		
+		static $_aFieldTypeDefinitions = array();	// Stores the default field definitions. Once they are set, it no longer needs to be done.
+		
+		if ( empty( $_aFieldTypeDefinitions ) ) {
+			
+			// This class adds filters for the field type definitions so that framework's default field types will be added.
+			new AdminPageFramework_FieldTypeRegistration( $_aFieldTypeDefinitions, $this->oProp->sClassName, $this->oMsg );					
+			
+		} 
+				
 		$this->oProp->aFieldTypeDefinitions = $this->oUtil->addAndApplyFilter(		// Parameters: $oCallerObject, $sFilter, $vInput, $vArgs...
 			$this,
 			'field_types_' . $this->oProp->sClassName,	// 'field_types_' . {extended class name}
-			$this->oProp->aFieldTypeDefinitions
+			$_aFieldTypeDefinitions
 		);				
 		
 	}
