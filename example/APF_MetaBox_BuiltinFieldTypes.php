@@ -61,9 +61,9 @@ class APF_MetaBox_BuiltinFieldTypes extends AdminPageFramework_MetaBox {
 				'field_id'		=> 'metabox_text_field',
 				'type'			=> 'text',
 				'title'			=> __( 'Text Input', 'admin-page-framework-demo' ),
-				'description'	=> __( 'The description for the field.', 'admin-page-framework-demo' ),
-				'help'			=> 'This is help text.',
-				'help_aside'	=> 'This is additional help text which goes to the side bar of the help pane.',
+				'description'	=> __( 'Type more than two characters.', 'admin-page-framework-demo' ),
+				'help'			=> __( 'This is help text.', 'admin-page-framework-demo' ),
+				'help_aside'	=> __( 'This is additional help text which goes to the side bar of the help pane.', 'admin-page-framework-demo' ),
 			),
 			array(
 				'field_id'		=> 'metabox_text_field_repeatable',
@@ -87,7 +87,9 @@ class APF_MetaBox_BuiltinFieldTypes extends AdminPageFramework_MetaBox {
 				'type' 			=> 'textarea',
 				'title' 		=> __( 'Rich Text Editor', 'admin-page-framework-demo' ),
 				'rich' 			=> true,	// array( 'media_buttons' => false )  <-- a setting array can be passed. For the specification of the array, see http://codex.wordpress.org/Function_Reference/wp_editor
-			),				
+			)
+		);
+		$this->addSettingFields(
 			array(
 				'section_id'	=> 'selectors',
 				'field_id'		=> 'checkbox_field',
@@ -135,7 +137,9 @@ class APF_MetaBox_BuiltinFieldTypes extends AdminPageFramework_MetaBox {
 					'two' => false,
 					'three' => false,
 				),
-			),			
+			)
+		);			
+		$this->addSettingFields(
 			array (
 				'section_id'	=> 'misc',
 				'field_id'		=> 'image_field',
@@ -143,6 +147,11 @@ class APF_MetaBox_BuiltinFieldTypes extends AdminPageFramework_MetaBox {
 				'title'			=> __( 'Image', 'admin-page-framework-demo' ),
 				'description'	=> __( 'The description for the field.', 'admin-page-framework-demo' ),
 			),		
+			array(
+				'field_id'		=>	'metabox_password',
+				'type'			=>	'password',
+				'title'			=>	__( 'Password', 'admin-page-framework-demo' ),
+			),
 			array (
 				'field_id'		=> 'color_field',
 				'type'			=> 'color',
@@ -274,8 +283,34 @@ class APF_MetaBox_BuiltinFieldTypes extends AdminPageFramework_MetaBox {
 	
 	public function validation_APF_MetaBox_BuiltinFieldTypes( $aInput, $aOldInput ) {	// validation_{instantiated class name}
 	
+		$_fIsValid = true;
+		$_aErrors = array();
+
 		// You can check the passed values and correct the data by modifying them.
-		// $this->oDebug->logArray( $aInput );
+		// $this->oDebug->logArray( $aInput );		
+		
+		// Validate the submitted data.
+		if ( strlen( trim( $aInput['metabox_text_field'] ) ) < 3 ) {
+			
+			$_aErrors['metabox_text_field'] = __( 'The entered text is too short! Type more than 2 characters.', 'admin-page-framework-demo' ) . ': ' . $aInput['metabox_text_field'];
+			$_fIsValid = false;			
+			
+		}
+		if ( empty( $aInput['misc']['metabox_password'] ) ) {
+			
+			$_aErrors['misc']['metabox_password'] = __( 'The password cannot be empty.', 'admin-page-framework-demo' );
+			$_fIsValid = false;
+			
+		}
+		
+		if ( ! $_fIsValid ) {
+			
+			$this->setFieldErrors( $_aErrors );
+			$this->setSettingNotice( __( 'There was an error in your input.', 'admin-page-framework-demo' ) );	
+			return $aOldInput;
+			
+		}
+
 		return $aInput;
 		
 	}

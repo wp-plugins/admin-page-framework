@@ -16,7 +16,7 @@ class APF_Demo extends AdminPageFramework {
 			dirname( APFDEMO_FILE ) . '/third-party/sample-custom-field-type/SampleCustomFieldType.php',
 			dirname( APFDEMO_FILE ) . '/third-party/revealer-custom-field-type/RevealerCustomFieldType.php',
 			dirname( APFDEMO_FILE ) . '/third-party/grid-custom-field-type/GridCustomFieldType.php',
-			dirname( APFDEMO_FILE ) . '/third-party/autocomplete-custom-field-type/AutocompleteCustomFieldType.php',
+			dirname( APFDEMO_FILE ) . '/third-party/autocomplete-custom-field-type/AutocompleteCustomFieldType.php',			
 		);
 		foreach( $aFiles as $sFilePath )
 			if ( file_exists( $sFilePath ) ) include_once( $sFilePath );
@@ -2004,7 +2004,7 @@ class APF_Demo extends AdminPageFramework {
 				'section_id'	=>	'autocomplete',
 				'type'	=>	'autocomplete',		
 				'field_id'	=>	'autocomplete_field',
-				'title'		=>	__( 'Dafault', 'admin-page-framework-demo' ),
+				'title'		=>	__( 'Default', 'admin-page-framework-demo' ),
 				'description'	=>	__( 'By default, all the post titles will be fetched in the background and will pop up.', 'admin-page-framework-demo' ),	
 			),
 			array(
@@ -2029,6 +2029,10 @@ class APF_Demo extends AdminPageFramework {
 				'settings2'	=> array(
 					'theme'	=>	'mac',
 					'hintText'	=>	__( 'Type a programming language.', 'admin-page-framework-demo' ),
+					'prePopulate' => array(
+						array( 'id' => 3, 'name' => 'PHP' ),
+						array( 'id' => 5, 'name' => 'APS' ),
+					)					
 				),
 				'description'	=>	__( 'Predefined items are Ruby, Python, JavaScript, ActionScript, Scheme, Lisp, C#, Fortran, Vidual Basic, C, C++, Java.', 'admin-page-framework-demo' ),	
 			),
@@ -2039,9 +2043,10 @@ class APF_Demo extends AdminPageFramework {
 				'title'		=>	__( 'Custom Post Type', 'admin-page-framework-demo' ),
 				'settings'	=> add_query_arg( array( 'request' => 'autocomplete', 'post_type' => 'apf_posts' ) + $_GET, admin_url( $GLOBALS['pagenow'] ) ),
 				'settings2'	=>	array(	// equivalent to the second parameter of the tokenInput() method
-					'tokenLimit' =>	5,
+					'tokenLimit'		=>	5,
 					'preventDuplicates'	=>	true,
-					'theme'	=> 'facebook',
+					'theme'				=>	'facebook',	
+					'searchDelay'		=>	50,	// 50 milliseconds. Default: 300
 				),
 				'description'	=>	__( 'To set a custom post type, you need to compose the query url. This field is for the titles of this demo plugin\'s custom post type.', 'admin-page-framework-demo' ),	//' syntax fixer
 			),
@@ -2051,7 +2056,7 @@ class APF_Demo extends AdminPageFramework {
 				'field_id'	=>	'autocomplete_repeatable_field',
 				'title'		=>	__( 'Repeatable', 'admin-page-framework-demo' ),
 				'repeatable'	=> true,
-			),			
+			),
 			array()
 		);
 		/*

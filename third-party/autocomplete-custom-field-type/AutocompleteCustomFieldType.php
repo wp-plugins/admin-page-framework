@@ -53,33 +53,59 @@ class AutoCompleteCustomFieldType extends AdminPageFramework_FieldType {
 		/*
 		 * If the request key is set in the url and it yields 'autocomplete', return a JSON output and exit.
 		 */
-		if ( isset( $_GET['request'] ) && $_GET['request'] == 'autocomplete' ) {
+		if ( isset( $_GET['request'] ) && 'autocomplete' == $_GET['request'] ) {
 			
-			if ( ! function_exists( 'is_user_logged_in' ) ) 
+			if ( ! function_exists( 'is_user_logged_in' ) ) {
 				include( ABSPATH . "wp-includes/pluggable.php" ); 			
+			}
+			
 			if ( is_user_logged_in() ) :
 			
 				$_aGet = $_GET;
 				unset( $_aGet['request'], $_aGet['page'], $_aGet['tab'], $_aGet['settings-updated'] );
-				
-				// Compose the argument.
-				$aArgs = $_aGet + array(
-					'post_type' => 'post',
+							
+				// Retrieve posts
+				$_aArgs = $_aGet + array(
+					'post_type'			=> 'post',
+					'post_status'		=> 'publish',
+					'orderby'			=> 'title', 
+					'order'				=> 'ASC',
+					'posts_per_page'	=> -1,	
 				);
-				$oResults = new WP_Query( $aArgs );
-				$aData = array();
-				foreach( $oResults->posts as $iIndex => $oPost ) {
-					$aData[ $iIndex ] = array(
-						'id'	=>	$oPost->ID,
-						'name'	=>	$oPost->post_title,
+				if ( isset( $_GET['q'] ) ) {
+					add_filter( 'posts_where', array( $this, '_replyToModifyMySQLWhereClause' ), 10, 2 );
+					$_aArgs['q'] = $_GET['q'] ;
+				}
+				$_oResults = new WP_Query( $_aArgs );					
+				
+				// Format the data
+				$_aData = array();
+				foreach( $_oResults->posts as $__iIndex => $__oPost ) {
+					$_aData[ $__iIndex ] = array(
+						'id'	=>	$__oPost->ID,
+						'name'	=>	$__oPost->post_title,
 					);
 				}
-				die( json_encode( $aData ) );
+				
+				die( json_encode( $_aData ) );
+				
 			endif;
 			
 		}		
 		
 	}
+		/**
+		 * Modifies the WordPress database query.
+		 */
+		public function _replyToModifyMySQLWhereClause( $sWhere, $oWPQuery ) {
+			
+			global $wpdb;
+			if ( $_sSearchTerm = $oWPQuery->get( 'q' ) ) {
+				$sWhere .= ' AND ' . $wpdb->posts . '.post_title LIKE \'' . esc_sql( like_escape( $_sSearchTerm ) ) . '%\'';
+			}
+			return $sWhere;
+			
+		}	
 	
 	/**
 	 * Loads the field type necessary components.
