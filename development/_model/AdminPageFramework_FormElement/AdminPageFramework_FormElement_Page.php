@@ -170,7 +170,7 @@ class AdminPageFramework_FormElement_Page extends AdminPageFramework_FormElement
 	/**
 	 * Returns the formatted field array.
 	 * 
-	 * Before callign this method, $sOptionKey and $sClassName properties must be set.
+	 * Before calling this method, $sOptionKey and $sClassName properties must be set.
 	 * 
 	 * @since			3.0.0
 	 */
@@ -201,7 +201,7 @@ class AdminPageFramework_FormElement_Page extends AdminPageFramework_FormElement
 		if ( ! current_user_can( $aSection['capability'] ) ) return;
 		if ( ! $aSection['if'] ) return;	
 		if ( ! $aSection['page_slug'] ) return;	
-		if ( $GLOBALS['pagenow'] != 'options.php' && $this->sCurrentPageSlug != $aSection['page_slug'] ) return;	
+		if ( 'options.php' != $this->getPageNow() && $this->sCurrentPageSlug != $aSection['page_slug'] ) return;	
 		if ( ! $this->_isSectionOfCurrentTab( $aSection, $this->sCurrentPageSlug, $this->sCurrentTabSlug ) ) return;
 		return $aSection;
 		

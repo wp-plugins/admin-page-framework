@@ -44,56 +44,69 @@ class AutoCompleteCustomFieldType extends AdminPageFramework_FieldType {
 		
 		$_aGet = $_GET;
 		unset( $_aGet['post_type'], $_aGet['request'], $_aGet['page'], $_aGet['tab'], $_aGet['settings-updated'] );
-		$this->aDefaultKeys['settings'] = add_query_arg( array( 'request' => 'autocomplete' ) + $_aGet, admin_url( $GLOBALS['pagenow'] ) );
+		$this->aDefaultKeys['settings'] = add_query_arg( array( 'request' => 'autocomplete' ) + $_aGet, admin_url( $this->getPageNow() ) );
 		$this->aDefaultKeys['settings2'] = array(
 			'hintText'	=>	__( 'Type the title of posts.', 'admin-page-framework-demo' ),
 		);
 		parent::__construct( $asClassName, $asFieldTypeSlug, $oMsg, $bAutoRegister );
-		
+
 		/*
 		 * If the request key is set in the url and it yields 'autocomplete', return a JSON output and exit.
-		 */
+		 */		
 		if ( isset( $_GET['request'] ) && 'autocomplete' == $_GET['request'] ) {
+			add_action( 'init', array( $this, '_replyToReturnAutoCompleteRequest' ) );
+		}
+
+	}
+	
+	public function _replyToReturnAutoCompleteRequest() {
+	
+		if ( ! $this->_isLoggedIn() ) exit;
 			
-			if ( ! function_exists( 'is_user_logged_in' ) ) {
-				include( ABSPATH . "wp-includes/pluggable.php" ); 			
-			}
-			
-			if ( is_user_logged_in() ) :
-			
-				$_aGet = $_GET;
-				unset( $_aGet['request'], $_aGet['page'], $_aGet['tab'], $_aGet['settings-updated'] );
-							
-				// Retrieve posts
-				$_aArgs = $_aGet + array(
-					'post_type'			=> 'post',
-					'post_status'		=> 'publish',
-					'orderby'			=> 'title', 
-					'order'				=> 'ASC',
-					'posts_per_page'	=> -1,	
-				);
-				if ( isset( $_GET['q'] ) ) {
-					add_filter( 'posts_where', array( $this, '_replyToModifyMySQLWhereClause' ), 10, 2 );
-					$_aArgs['q'] = $_GET['q'] ;
-				}
-				$_oResults = new WP_Query( $_aArgs );					
-				
-				// Format the data
-				$_aData = array();
-				foreach( $_oResults->posts as $__iIndex => $__oPost ) {
-					$_aData[ $__iIndex ] = array(
-						'id'	=>	$__oPost->ID,
-						'name'	=>	$__oPost->post_title,
-					);
-				}
-				
-				die( json_encode( $_aData ) );
-				
-			endif;
-			
-		}		
+		$_aGet = $_GET;
+		unset( $_aGet['request'], $_aGet['page'], $_aGet['tab'], $_aGet['settings-updated'] );
+					
+		// Retrieve posts
+		$_aArgs = $_aGet + array(
+			'post_type'			=> 'post',
+			'post_status'		=> 'publish',
+			'orderby'			=> 'title', 
+			'order'				=> 'ASC',
+			'posts_per_page'	=> -1,	
+		);
+		if ( isset( $_GET['q'] ) ) {
+			add_filter( 'posts_where', array( $this, '_replyToModifyMySQLWhereClause' ), 10, 2 );
+			$_aArgs['q'] = $_GET['q'] ;
+		}
+		$_oResults = new WP_Query( $_aArgs );					
+		
+		// Format the data
+		$_aData = array();
+		foreach( $_oResults->posts as $__iIndex => $__oPost ) {
+			$_aData[ $__iIndex ] = array(
+				'id'	=>	$__oPost->ID,
+				'name'	=>	$__oPost->post_title,
+			);
+		}
+		
+		die( json_encode( $_aData ) );
+	
 		
 	}
+		private function _isLoggedIn() {
+			
+			if ( ! is_multisite() ) {				
+				if ( ! function_exists( 'is_user_logged_in' ) ) {
+					include_once( ABSPATH . "wp-includes/pluggable.php" ); 			
+				}	
+				return is_user_logged_in();
+			}
+			
+			// For multi-sites
+			return is_user_member_of_blog( get_current_user_id(), get_current_blog_id() ) ;
+
+		}
+	
 		/**
 		 * Modifies the WordPress database query.
 		 */

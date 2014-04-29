@@ -233,6 +233,9 @@ Yes. For built-in root menu items or create your own ones, you need to use the `
 e.g.
 `$this->setRootMenuPageBySlug( 'edit.php?post_type=apf_posts' );`
 
+= Does the framework work with [WordPress MU](https://codex.wordpress.org/WordPress_MU)? =
+Yes.
+
 == Other Notes ==
 
 = Tips =
@@ -272,7 +275,15 @@ Check out [the issues](https://github.com/michaeluno/admin-page-framework/issues
 
 == Changelog ==
 
-= 3.0.4 =
+= 3.0.5 - 04/29/2014 =
+- Fixed a bug that the `redirect_url` option of the `submit` field type did not take effect.
+- Fixed a bug that repeatable sections messages did not indicate the correct maximum and minimum numbers.
+- Tweaked the `autocomplete` custom field type to have some delays to perform post title queries in the background.
+- Changed the `validation_{instantiated class name}_{section id}_{field id}` and `validation_{instantiated class name}_{field id}` hooks to be triggered only when the section or field belongs to the page that the form is submitted.
+- Fixed a bug that some public methods caused a PHP fatal error "Call to a member function" after submitting a form in multi-sites when a plugin is network-activated.
+- Changed the post type class methods, `enquueueStyles()`, `enquueueStyle()`, `enquueueScripts()`, `enquueueScript()` to silently fail when they are called not in the post type page.
+
+= 3.0.4 - 04/19/2014 =
 - Improved the accuracy on search results of the `autocomplete` custom field type.
 - Fixed a bug that the help pane of meta box fields did not appear in the page after submitting the form.
 - Added the ability to set a validation error message to appear at the top of a form section output.

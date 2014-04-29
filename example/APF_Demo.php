@@ -1393,7 +1393,7 @@ class APF_Demo extends AdminPageFramework {
 			),			
 			array( // Submit button as a redirect
 				'field_id'	=>	'submit_button_redirect',
-				'title'	=>	'Redirect Button',
+				'title'	=>	__( 'Redirect Button', 'admin-page-framework-demo' ),
 				'type'	=>	'submit',
 				'description'	=>	sprintf( __( 'Unlike the above link buttons, this button saves the options and then redirects to: <code>%1$s</code>', 'admin-page-framework-demo' ), admin_url() )
 					. ' ' . __( 'To enable this functionality, set the url to the <code>redirect_url</code> key in the field definition array.', 'admin-page-framework-demo' ),
@@ -1405,7 +1405,7 @@ class APF_Demo extends AdminPageFramework {
 			),
 			array( // Reset Submit button
 				'field_id'	=>	'submit_button_reset',
-				'title'	=>	'Reset Button',
+				'title'	=>	__( 'Reset Button', 'admin-page-framework-demo' ),
 				'type'	=>	'submit',
 				'label'	=>	__( 'Reset', 'admin-page-framework-demo' ),
 				'reset'	=>	true,
@@ -2041,7 +2041,7 @@ class APF_Demo extends AdminPageFramework {
 				'type'	=>	'autocomplete',		
 				'field_id'	=>	'autocomplete_custom_post_type',
 				'title'		=>	__( 'Custom Post Type', 'admin-page-framework-demo' ),
-				'settings'	=> add_query_arg( array( 'request' => 'autocomplete', 'post_type' => 'apf_posts' ) + $_GET, admin_url( $GLOBALS['pagenow'] ) ),
+				'settings'	=> add_query_arg( array( 'request' => 'autocomplete', 'post_type' => 'apf_posts' ) + $_GET, admin_url( AdminPageFramework_WPUtility::getPageNow() ) ),
 				'settings2'	=>	array(	// equivalent to the second parameter of the tokenInput() method
 					'tokenLimit'		=>	5,
 					'preventDuplicates'	=>	true,
@@ -2345,7 +2345,7 @@ class APF_Demo extends AdminPageFramework {
 	public function validation_APF_Demo_verification_verify_text_field( $sNewInput, $sOldInput ) {	// validation_{extended class name}_{section id}_{field id}
 	
 		/* 1. Set a flag. */
-		$bVerified = true;
+		$_bVerified = true;
 		
 		/* 2. Prepare an error array.
 		 	We store values that have an error in an array and pass it to the setFieldErrors() method.
@@ -2354,23 +2354,23 @@ class APF_Demo extends AdminPageFramework {
 			The library class will search for this transient when it renders the form fields 
 			and if it is found, it will display the error message set in the field array. 	
 		*/
-		$aErrors = array();
+		$_aErrors = array();
 
 		/* 3. Check if the submitted value meets your criteria. As an example, here a numeric value is expected. */
 		if ( ! is_numeric( $sNewInput ) ) {
 			
 			// $variable[ 'sectioni_id' ]['field_id']
-			$aErrors['verification']['verify_text_field'] = __( 'The value must be numeric:', 'admin-page-framework-demo' ) . ' ' . $sNewInput;
-			$bVerified = false;
-			
+			$_aErrors['verification']['verify_text_field'] = __( 'The value must be numeric:', 'admin-page-framework-demo' ) . ' ' . $sNewInput;
+			$_bVerified = false;
+					
 		}
 		
 		/* 4. An invalid value is found. */
-		if ( ! $bVerified ) {
+		if ( ! $_bVerified ) {
 		
 			/* 4-1. Set the error array for the input fields. */
-			$this->setFieldErrors( $aErrors );		
-			$this->setSettingNotice( __( 'There was an error in your input.', 'admin-page-framework-demo' ) );
+			$this->setFieldErrors( $_aErrors );		
+			$this->setSettingNotice( __( 'There was something wrong with your input.', 'admin-page-framework-demo' ) );
 			return $sOldInput;
 			
 		}
