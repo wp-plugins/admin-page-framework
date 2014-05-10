@@ -114,7 +114,7 @@ class AutoCompleteCustomFieldType extends AdminPageFramework_FieldType {
 			
 			global $wpdb;
 			if ( $_sSearchTerm = $oWPQuery->get( 'q' ) ) {
-				$sWhere .= ' AND ' . $wpdb->posts . '.post_title LIKE \'' . esc_sql( like_escape( $_sSearchTerm ) ) . '%\'';
+				$sWhere .= " AND " . $wpdb->posts . ".post_title LIKE '%" . esc_sql( like_escape( $_sSearchTerm ) ) . "%'";
 			}
 			return $sWhere;
 			
@@ -191,21 +191,33 @@ class AutoCompleteCustomFieldType extends AdminPageFramework_FieldType {
 		return "
 			jQuery( document ).ready( function(){
 				jQuery().registerAPFCallback( {				
-					added_repeatable_field: function( node, sFieldType, sFieldTagID ) {
+				
+					/**
+					 * The repeatable field callback.
+					 * 
+					 * @param	object	oCopiedNode
+					 * @param	string	the field type slug
+					 * @param	string	the field container tag ID
+					 * @param	integer	the caller type. 1 : repeatable sections. 0 : repeatable fields.
+					 */
+					added_repeatable_field: function( oCopiedNode, sFieldType, sFieldTagID, iCallType ) {
 			
 						/* If it is not this field type, do nothing. */
 						if ( jQuery.inArray( sFieldType, {$aJSArray} ) <= -1 ) return;
 
 						/* If the input tag is not found, do nothing  */
-						var nodeNewAutoComplete = node.find( 'input.autocomplete' );
+						var nodeNewAutoComplete = oCopiedNode.find( 'input.autocomplete' );
 						if ( nodeNewAutoComplete.length <= 0 ) return;
 						
 						/* Remove unnecessary elements */
-						node.find( 'ul.token-input-list' ).remove();
+						oCopiedNode.find( 'ul.token-input-list' ).remove();
 						
-						/* Bind the knob script */
-						var sFieldsID = node.closest( '.admin-page-framework-fields' ).attr( 'id' );
-						var aOptions = jQuery( '#' + nodeNewAutoComplete.attr( 'id' ) ).getTokenInputOptions( sFieldsID );
+						/* Bind the autocomplete script */
+						var sFieldsID = oCopiedNode.closest( '.admin-page-framework-fields' ).attr( 'id' );
+						var sOptionID = oCopiedNode.closest( '.admin-page-framework-sections' ).attr( 'id' ) + '_' + oCopiedNode.closest( '.admin-page-framework-fields' ).attr( 'id' );	// sections id + _ + fields id 
+						var aOptions = jQuery( '#' + nodeNewAutoComplete.attr( 'id' ) ).getTokenInputOptions( sOptionID );
+						aOptions = jQuery.isArray( aOptions ) ? aOptions : [ [], [] ];
+						
 						jQuery( nodeNewAutoComplete ).tokenInput( 
 							aOptions[0], 
 							jQuery.extend( true, aOptions[1], {
@@ -217,8 +229,7 @@ class AutoCompleteCustomFieldType extends AdminPageFramework_FieldType {
 								},
 							})
 						);
-					},
-					
+					},					
 				});
 			});		
 		
@@ -239,7 +250,7 @@ class AutoCompleteCustomFieldType extends AdminPageFramework_FieldType {
 		.admin-page-framework-field-autocomplete {
 			width: 100%;
 		}
-		.admin-page-framework-input-label-container {
+		.admin-page-framework-field-autocomplete .admin-page-framework-input-label-container {
 			min-width: 200px;
 		}
 		";
@@ -259,7 +270,8 @@ class AutoCompleteCustomFieldType extends AdminPageFramework_FieldType {
 			'type'	=>	'text',
 		) + $aField['attributes'];
 		$aInputAttributes['class']	.= ' autocomplete';
-
+		// $aInputAttributes['value']	= '[]' === $aInputAttributes['value'] ? null : $aInputAttributes['value'];
+				
 		return 
 			$aField['before_label']
 			. "<div class='admin-page-framework-input-label-container'>"
@@ -273,22 +285,23 @@ class AutoCompleteCustomFieldType extends AdminPageFramework_FieldType {
 					. $aField['after_input']
 				. "</label>"
 			. "</div>"
-			. $this->getAutocompletenablerScript( $aField['input_id'], $aField['settings'], $aField['settings2'] )
+			. $this->getAutocompletenablerScript( $aField['input_id'], $aField['settings'], $aField['settings2'], $aInputAttributes['value'] )
 			. $aField['after_label'];
 		
 	}	
 		
-		private function getAutocompletenablerScript( $sInputID, $asParam1, $aParam2 ) {
-			$asParam1 = is_array( $asParam1 ) ? json_encode( $asParam1 ) : "'" . $asParam1 . "'";
-			$aParam2 = json_encode( ( array ) $aParam2 );
+		private function getAutocompletenablerScript( $sInputID, $asParam1, $aParam2, $sValue='' ) {
+			
+			$sParam1 = $this->_formatSettings( $asParam1, $sValue );
+			$sParam2 = $this->_formatSettings( $aParam2, $sValue );
 			return 
 				"<script type='text/javascript' class='autocomplete-enabler-script'>
 					jQuery( document ).ready( function() {
 
 						var oSavedValues = jQuery.parseJSON( jQuery( '#{$sInputID}' ).attr( 'value' ) );						
 						jQuery( '#{$sInputID}' ).tokenInput( 
-							{$asParam1}, 
-							jQuery.extend( true, {$aParam2}, {
+							{$sParam1}, 
+							jQuery.extend( true, {$sParam2}, {
 								onAdd: function ( item ) {
 									jQuery( '#{$sInputID}' ).attr( 'value', JSON.stringify( jQuery( '#{$sInputID}' ).tokenInput( 'get' ) ) );
 								},
@@ -300,9 +313,31 @@ class AutoCompleteCustomFieldType extends AdminPageFramework_FieldType {
 						jQuery( oSavedValues ).each( function ( index, value) {
 							jQuery( '#{$sInputID}' ).tokenInput( 'add', value );
 						}); 
-						jQuery( '#{$sInputID}' ).storeTokenInputOptions( jQuery( '#{$sInputID}' ).closest( '.admin-page-framework-fields' ).attr( 'id' ), {$asParam1}, {$aParam2} );
+						var sOptionID = jQuery( '#{$sInputID}' ).closest( '.admin-page-framework-sections' ).attr( 'id' ) + '_' + jQuery( '#{$sInputID}' ).closest( '.admin-page-framework-fields' ).attr( 'id' );
+						jQuery( '#{$sInputID}' ).storeTokenInputOptions( sOptionID, {$sParam1}, {$sParam2} );
 					});
 				</script>";		
+		}
+		
+		/**
+		 * 
+		 * @return			string			The json encoded string.
+		 */
+		private function _formatSettings( $asParams, $sValue='' ) {
+
+			if ( ! is_array( $asParams ) ) {
+				return "'" . ( string ) $asParams . "'";
+			}
+				
+			$aParams = $asParams;
+			
+			// the 'prePopulate' option should only be set when the value is not set; otherwise, the jQuery script causes an unknown error.
+			if ( isset( $aParams['prePopulate'] ) && $sValue ) {
+				unset( $aParams['prePopulate'] );
+			}
+			
+			return json_encode( ( array ) $aParams );
+			
 		}
 	
 }

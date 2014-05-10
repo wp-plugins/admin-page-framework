@@ -100,8 +100,8 @@ The HTML documentation is included in the distribution package and can be access
 
 = Getting Started =
 
-<h5><strong>Step 1</strong> - Include <em><strong>admin-page-framework.php</strong></em></h5>
-You need to include the library file in your PHP script. The file is located in the `class` folder of the uncompressed plugin file.
+<h5><strong>Step 1</strong> - Include <em><strong>admin-page-framework.min.php</strong></em></h5>
+You need to include the library file in your PHP script. The file is located in the `library` folder of the uncompressed plugin file.
 
 `if ( ! class_exists( 'AdminPageFramework' ) )
     include_once( dirname( __FILE__ ) . '/library/admin-page-framework.min.php' );`
@@ -233,8 +233,8 @@ Yes. For built-in root menu items or create your own ones, you need to use the `
 e.g.
 `$this->setRootMenuPageBySlug( 'edit.php?post_type=apf_posts' );`
 
-= Does the framework work with [WordPress MU](https://codex.wordpress.org/WordPress_MU)? =
-Yes.
+= Does the framework work with WordPress Multi-site? =
+Yes, it works with [WordPress MU](https://codex.wordpress.org/WordPress_MU).
 
 == Other Notes ==
 
@@ -274,6 +274,17 @@ To specify a custom size to the preview element of the `image` field type, set a
 Check out [the issues](https://github.com/michaeluno/admin-page-framework/issues?labels=enhancement&page=1&state=open) on GitHub labeled *enhancement*.
 
 == Changelog ==
+
+= 3.0.6 - 05/10/2014 =
+- Fixed a JavaScript syntax error in the `font` custom field type.
+- Fixed a bug in the `image` and `media` field types and the `font` custom field type that escaping the frame did not cancel setting the selection.
+- Fixed an issue that the section tab script was applying the styling to all the `ul` elements inside the section.
+- Tweaked the styling of the repeatable section buttons.
+- Tweaked the `autocomplete` custom field type to find more posts by loosening the search criteria. 
+- Fixed a bug in the `autocomplete` custom field type that setting the `prePopulate` option caused a JavaScript error after submitting the form.
+- Fixed an issue that submitted form input data array in validation callback methods lost array keys of fields with individual set capabilities when the form-submitting user has lower capability than the stored field capability.
+- Added the ability to set a link and its label in the title cell of the plugin listing table for a custom post type created by the framework.
+- Fixed an issue that the `dial` and `autocomplete` custom field type fields could not be repeated properly in repeatable sections.
 
 = 3.0.5 - 04/29/2014 =
 - Fixed a bug that the `redirect_url` option of the `submit` field type did not take effect.
