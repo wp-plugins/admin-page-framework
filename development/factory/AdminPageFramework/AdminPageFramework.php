@@ -59,12 +59,12 @@ if ( ! class_exists( 'AdminPageFramework' ) ) :
  * 	<li><strong>field_definition_{instantiated class name}_{section id}_{field ID}</strong> – [3.0.2+] receives the form field definition array of the given input field ID that has a section. The first parameter: the field definition array. The second parameter: the integer representing sub-section index if the field belongs to a sub-section.</li>
  * 	<li><strong>pages_{instantiated class name}</strong> – receives the registered page arrays. The first parameter: pages container array.</li> 
  * 	<li><strong>tabs_{instantiated class name}_{page slug}</strong> – receives the registered in-page tab arrays. The first parameter: tabs container array.</li> 
- * 	<li><strong>validation_{instantiated class name}_{field id}</strong> – [3.0.0+] receives the form submission value of the field that does not have a section. The first parameter: ( string|array ) submitted input value. The second parameter: ( string|array ) the old value stored in the database.</li>
- * 	<li><strong>validation_{instantiated class name}_{section_id}_{field id}</strong> – [3.0.0+] receives the form submission value of the field that has a section. The first parameter: ( string|array ) submitted input value. The second parameter: ( string|array ) the old value stored in the database.</li>
- * 	<li><strong>validation_{instantiated class name}_{section id}</strong> – [3.0.0+] receives the form submission values that belongs to the section.. The first parameter: ( array ) the array of submitted input values that belong to the section. The second parameter: ( array ) the array of the old values stored in the database.</li>
- * 	<li><strong>validation_{page slug}_{tab slug}</strong> – receives the form submission values as array. The first parameter: submitted input array. The second parameter: the original array stored in the database.</li>
- * 	<li><strong>validation_{page slug}</strong> – receives the form submission values as array. The first parameter: submitted input array. The second parameter: the original array stored in the database.</li>
- * 	<li><strong>validation_{instantiated class name}</strong> – receives the form submission values as array. The first parameter: submitted input array. The second parameter: the original array stored in the database.</li>
+ * 	<li><strong>validation_{instantiated class name}_{field id}</strong> – [3.0.0+] receives the form submission value of the field that does not have a section. The first parameter: ( string|array ) submitted input value. The second parameter: ( string|array ) the old value stored in the database. The third parameter: ( object ) [3.1.0+] the caller object.</li>
+ * 	<li><strong>validation_{instantiated class name}_{section_id}_{field id}</strong> – [3.0.0+] receives the form submission value of the field that has a section. The first parameter: ( string|array ) submitted input value. The second parameter: ( string|array ) the old value stored in the database. The third parameter: ( object ) [3.1.0+] the caller object.</li>
+ * 	<li><strong>validation_{instantiated class name}_{section id}</strong> – [3.0.0+] receives the form submission values that belongs to the section.. The first parameter: ( array ) the array of submitted input values that belong to the section. The second parameter: ( array ) the array of the old values stored in the database. The third parameter: ( object ) [3.1.0+] the caller object.</li>
+ * 	<li><strong>validation_{page slug}_{tab slug}</strong> – receives the form submission values as array. The first parameter: submitted input array. The second parameter: the original array stored in the database. The third parameter: ( object ) [3.1.0+] the caller object.</li>
+ * 	<li><strong>validation_{page slug}</strong> – receives the form submission values as array. The first parameter: submitted input array. The second parameter: the original array stored in the database. The third parameter: ( object ) [3.1.0+] the caller object.</li>
+ * 	<li><strong>validation_{instantiated class name}</strong> – receives the form submission values as array. The first parameter: submitted input array. The second parameter: the original array stored in the database. The third parameter: ( object ) [3.1.0+] the caller object.</li>
  * 	<li><strong>style_{page slug}_{tab slug}</strong> – receives the output of the CSS rules applied to the tab page of the slug.</li>
  * 	<li><strong>style_{page slug}</strong> – receives the output of the CSS rules applied to the page of the slug.</li>
  * 	<li><strong>style_{instantiated class name}</strong> – receives the output of the CSS rules applied to the pages added by the instantiated class object.</li>
@@ -113,6 +113,7 @@ if ( ! class_exists( 'AdminPageFramework' ) ) :
  * 	<li><strong>import_option_key_{page slug}_{tab slug}</strong> – receives the option array key of the importing array submitted from the tab page.</li>
  * 	<li><strong>import_option_key_{page slug}</strong> – receives the option array key of the importing array submitted from the page.</li>
  * 	<li><strong>import_option_key_{instantiated class name}</strong> – receives the option array key of the importing array submitted from the plugin.</li> 
+ * 	<li><strong>options_{instantiated class name}</strong> – [3.1.0+] receives the option array.</li> 
  * </ul>
  * <h3>Remarks</h3>
  * <p>The slugs must not contain a dot(.) or a hyphen(-) since it is used in the callback method name.</p>
@@ -177,7 +178,9 @@ if ( ! class_exists( 'AdminPageFramework' ) ) :
  *              do_form_{page slug}_{tab slug}
  *              do_form_{page slug}
  *              do_form_{instantiated class name}
- *  
+ *  			
+ * 				field_definition_{instantiated class name}_{section ID}_{field ID}
+ * 				field_definition_{instantiated class name}_{field ID (which does not have a section)}
  *              section_head_{instantiated class name}_{section ID}
  *              field_{instantiated class name}_{field ID}
  *  
@@ -203,10 +206,17 @@ if ( ! class_exists( 'AdminPageFramework' ) ) :
  *  do_after_{page slug}_{tab slug}
  *  
  *  ----- After Submitting the Form ------
- *  
- *  validation_{instantiated class name}_{submit button input id}
- *  validation_{instantiated class name}_{submit button field id}
- *  validation_{page slug}_{tab slug }
+ * 
+ *  submit_{instantiated class name}_{pressed submit field id}
+ *  submit_{instantiated class name}_{section id}
+ *  submit_{instantiated class name}_{section id}_{field id}
+ *  submit_{instantiated class name}_{page slug}
+ *  submit_{instantiated class name}_{page slug}_{tab slug}
+ *  submit_{instantiated class name}
+ *  validation_{instantiated class name}_{field id (which does not have a section)}
+ *  validation_{instantiated class name}_{section_id}
+ *  validation_{instantiated class name}_{section id}_{field id}
+ *  validation_{page slug}_{tab slug}
  *  validation_{page slug }
  *  validation_{instantiated class name }
  *  export_{page slug}_{tab slug}
@@ -229,7 +239,7 @@ if ( ! class_exists( 'AdminPageFramework' ) ) :
  * @package			AdminPageFramework
  * @subpackage		Page
  */
-abstract class AdminPageFramework extends AdminPageFramework_Setting_Validation {
+abstract class AdminPageFramework extends AdminPageFramework_Setting {
 		
 	/**
 	 * Registers necessary callbacks ans sets up internal components including properties.
@@ -249,7 +259,11 @@ abstract class AdminPageFramework extends AdminPageFramework_Setting_Validation 
 	 * @return			void			returns nothing.
 	 */
 	public function __construct( $sOptionKey=null, $sCallerPath=null, $sCapability='manage_options', $sTextDomain='admin-page-framework' ){
-			
+						
+		if ( ! $this->_isInstantiatabe() ) {
+			return;
+		 }
+						
 		parent::__construct( 
 			$sOptionKey, 
 			$sCallerPath ? $sCallerPath : AdminPageFramework_Utility::getCallerScriptPath( __FILE__ ), 	// this is important to attempt to find the caller script path here when separating the library into multiple files.
@@ -335,7 +349,9 @@ abstract class AdminPageFramework extends AdminPageFramework_Setting_Validation 
 	 * @return			void
 	 */ 
 	public function addHelpTab( $aHelpTab ) {
-		$this->oHelpPane->_addHelpTab( $aHelpTab );
+		if ( method_exists( $this->oHelpPane, '_addHelpTab' ) ) {
+			$this->oHelpPane->_addHelpTab( $aHelpTab );
+		}
 	}
 
 	/*
@@ -363,7 +379,9 @@ abstract class AdminPageFramework extends AdminPageFramework_Setting_Validation 
 	 * @return			array			The array holing the queued items.
 	 */
 	public function enqueueStyles( $aSRCs, $sPageSlug='', $sTabSlug='', $aCustomArgs=array() ) {
-		return $this->oHeadTag->_enqueueStyles( $aSRCs, $sPageSlug, $sTabSlug, $aCustomArgs );
+		if ( method_exists( $this->oHeadTag, '_enqueueStyles' ) ) {
+			return $this->oHeadTag->_enqueueStyles( $aSRCs, $sPageSlug, $sTabSlug, $aCustomArgs );
+		}
 	}
 	/**
 	 * Enqueues a style by page slug and tab slug.
@@ -388,7 +406,9 @@ abstract class AdminPageFramework extends AdminPageFramework_Setting_Validation 
 	 * @return			string			The style handle ID. If the passed url is not a valid url string, an empty string will be returned.
 	 */	
 	public function enqueueStyle( $sSRC, $sPageSlug='', $sTabSlug='', $aCustomArgs=array() ) {
-		return $this->oHeadTag->_enqueueStyle( $sSRC, $sPageSlug, $sTabSlug, $aCustomArgs );		
+		if ( method_exists( $this->oHeadTag, '_enqueueStyle' ) ) {
+			return $this->oHeadTag->_enqueueStyle( $sSRC, $sPageSlug, $sTabSlug, $aCustomArgs );		
+		}
 	}
 	/**
 	 * Enqueues scripts by page slug and tab slug.
@@ -412,7 +432,9 @@ abstract class AdminPageFramework extends AdminPageFramework_Setting_Validation 
 	 * @return			array			The array holding the queued items.
 	 */
 	public function enqueueScripts( $aSRCs, $sPageSlug='', $sTabSlug='', $aCustomArgs=array() ) {
-		return $this->oHeadTag->_enqueueScripts( $sSRC, $sPageSlug, $sTabSlug, $aCustomArgs );
+		if ( method_exists( $this->oHeadTag, '_enqueueScripts' ) ) {
+			return $this->oHeadTag->_enqueueScripts( $sSRC, $sPageSlug, $sTabSlug, $aCustomArgs );
+		}
 	}	
 	/**
 	 * Enqueues a script by page slug and tab slug.
@@ -449,7 +471,9 @@ abstract class AdminPageFramework extends AdminPageFramework_Setting_Validation 
 	 * @return			string			The script handle ID. If the passed url is not a valid url string, an empty string will be returned.
 	 */
 	public function enqueueScript( $sSRC, $sPageSlug='', $sTabSlug='', $aCustomArgs=array() ) {	
-		return $this->oHeadTag->_enqueueScript( $sSRC, $sPageSlug, $sTabSlug, $aCustomArgs );
+		if ( method_exists( $this->oHeadTag, '_enqueueScript' ) ) {
+			return $this->oHeadTag->_enqueueScript( $sSRC, $sPageSlug, $sTabSlug, $aCustomArgs );
+		}
 	}
 	
 	/**
@@ -471,7 +495,9 @@ abstract class AdminPageFramework extends AdminPageFramework_Setting_Validation 
 	* @return			void
 	*/		
 	public function addLinkToPluginDescription( $sTaggedLinkHTML1, $sTaggedLinkHTML2=null, $_and_more=null ) {
-		$this->oLink->_addLinkToPluginDescription( func_get_args() );		
+		if ( method_exists( $this->oLink, '_addLinkToPluginDescription' ) ) {
+			$this->oLink->_addLinkToPluginDescription( func_get_args() );		
+		}
 	}
 
 	/**
@@ -492,7 +518,20 @@ abstract class AdminPageFramework extends AdminPageFramework_Setting_Validation 
 	* @return			void
 	*/	
 	public function addLinkToPluginTitle( $sTaggedLinkHTML1, $sTaggedLinkHTML2=null, $_and_more=null ) {	
-		$this->oLink->_addLinkToPluginTitle( func_get_args() );		
+		if ( method_exists( $this->oLink, '_addLinkToPluginTitle' ) ) {
+			$this->oLink->_addLinkToPluginTitle( func_get_args() );		
+		}
+	}
+	 
+	/**
+	 * Sets the label applied to the settings link which automatically embedded to the plugin listing table of the plugin title cell.
+	 * 
+	 * To disable the embedded settings link, pass an empty value.
+	 * 
+	 * @since			3.1.0
+	 */	 
+	public function setPluginSettingsLinkLabel( $sLabel ) {
+		$this->oProp->sLabelPluginSettingsLink = $sLabel;
 	}
 	 
 	/**
@@ -587,10 +626,11 @@ abstract class AdminPageFramework extends AdminPageFramework_Setting_Validation 
 		 */
 		public function _replyToPrintAdminNotices() {
 			
-			foreach( $this->oProp->aAdminNotices as $aAdminNotice ) 
-				echo "<div class='{$aAdminNotice['sClassSelector']}' id='{$aAdminNotice['sID']}' ><p>"
-					. $aAdminNotice['sMessage']
-					. "</p></div>";
+			foreach( $this->oProp->aAdminNotices as $aAdminNotice ) {
+				echo "<div class='{$aAdminNotice['sClassSelector']}' id='{$aAdminNotice['sID']}'>"
+						. "<p>" . $aAdminNotice['sMessage'] . "</p>"
+					. "</div>";
+			}
 			
 		}	
 	
@@ -655,6 +695,22 @@ abstract class AdminPageFramework extends AdminPageFramework_Setting_Validation 
 	static public function getOption( $sOptionKey, $asKey=null , $vDefault=null ) {
 		return AdminPageFramework_WPUtility::getOption( $sOptionKey,$asKey, $vDefault );
 	}
+	
+	
+	/**
+	 * Disables the functionality to save submitted form data into the options table.
+	 * 
+	 * <h4>Example</h4>
+	 * <code>
+	 * $this->disableSavingOptions();
+	 * </code>
+	 * @since			3.1.0
+	 * @deprecated		3.1.0b27		Passing an empty string to the first parameter of the constructor should be sufficient.
+	 */
+	// public function disableSavingOptions() {
+		// $this->oProp->_bDisableSavingOptions = true;
+	// }
+	
 	
 }
 endif;

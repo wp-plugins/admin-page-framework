@@ -16,7 +16,7 @@ if ( ! class_exists( 'AdminPageFramework_Base' ) ) :
  * @subpackage		Page
  * @internal
  */
-abstract class AdminPageFramework_Base {
+abstract class AdminPageFramework_Base extends AdminPageFramework_Factory {
 	
 	/**
 	 * Stores the prefixes of the filters used by this framework.
@@ -65,6 +65,7 @@ abstract class AdminPageFramework_Base {
 		
 		'field_types_'		=> 'field_types_',
 		'field_definition_'	=> 'field_definition_',	// 3.0.2+
+		'options_'			=> 'options_',	// 3.1.0+
 	);
 	
 	/**
@@ -82,20 +83,33 @@ abstract class AdminPageFramework_Base {
 	* 
 	* @since			2.0.0
 	* @since			3.0.0			Moved from the main class.
-	* @access			protected
+	* @since			3.1.0			Changed the scope to public from protected to allow the user to use the methods.
+	* @access			public
 	* @var				object			an instance of AdminPageFramework_Debug will be assigned in the constructor.
     */		
-	protected $oDebug;
+	public $oDebug;
 	
 	/**
     * Provides the methods for text messages of the framework. 
 	* 
 	* @since			2.0.0
 	* @since			3.0.0			Moved from the main class.
-	* @access			protected
+	* @since			3.1.0			Changed the scope to public from protected.
+	* @access			public
 	* @var				object			an instance of AdminPageFramework_Message will be assigned in the constructor.
     */	
-	protected $oMsg;
+	public $oMsg;
+	
+	/**
+    * Provides the utility methods. 
+	* 
+	* @since			2.0.0
+	* @since			3.0.0			Moved from the main class.
+	* @since			3.1.0			Changed the scope to public from protected.
+	* @access			public
+	* @var				object			an instance of AdminPageFramework_Utility will be assigned in the constructor.
+    */			
+	public $oUtil;
 	
 	/**
     * Provides the methods for creating HTML link elements. 
@@ -106,16 +120,6 @@ abstract class AdminPageFramework_Base {
 	* @var				object			an instance of AdminPageFramework_Link_Page will be assigned in the constructor.
     */		
 	protected $oLink;
-	
-	/**
-    * Provides the utility methods. 
-	* 
-	* @since			2.0.0
-	* @since			3.0.0			Moved from the main class.
-	* @access			protected
-	* @var				object			an instance of AdminPageFramework_Utility will be assigned in the constructor.
-    */			
-	protected $oUtil;
 	
 	/**
 	 * Provides the methods to insert head tag elements.
@@ -150,17 +154,14 @@ abstract class AdminPageFramework_Base {
 	function __construct( $sOptionKey=null, $sCallerPath=null, $sCapability='manage_options', $sTextDomain='admin-page-framework' ) {
 				
 		// Objects
-		$this->oProp = new AdminPageFramework_Property_Page( $this, $sCallerPath, get_class( $this ), $sOptionKey, $sCapability, $sTextDomain );
-		$this->oMsg = AdminPageFramework_Message::instantiate( $sTextDomain );
-		$this->oPageLoadInfo = AdminPageFramework_PageLoadInfo_Page::instantiate( $this->oProp, $this->oMsg );
-		$this->oHelpPane = new AdminPageFramework_HelpPane_Page( $this->oProp );
-		$this->oLink = new AdminPageFramework_Link_Page( $this->oProp, $this->oMsg );
-		$this->oHeadTag = new AdminPageFramework_HeadTag_Page( $this->oProp );
-		$this->oUtil = new AdminPageFramework_WPUtility;
-		$this->oDebug = new AdminPageFramework_Debug;		
+		$this->oProp = isset( $this->oProp ) 
+			? $this->oProp	// for the AdminPageFramework_NetworkAdmin class
+			: new AdminPageFramework_Property_Page( $this, $sCallerPath, get_class( $this ), $sOptionKey, $sCapability, $sTextDomain );
+
+		parent::__construct( $this->oProp );
 
 		if ( $this->oProp->bIsAdmin ) {
-			add_action( 'wp_loaded', array( $this, 'setUp' ) );		
+			add_action( 'wp_loaded', array( $this, 'setup_pre' ) );		
 		}
 		
 	}
@@ -206,14 +207,14 @@ abstract class AdminPageFramework_Base {
 	protected function addSubMenuPage( array $aSubMenuPage ) {}
 	
 	/* Defined in AdminPageFramework_Setting */
-	public function setSettingNotice( $sMsg, $sType='error', $sID=null, $bOverride=true ) {}
+	// public function setSettingNotice( $sMsg, $sType='error', $sID=null, $bOverride=true ) {}	// deprecated as of 3.1.0 and uses the definition defined in the factory class
 	public function addSettingSections( $aSection1, $aSection2=null, $_and_more=null ) {}
 	public function addSettingSection( $asSection ) {}
 	public function removeSettingSections( $sSectionID1=null, $sSectionID2=null, $_and_more=null ) {}	
 	public function addSettingFields( $aField1, $aField2=null, $_and_more=null ) {}
 	public function addSettingField( $asField ) {}
 	public function removeSettingFields( $sFieldID1, $sFieldID2=null, $_and_more ) {}
-	public function setFieldErrors( $aErrors, $sID=null, $iLifeSpan=300 ) {}
+	// public function setFieldErrors( $aErrors, $sID=null, $iLifeSpan=300 ) {}		// deprecated as of 3.1.0 and uses the definition defined in the factory class
 	public function getFieldValue( $sFieldID ) {}
 	/**#@-*/    
 	
@@ -234,19 +235,27 @@ abstract class AdminPageFramework_Base {
 		$sPageSlug = isset( $_GET['page'] ) ? $_GET['page'] : null;	
 		$sTabSlug = isset( $_GET['tab'] ) ? $_GET['tab'] : $this->oProp->getDefaultInPageTab( $sPageSlug );	
 
+		if ( 'setup_pre' == $sMethodName ) {
+			$this->_setUp();
+			$this->oProp->_bSetupLoaded = true;
+			return;
+		}
+		
 		// If it is a pre callback method, call the redirecting method.		
 		if ( substr( $sMethodName, 0, strlen( 'section_pre_' ) )	== 'section_pre_' )	return $this->_renderSectionDescription( $sMethodName );  // add_settings_section() callback	- defined in AdminPageFramework_Setting
 		if ( substr( $sMethodName, 0, strlen( 'field_pre_' ) )		== 'field_pre_' )	return $this->_renderSettingField( $aArgs[ 0 ], $sPageSlug );  // add_settings_field() callback - defined in AdminPageFramework_Setting
-		if ( substr( $sMethodName, 0, strlen( 'validation_pre_' ) )	== 'validation_pre_' )	return $this->_doValidationCall( $sMethodName, $aArgs[ 0 ] ); // register_setting() callback - defined in AdminPageFramework_Setting
+		// if ( substr( $sMethodName, 0, strlen( 'validation_pre_' ) )	== 'validation_pre_' )	return $this->_doValidationCall( $aArgs[ 0 ] ); // register_setting() callback - defined in AdminPageFramework_Setting	// deprecated as of 3.1.0
 		if ( substr( $sMethodName, 0, strlen( 'load_pre_' ) )		== 'load_pre_' )	return $this->_doPageLoadCall( substr( $sMethodName, strlen( 'load_pre_' ) ), $sTabSlug, $aArgs[ 0 ] );  // load-{page} callback
 
 		// The callback of the call_page_{page slug} action hook
-		if ( $sMethodName == $this->oProp->sClassHash . '_page_' . $sPageSlug )
+		if ( $sMethodName == $this->oProp->sClassHash . '_page_' . $sPageSlug ) {
 			return $this->_renderPage( $sPageSlug, $sTabSlug );		// the method is defined in the AdminPageFramework_Page class.
+		}
 		
 		// If it's one of the framework's callback methods, do nothing.	
-		if ( $this->_isFrameworkCallbackMethod( $sMethodName ) )
-			return isset( $aArgs[0] ) ? $aArgs[0] : null;	// if $aArgs[0] is set, it's a filter, otherwise, it's an action.		
+		if ( $this->_isFrameworkCallbackMethod( $sMethodName ) ) {
+			return isset( $aArgs[0] ) ? $aArgs[0] : null;	// if $aArgs[0] is set, it's a filter; otherwise, it's an action.		
+		}
 		
 		trigger_error( 'Admin Page Framework: ' . ' : ' . sprintf( __( 'The method is not defined: %1$s', $this->oProp->sTextDomain ), $sMethodName ), E_USER_ERROR );
 		
@@ -262,10 +271,11 @@ abstract class AdminPageFramework_Base {
 		 */
 		private function _isFrameworkCallbackMethod( $sMethodName ) {
 				
-			foreach( self::$_aHookPrefixes as $sPrefix ) 
-				if ( substr( $sMethodName, 0, strlen( $sPrefix ) )	== $sPrefix  ) 
+			foreach( self::$_aHookPrefixes as $sPrefix ) {
+				if ( substr( $sMethodName, 0, strlen( $sPrefix ) )	== $sPrefix  ) {
 					return true;
-			
+				}
+			}
 			return false;
 			
 		}
@@ -305,6 +315,24 @@ abstract class AdminPageFramework_Base {
 			: 1;
 	}	
 
+	
+	/**
+	 * Checks whether the class should be instantiated.
+	 * 
+	 * @since			3.1.0
+	 * @internal
+	 */
+	protected function _isInstantiatabe() {
+		
+		// Nothing to do in the non-network admin area.
+		if ( ! is_network_admin() ) {
+			return true;
+		}
+		
+		return false;
+		
+	}
+	
 	/**
 	 * Checks whether the currently loading page is of the given pages. 
 	 * 
@@ -312,18 +340,28 @@ abstract class AdminPageFramework_Base {
 	 * @internal
 	 */
 	protected function _isInThePage( $aPageSlugs=array() ) {
+				
+		// Maybe called too early
+		if ( ! isset( $this->oProp ) ) {
+			return true;
+		}
+		
+		// If the setUp method is not loaded yet,
+		if ( ! $this->oProp->_bSetupLoaded ) {
+			return true;
+		}	
 		
 		if ( in_array( $this->oProp->sPageNow, array( 'options.php' ) ) ) {			
 			return true;
 		}
 
 		if ( ! isset( $_GET['page'] ) ) return false;
-		
+				
 		if ( empty( $aPageSlugs ) ) {
 			return $this->oProp->isPageAdded();
 		}
 				
-		return ( in_array( $_GET['page'], $aPageSlugs ) );
+		return in_array( $_GET['page'], $aPageSlugs );
 		
 	}
 }

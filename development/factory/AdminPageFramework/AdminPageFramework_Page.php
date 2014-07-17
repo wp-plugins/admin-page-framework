@@ -299,7 +299,7 @@ abstract class AdminPageFramework_Page extends AdminPageFramework_Page_MetaBox {
 	 * @internal
 	 */ 
 	protected function _renderPage( $sPageSlug, $sTabSlug=null ) {
-
+				
 		// Do actions before rendering the page. In this order, global -> page -> in-page tab
 		$this->oUtil->addAndDoActions( $this, $this->oUtil->getFilterArrayByPrefix( 'do_before_', $this->oProp->sClassName, $sPageSlug, $sTabSlug, true ) );	
 		?>
@@ -316,9 +316,8 @@ abstract class AdminPageFramework_Page extends AdminPageFramework_Page_MetaBox {
 			?>
 			<div class="admin-page-framework-container">	
 				<?php
-					$this->_showSettingsErrors();
 					$this->oUtil->addAndDoActions( $this, $this->oUtil->getFilterArrayByPrefix( 'do_form_', $this->oProp->sClassName, $sPageSlug, $sTabSlug, true ) );	
-					echo $this->_getFormOpeningTag();	// <form ... >
+					$this->_printFormOpeningTag( $this->oProp->bEnableForm );	// <form ... >
 				?>
 				<div id="poststuff">
 					<div id="post-body" class="metabox-holder columns-<?php echo $this->_getNumberOfColumns(); ?>">
@@ -331,7 +330,7 @@ abstract class AdminPageFramework_Page extends AdminPageFramework_Page_MetaBox {
 					</div><!-- #post-body -->	
 				</div><!-- #poststuff -->
 				
-			<?php echo $this->_getFormClosingTag( $sPageSlug, $sTabSlug );  // </form> ?>
+			<?php echo $this->_printFormClosingTag( $sPageSlug, $sTabSlug, $this->oProp->bEnableForm );  // </form> ?>
 			</div><!-- .admin-page-framework-container -->
 				
 			<?php	
@@ -356,18 +355,15 @@ abstract class AdminPageFramework_Page extends AdminPageFramework_Page_MetaBox {
 
 			echo "<!-- main admin page content -->";
 			echo "<div class='admin-page-framework-content'>";
-			if ( $_bIsSideMetaboxExist ) 
+			if ( $_bIsSideMetaboxExist ) {
 				echo "<div id='post-body-content'>";
+			}
 	
 			/* Capture the output buffer */
 			ob_start(); // start buffer
 										
-			// Render the form elements by Settings API
+			// Render the form elements.
 			if ( $this->oProp->bEnableForm ) {
-
-				// this value also determines the $option_page global variable value. This is important to get redirected back from option.php page.
-				// This also is needed for page meta box fields.
-				settings_fields( $this->oProp->sOptionKey );	
 				
 				// do_settings_sections( $sPageSlug ); // deprecated						
 				if ( $this->oForm->isPageAdded( $sPageSlug ) ) {
@@ -379,18 +375,17 @@ abstract class AdminPageFramework_Page extends AdminPageFramework_Page_MetaBox {
 					$this->oForm->applyConditions();
 					$this->oForm->applyFiltersToFields( $this, $this->oProp->sClassName );	// applies filters to the conditioned field definition arrays.
 					$this->oForm->setDynamicElements( $this->oProp->aOptions );	// will update $this->oForm->aConditionedFields
-					
 					echo $oFieldsTable->getFormTables( $this->oForm->aConditionedSections, $this->oForm->aConditionedFields, array( $this, '_replyToGetSectionHeaderOutput' ), array( $this, '_replyToGetFieldOutput' ) );
-					// echo $oFieldsTable->getFormTables( $this->oForm->getFieldsByPageSlug( $sPageSlug, $sTabSlug ), array( $this, '_replyToGetSectionHeaderOutput' ), array( $this, '_replyToGetFieldOutput' ) );
+
 				} 
 				
 			}				
 			 
-			$sContent = ob_get_contents(); // assign the content buffer to a variable
+			$_sContent = ob_get_contents(); // assign the content buffer to a variable
 			ob_end_clean(); // end buffer and remove the buffer
 						
 			// Apply the content filters.
-			echo $this->oUtil->addAndApplyFilters( $this, $this->oUtil->getFilterArrayByPrefix( 'content_', $this->oProp->sClassName, $sPageSlug, $sTabSlug, false ), $sContent );
+			echo $this->oUtil->addAndApplyFilters( $this, $this->oUtil->getFilterArrayByPrefix( 'content_', $this->oProp->sClassName, $sPageSlug, $sTabSlug, false ), $_sContent );
 
 			// Do the page actions.
 			$this->oUtil->addAndDoActions( $this, $this->oUtil->getFilterArrayByPrefix( 'do_', $this->oProp->sClassName, $sPageSlug, $sTabSlug, true ) );			
@@ -404,89 +399,49 @@ abstract class AdminPageFramework_Page extends AdminPageFramework_Page_MetaBox {
 		 * Retrieves the form opening tag.
 		 * 
 		 * @since			2.0.0
+		 * @since			3.1.0			Changed to echo the output.	Changed to remove disallowed query keys in the target action url.
 		 * @internal
+		 * @return			void
 		 */ 
-		private function _getFormOpeningTag() {	
-			return $this->oProp->bEnableForm
-				? "<form action='options.php' method='post' enctype='{$this->oProp->sFormEncType}' id='admin-page-framework-form'>"
-				: "";
+		private function _printFormOpeningTag( $fEnableForm=true ) {	
+			
+			if ( ! $fEnableForm ) {
+				return;
+			}
+	
+			echo "<form " 
+					. $this->oUtil->generateAttributes(
+						array(
+							'method'	=>	'post',
+							'enctype'	=>	$this->oProp->sFormEncType,
+							'id'		=>	'admin-page-framework-form',
+							'action'	=>	wp_unslash( remove_query_arg( 'settings-updated', $this->oProp->sTargetFormPage ) ),
+						)	
+					) 
+				. ">";
+			settings_fields( $this->oProp->sOptionKey );
+			
 		}
 		/**
 		 * Retrieves the form closing tag.
 		 * 
 		 * @since			2.0.0
+		 * @since			3.1.0			Prints out the output.
 		 * @internal
-		 */ 	
-		private function _getFormClosingTag( $sPageSlug, $sTabSlug ) {
-			return $this->oProp->bEnableForm 
-				? "<input type='hidden' name='page_slug' value='{$sPageSlug}' />" . PHP_EOL
-					. "<input type='hidden' name='tab_slug' value='{$sTabSlug}' />" . PHP_EOL			
-					. "<input type='hidden' name='_is_admin_page_framework' value='1' />" . PHP_EOL			
-					. "</form><!-- End Form -->"
-				: '';
-		}	
-	
-		/**
-		 * Displays admin notices set for the settings.
-		 * 
-		 * @since			2.0.0
-		 * @since			2.0.1			Fixed a bug that the admin messages were displayed twice in the options-general.php page.
 		 * @return			void
-		 * @internal		
-		 */ 
-		private function _showSettingsErrors() {
+		 */ 	
+		private function _printFormClosingTag( $sPageSlug, $sTabSlug, $fEnableForm=true ) {
 			
-			// WordPress automatically performs the settings_errors() function in the options pages. See options-head.php.
-			if ( 'options-general.php' == $this->oProp->sPageNow ) return;	
+			if ( ! $fEnableForm ) {
+				return;
+			}
 			
-			$aSettingsMessages = get_settings_errors( $this->oProp->sOptionKey );
+			echo "<input type='hidden' name='page_slug' value='{$sPageSlug}' />" . PHP_EOL
+					. "<input type='hidden' name='tab_slug' value='{$sTabSlug}' />" . PHP_EOL			
+					. "<input type='hidden' name='_is_admin_page_framework' value='1' />" . PHP_EOL
+					. "</form><!-- End Form -->" . PHP_EOL;
 			
-			// If custom messages are added, remove the default one. 
-			if ( count( $aSettingsMessages ) > 1 ) 
-				$this->_removeDefaultSettingsNotice();
-			
-			settings_errors( $this->oProp->sOptionKey );	// Show the message like "The options have been updated" etc.
-		
-		}
-			/**
-			 * Removes default admin notices set for the settings.
-			 * 
-			 * This removes the settings messages ( admin notice ) added automatically by the framework when the form is submitted.
-			 * This is used when a custom message is added manually and the default message should not be displayed.
-			 * 
-			 * @since			2.0.0
-			 * @internal
-			 */	
-			private function _removeDefaultSettingsNotice() {
-						
-				global $wp_settings_errors;
-				/*
-				 * The structure of $wp_settings_errors
-				 * 	array(
-				 *		array(
-							'setting' => $setting,
-							'code' => $code,
-							'message' => $message,
-							'type' => $type
-						),
-						array( ...
-					)
-				 * */
-				
-				$aDefaultMessages = array(
-					$this->oMsg->__( 'option_cleared' ),
-					$this->oMsg->__( 'option_updated' ),
-				);
-				
-				foreach ( ( array ) $wp_settings_errors as $iIndex => $aDetails ) {
-					
-					if ( $aDetails['setting'] != $this->oProp->sOptionKey ) continue;
-					
-					if ( in_array( $aDetails['message'], $aDefaultMessages ) )
-						unset( $wp_settings_errors[ $iIndex ] );
-						
-				}
-			}		
+		}	
 	
 		/**
 		 * Retrieves the screen icon output as HTML.

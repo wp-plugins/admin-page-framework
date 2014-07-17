@@ -4,7 +4,7 @@ Donate link: http://michaeluno.jp/en/donate
 Tags: admin, administration, admin panel, option, options, setting, settings, Settings API, API, framework, library, class, classes, developers, developer tool, meta box, custom post type, utility, utilities, field, fields, custom field, custom fields, tool, tools
 Requires at least: 3.3
 Tested up to: 3.9.1
-Stable tag: 3.0.6
+Stable tag: 3.0.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -81,6 +81,8 @@ The HTML documentation is included in the distribution package and can be access
 4. [Create In-page Tabs](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/04-create-inpage-tabs/)
 5. [Organize a Form with Sections](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/05-organize-a-form-with-sections/)
 6. [Use Section Tabs and Repeatable Sections](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/06-use-section-tabs-and-repeatable-sections/)
+7. [Validate Submitted Form Data of a Single Field](en.michaeluno.jp/admin-page-framework/tutorials-v3/07-validate-submitted-form-data-of-a-single-field/)
+8. [Validate Submitted Form Data of Multiple Fields](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/08-validate-submitted-form-data-of-multiple-fields/)
 
 == Screenshots ==
 1. **Text Fields**
@@ -222,16 +224,36 @@ In addition, your tutorials and snippets for the framework can be listed in the 
 = Does my commercial product incorporating your framework library have to be released under GPL? =
 No. The demo plugin is released under GPLv2 or later but the library itself is released under MIT. 
 
+= Can I set a custom post type as a root page? =
+Yes. For built-in root menu items or create your own ones, you need to use the `setRootMenuPage()` method. For root pages of custom post types, use `setRootMenuPageBySlug()`.
+
 = How do I retrieve the stored options? =
 The framework stores them as an organized multidimensional array in the options table in a single row. So use the `get_option()` function and pass the instantiated class name as the key or the custom key if you specify one in the constructor. 
 
 For instance, if your instantiated class name is `APF` then the code would be `get_option( 'APF' );` Alternatively, use the [AdminPageFramework::getOption()](http://admin-page-framework.michaeluno.jp/en/v3/class-AdminPageFramework.html#_getOption) static method.
 
-= Can I set a custom post type as a root page? =
-Yes. For built-in root menu items or create your own ones, you need to use the `setRootMenuPage()` method. For root pages of custom post types, use `setRootMenuPageBySlug()`.
+= Is it possible to use a custom database table to store submitted form data instead of using the options table? =
+Yes. There are two main means to achive that. 
+
+One is to set the `value` argument in the field definition array to suppress the displaying value in the field.
+See an example. https://gist.github.com/michaeluno/fb4088b922b71710c7fb
+
+The other is to override the options array set to the entire form using the `options_{instantiated class name}`.
+See an example. https://gist.github.com/michaeluno/fcfac27825aa8a35b90f
+
+Also passing an empty string, `''` to the first parameter of the constructor will disable the ability to store submitted form data into the options table.
 
 e.g.
-`$this->setRootMenuPageBySlug( 'edit.php?post_type=apf_posts' );`
+`new MyAdminPage( '' );`
+
+= How can I add sub-menu pages to the root page created by the framework in a separate script? =
+
+Say, in your main plugin, your class `MyAdminPageClassA` created a root page. In your extension plugin, you want to add sub-menu pages from another instance `MyAdminPageClassB`. 
+
+In the `setUp()` method of `MyAdminPageClasB`, pass the instantiated class name of the main plugin that created the root menu, `MyAdminPageClassA`, to the `setRootMenuPageBySlug()` method.
+
+e.g.
+`$this->setRootMenuPageBySlug( 'MyAdminPageClassA' );`
 
 = Does the framework work with WordPress Multi-site? =
 Yes, it works with [WordPress MU](https://codex.wordpress.org/WordPress_MU).
@@ -270,10 +292,85 @@ To specify a custom size to the preview element of the `image` field type, set a
 	),
 ),`
 
+<h5><strong>Set default field value</strong></h5>
+To set the initial value of a field, use the `default` argument in the field definition array.
+
+`array(
+	'field_id'	=>	'my_text_field_id',
+	'title'	=>	__( 'My Text Input Field', 'admin-page-framework-demo' ),
+	'type'	=>	'text',
+	'default'	=>	'This text will be displayed for the first time that the field is displayed and will be overridden when a user set an own value.',
+),`
+
+<h5><strong>Always display a particular value in a field</strong></h5>
+The `value` argument in the definition array can suppress the saved value. This is useful when you want to set a value from a different data source or create a wizard form that stores the data in a custom location.
+
+`array(
+	'field_id'	=>	'my_text_field_id',
+	'title'	=>	__( 'My Text Inpu Field', 'admin-page-framework-demo' ),
+	'type'	=>	'text',
+	'value'	=>	'This will be always set.',
+),`
+
+If it is a repeatable field, set the value in the sub-fields.
+
+`array(
+	'field_id'	=>	'my_text_field_id',
+	'title'	=>	__( 'My Text Input Field', 'admin-page-framework-demo' ),
+	'type'	=>	'text',
+	'repeatable'	=>	true,
+	'value'	=>	'the first value',
+	array(
+		'value'	=>	'the second value',
+	),
+	array(
+		'value'	=>	'the third value',
+	),	
+),`
+
+Alternately, if it is in a framework's generic pages (not post meta box fields) you may use the `options_{instantiated class name}` filter to suppress the options so that setting the value argument is not necessary.
+See examples, https://gist.github.com/michaeluno/c30713fcfe0d9d45d89f, https://gist.github.com/michaeluno/fcfac27825aa8a35b90f, 
+
 = Roadmap =
 Check out [the issues](https://github.com/michaeluno/admin-page-framework/issues?labels=enhancement&page=1&state=open) on GitHub labeled *enhancement*.
 
 == Changelog ==
+
+= 3.1.0 - 2014/07/18 =
+- Added the `options_{instantiated class name}` filter to suppress the data used to display the form values.
+- Added the `AdminPageFramework_Debug::log()` method.
+- Added the ability not to set the default link to the custom post type post listing table's page in the plugin listing table page by passing an empty string to the 'plugin_listing_table_title_cell_link` key of the 'label' argument option.
+- Added the `date_range`, `date_time_range`, `time_range` custom field type.
+- Added the ability to set options for the `date`, `date_time`, and `time` custom field types.
+- Added the `hasSettingNotice()` method that checks if at least one setting notice has been set or not.
+- Added the `admin-page-framework-subfield` class selector to the div element's class attribute of field containers of sub-fields. 
+- Added the `field_definition_{instantiated class name}` filter hook that applies to all the defined field arrays.
+- Added the `disableSavingOptions()` method that disables the functionality to save submitted form data into the options table.
+- Added the `setPluginSettingsLinkLabel()` method which enables to set the text label to the automatically embedded link to the plugin listing table of the plugin title cell in addition to disabling the functionality.
+- Added the `start()` method which is automatically called at the end of the constructor, which can be used when the instantiated class name cannot be determined. 
+- Added the ability to disable settings notices by passing false to the `$_GET{'settings-notice']` key.
+- Added the `AdminPageFramework_NetworkAdmin` abstract class that enables to add pages in the network admin area.
+- Tweaked the styling of the `number` input type to align the text on the right.
+- Tweaked the styling of the `checkbox` field type not to wrap the label after the checkbox.
+- Tweaked the styling of field td element when the `show_title_column` option is set to false to disable the title.
+- Changed the `removed_repeatable_field` callback to be triggered after the element is removed.
+- Changed the target form action url not to contain the `settings-updated` key.
+- Changed the demo plugin to be separated into smaller components.
+- Changed the `validation_{...}` callback methods to receive a third parameter of the class object so that third party scripts can access object members inside from the validation method.
+- Changed the `AdminPageFramework` class to accept an empty string value to be passed to the first parameter of the constructor, to be used to disable saving options.
+- Changed the scope of `oUtil`, `oDebug`, and `oMsg` objects to public from protected to be accessed from an instantiated object.
+- Changed the `section_head` filter hook to be triggered even when the section description is not set.
+- Changed not to redirect to options.php when a form created by the framework is submitted in the pages created by the framework.
+- Fixed a bug that a value of `0` did not get displayed but and empty string instead.
+- Fixed a bug that sub-fields could not properly have the default key-values of the field definition of the type.
+- Fixed a bug that in PHP v5.2.x, setting a section error message caused a string "A" to be inserted in each belonging field.
+- Fixed a bug that previously set field error arrays were lost if the `setFieldErrors()` method is performed multiple times in a page load.
+- Fixed a bug that page load info was not inserted when multiple admin page objects were instantiated.
+- Fixed a bug that duplicated setting notices were displayed.
+- Fixed a bug that the redirect transient remained when a field error is set and caused unexpected redirects when the 'href' argument is set for the submit field type.
+- Fixed an issue that `textarea` input field was placed in the wrong position when the browser turned off JavaScript.
+- Fixed a bug that the `autocomplete` custom field type's JavaScript script could not run when the prePopulate option is set and the value is saved without changing.
+- Fixed an issue in the class autoloader that caused a PHP fatal error in some non GNU OSes such as Solaris in the development version.
 
 = 3.0.6 - 05/10/2014 =
 - Fixed a JavaScript syntax error in the `font` custom field type.

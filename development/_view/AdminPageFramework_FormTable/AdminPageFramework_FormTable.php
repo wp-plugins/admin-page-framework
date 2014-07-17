@@ -273,7 +273,7 @@ class AdminPageFramework_FormTable extends AdminPageFramework_FormTable_Base {
 									. "</div>"
 								: ""
 							)					
-							. ( $aSection['description'] && is_callable( $hfSectionCallback )
+							. ( is_callable( $hfSectionCallback )
 								? "<div class='admin-page-framework-section-description'>" 	// admin-page-framework-section-description is referred by the repeatable section buttons
 										. call_user_func_array( $hfSectionCallback, array( '<p>' . $aSection['description'] . '</p>', $aSection ) )
 									. "</div>"
@@ -328,7 +328,7 @@ class AdminPageFramework_FormTable extends AdminPageFramework_FormTable_Base {
 			
 			$aOutput = array();
 			$_aField = $this->_mergeDefault( $aField );
-			$_sAttributes = $this->_getAttributes( 
+			$_sAttributes_TR = $this->_getAttributes( 
 				$_aField,
 				array( 
 					'id' => 'fieldrow-' . AdminPageFramework_FormField::_getInputTagID( $_aField ),
@@ -336,10 +336,17 @@ class AdminPageFramework_FormTable extends AdminPageFramework_FormTable_Base {
 					'class' => 'admin-page-framework-fieldrow',
 				)
 			);
-			$aOutput[] = "<tr {$_sAttributes}>";
-				if ( $_aField['show_title_column'] )
+			$_sAttributes_TD = $this->generateAttributes( 
+				array(
+					'colspan'	=>	$_aField['show_title_column'] ? 1 : 2,
+					'class'		=>	$_aField['show_title_column'] ?	'' : 'admin-page-framework-field-td-no-title',
+				)
+			);
+			$aOutput[] = "<tr {$_sAttributes_TR}>";
+				if ( $_aField['show_title_column'] ) {
 					$aOutput[] = "<th>" . $this->_getFieldTitle( $_aField ) . "</th>";
-				$aOutput[] = "<td>" . call_user_func_array( $hfCallback, array( $aField ) ) . "</td>";	// $aField is passed, not $_aField as $_aField do not respect subfields.
+				}
+				$aOutput[] = "<td {$_sAttributes_TD}>" . call_user_func_array( $hfCallback, array( $aField ) ) . "</td>";	// $aField is passed, not $_aField as $_aField do not respect subfields.
 			$aOutput[] = "</tr>";
 			return implode( PHP_EOL, $aOutput );
 				
@@ -373,8 +380,9 @@ class AdminPageFramework_FormTable extends AdminPageFramework_FormTable_Base {
 			$aOutput = array();
 			$_aField = $this->_mergeDefault( $aField );
 			$aOutput[] = "<div " . $this->_getAttributes( $_aField ) . ">";
-			if ( $_aField['show_title_column'] )
+			if ( $_aField['show_title_column'] ) {
 				$aOutput[] = $this->_getFieldTitle( $_aField );
+			}
 			$aOutput[] = call_user_func_array( $hfCallback, array( $aField ) );	// $aField is passed, not $_aField as $_aField do not respect subfields.
 			$aOutput[] = "</div>";
 			return implode( PHP_EOL, $aOutput );		

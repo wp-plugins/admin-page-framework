@@ -29,6 +29,13 @@ class AdminPageFramework_Property_Page extends AdminPageFramework_Property_Base 
 	public $_sPropertyType = 'page';
 	
 	/**
+	 * Defines the fields type.
+	 * 
+	 * @since			3.1.0
+	 */
+	public $sFieldsType = 'page';
+	
+	/**
 	 * Stores framework's instantiated object name.
 	 * 
 	 * @since			2.0.0
@@ -210,8 +217,39 @@ class AdminPageFramework_Property_Page extends AdminPageFramework_Property_Base 
 	 * @remark			Currently this does not take effect on the meta box and post type classes of the framework.
 	 * @since			2.1.2
 	 */
-	public $aDisallowedQueryKeys	= array( 'settings-updated' );
+	public $aDisallowedQueryKeys = array( 'settings-updated' );
 		
+		
+	/** 
+	 * Stores the target page redirected to when the user submit the form of the framework.
+	 * 
+	 * @since			3.1.0
+	 */
+	public $sTargetFormPage = '';
+	 
+	 
+	/**
+	 * Indicates whether the menu building procedure has been completed. 
+	 * 
+	 * @since			3.1.0
+	 * @internal
+	 */
+	public $_bBuiltMenu = false;
+		
+	/**	
+	 * Stores the label of the settings link embedded to the plugin listing table cell of the plugin title.
+	 * 
+	 * @since			3.1.0
+	 */
+	public $sLabelPluginSettingsLink = '';
+	 
+	 
+	/**
+	 * Indicates whether the form data should be automatically saved in the options table.
+	 * @since			3.1.0
+	 */ 
+	public $_bDisableSavingOptions = false;
+	 
 	/**
 	 * Construct the instance of AdminPageFramework_Property_Page class object.
 	 * 
@@ -220,12 +258,15 @@ class AdminPageFramework_Property_Page extends AdminPageFramework_Property_Base 
 	 * @since			2.1.5			The $oCaller parameter was added.
 	 * @return			void
 	 */ 
-	public function __construct( $oCaller, $sCallerPath, $sClassName, $sOptionKey, $sCapability='manage_options', $sTextDomain='admin-page-framework', $sFieldsType='page' ) {
+	public function __construct( $oCaller, $sCallerPath, $sClassName, $sOptionKey, $sCapability='manage_options', $sTextDomain='admin-page-framework' ) {
 		
-		parent::__construct( $oCaller, $sCallerPath, $sClassName, $sCapability, $sTextDomain, $sFieldsType );
+		parent::__construct( $oCaller, $sCallerPath, $sClassName, $sCapability, $sTextDomain, $this->sFieldsType );
 		
 		$this->sOptionKey = $sOptionKey ? $sOptionKey : $sClassName;
-					
+		$this->_bDisableSavingOptions = '' === $sOptionKey ? true : false;
+				
+		$this->sTargetFormPage = $_SERVER['REQUEST_URI'];
+				
 		/* Store the page class objects in the global storage. These will be referred by the meta box class to determine if the passed page slug's screen ID (hook suffix). */
 		$GLOBALS['aAdminPageFramework']['aPageClasses'] = isset( $GLOBALS['aAdminPageFramework']['aPageClasses'] ) && is_array( $GLOBALS['aAdminPageFramework']['aPageClasses'] )
 			? $GLOBALS['aAdminPageFramework']['aPageClasses']
@@ -258,16 +299,35 @@ class AdminPageFramework_Property_Page extends AdminPageFramework_Property_Base 
 			
 		}	
 	
+	/**
+	 * Returns the option array.
+	 * 
+	 * @since			3.1.0
+	 * @internal
+	 */
+	protected function _getOptions() {
+	
+		return AdminPageFramework_WPUtility::addAndApplyFilter(		// Parameters: $oCallerObject, $sFilter, $vInput, $vArgs...
+			$GLOBALS['aAdminPageFramework']['aPageClasses'][ $this->sClassName ],	// the caller object
+			'options_' . $this->sClassName,	// options_{instantiated class name}
+			$this->sOptionKey ? get_option( $this->sOptionKey, array() ) : array()
+		);
+			
+	}
+	
 	/*
 	 * Magic methods
 	 * */
+	/**
+	 * 
+	 * @remark		Without the the ampersand in the method name, it causes a PHP warning.
+	 */
 	public function &__get( $sName ) {
 		
-		// If $this->aOptions is called for the first time, retrieve the option data from the database and assign to the property.
+		// If $this->aOptions is called for the first time, retrieve the option data from the database and assign them to the property.
 		// Once this is done, calling $this->aOptions will not trigger the __get() magic method any more.
-		// Without the the ampersand in the method name, it causes a PHP warning.
-		if ( $sName == 'aOptions' ) {
-			$this->aOptions = get_option( $this->sOptionKey, array() );
+		if ( 'aOptions' == $sName ) {
+			$this->aOptions = $this->_getOptions();
 			return $this->aOptions;	
 		}
 		
@@ -279,6 +339,16 @@ class AdminPageFramework_Property_Page extends AdminPageFramework_Property_Base 
 	/*
 	 * Utility methods
 	 * */
+	 
+	/**
+	 * Saves the options into the database.
+	 * 
+	 * @since			3.1.0
+	 */
+	public function updateOption( $aOptions=null ) {
+		update_option( $this->sOptionKey, $aOptions !== null ? $aOptions : $this->aOptions );
+	}
+	
 	
 	/**
 	 * Checks if the given page slug is one of the pages added by the framework.

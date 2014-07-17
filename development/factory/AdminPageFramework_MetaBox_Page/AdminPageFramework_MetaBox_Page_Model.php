@@ -45,14 +45,14 @@ abstract class AdminPageFramework_MetaBox_Page_Model extends AdminPageFramework_
 				if ( is_string( $_asTabArrayOrPageSlug ) ) {				
 					$_sPageSlug = $_asTabArrayOrPageSlug;
 					add_filter( "validation_saved_options_{$_sPageSlug}", array( $this, '_replyToFilterPageOptions' ) );
-					add_filter( "validation_{$_sPageSlug}", array( $this, '_replyToValidateOptions' ), 10, 2 );
+					add_filter( "validation_{$_sPageSlug}", array( $this, '_replyToValidateOptions' ), 10, 3 );
 					continue;
 				}
 				
 				// At this point, the array key is the page slug.
 				$_sPageSlug = $_sIndexOrPageSlug;
 				$_aTabs = $_asTabArrayOrPageSlug;
-				add_filter( "validation_{$_sPageSlug}", array( $this, '_replyToValidateOptions' ), 10, 2 );
+				add_filter( "validation_{$_sPageSlug}", array( $this, '_replyToValidateOptions' ), 10, 3 );
 				foreach( $_aTabs as $_sTabSlug ) {
 					add_filter( "validation_saved_options_{$_sPageSlug}_{$_sTabSlug}", array( $this, '_replyToFilterPageOptions' ) );
 				}
@@ -92,8 +92,7 @@ abstract class AdminPageFramework_MetaBox_Page_Model extends AdminPageFramework_
 				? $this->oProp->getOptionKey( $_GET['page'] )
 				: null;
 		}
-			
-			
+					
 	/**
 	 * Adds the defined meta box.
 	 * 
@@ -104,8 +103,8 @@ abstract class AdminPageFramework_MetaBox_Page_Model extends AdminPageFramework_
 	 * @remark			A callback for the <em>add_meta_boxes</em> hook.
 	 * @return			void
 	 */ 
-	public function _replyToAddMetaBox() {
-		
+	public function _replyToAddMetaBox( $sPageHook='' ) {
+
 		foreach( $this->oProp->aPageSlugs as $sKey => $asPage ) {
 			
 			if ( is_string( $asPage ) )  {
@@ -132,7 +131,7 @@ abstract class AdminPageFramework_MetaBox_Page_Model extends AdminPageFramework_
 		 * @internal
 		 */
 		private function _addMetaBox( $sPageSlug ) {
-			
+
 			add_meta_box( 
 				$this->oProp->sMetaBoxID, 		// id
 				$this->oProp->sTitle, 	// title
@@ -179,7 +178,7 @@ abstract class AdminPageFramework_MetaBox_Page_Model extends AdminPageFramework_
 
 		// Apply filters - third party scripts will have access to the input.
 		$_aNewMetaBoxInput = stripslashes_deep( $_aNewMetaBoxInput );	// fixes magic quotes
-		$_aNewMetaBoxInput = $this->oUtil->addAndApplyFilters( $this, "validation_{$this->oProp->sClassName}", $_aNewMetaBoxInput, $_aOldMetaBoxInput );
+		$_aNewMetaBoxInput = $this->oUtil->addAndApplyFilters( $this, "validation_{$this->oProp->sClassName}", $_aNewMetaBoxInput, $_aOldMetaBoxInput, $this );
 	
 		// Now merge the input values with the passed page options, and plus the old data to cover different in-page tab field options.
 		return $this->oUtil->uniteArrays( $_aNewMetaBoxInput, $aNewPageOptions, $_aOtherOldMetaBoxInput );

@@ -143,7 +143,8 @@ abstract class AdminPageFramework_TaxonomyField extends AdminPageFramework_Facto
 		if ( ! $this->_isInThePage() ) return;
 		
 		$this->_loadDefaultFieldTypeDefinitions();
-		$this->setUp();
+		$this->_setUp();
+		$this->oProp->_bSetupLoaded = true;
 		add_action( 'current_screen', array( $this, '_replyToRegisterFormElements' ) );	// the screen object should be established to detect the loaded page. 
 	
 		foreach( $this->oProp->aTaxonomySlugs as $__sTaxonomySlug ) {				
@@ -316,7 +317,7 @@ abstract class AdminPageFramework_TaxonomyField extends AdminPageFramework_Facto
 					$aSubmittedOptions[ $_sFieldID ] = $_POST[ $_sFieldID ];
 			
 		/* Apply validation filters to the submitted option array. */
-		$aSubmittedOptions = $this->oUtil->addAndApplyFilters( $this, 'validation_' . $this->oProp->sClassName, $aSubmittedOptions, $aOldOptions );
+		$aSubmittedOptions = $this->oUtil->addAndApplyFilters( $this, 'validation_' . $this->oProp->sClassName, $aSubmittedOptions, $aOldOptions, $this );
 		
 		$aTaxonomyFieldOptions[ $iTermID ] = $this->oUtil->uniteArrays( $aSubmittedOptions, $aOldOptions );
 		update_option( $this->oProp->sOptionKey, $aTaxonomyFieldOptions );

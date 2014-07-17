@@ -20,7 +20,9 @@ abstract class AdminPageFramework_Factory_Controller extends AdminPageFramework_
 	/*
 	 * Should be extended
 	 */
+	public function start() {}
 	public function setUp() {}
+			
 			
 	/*
 	 * Head Tag Methods - should be extended.
@@ -144,7 +146,7 @@ abstract class AdminPageFramework_Factory_Controller extends AdminPageFramework_
     *         'title'          => 'Textarea',
     *         'description'    => 'The description for the field.',
     *         'type'           => 'textarea',
-    *         'default'          => 'This is a default text.',
+    *         'default'          => 'This is a default text value.',
     *     )
     * );</code>
 	* 
@@ -376,7 +378,9 @@ abstract class AdminPageFramework_Factory_Controller extends AdminPageFramework_
 		}
 		
 		$_sID = md5( $this->oProp->sClassName );
-		$GLOBALS['aAdminPageFramework']['aFieldErrors'][ $_sID ] = $aErrors;
+		$GLOBALS['aAdminPageFramework']['aFieldErrors'][ $_sID ] = isset( $GLOBALS['aAdminPageFramework']['aFieldErrors'][ $_sID ] )
+			? $this->oUtil->uniteArrays( $GLOBALS['aAdminPageFramework']['aFieldErrors'][ $_sID ], $aErrors )
+			: $aErrors;
 	
 	}	
 	
@@ -415,22 +419,54 @@ abstract class AdminPageFramework_Factory_Controller extends AdminPageFramework_
 		$_sID = md5( trim( $sMessage ) );
 			
 		// If the override options is true, or if the message is set,
-		if ( $bOverride || ! isset( $GLOBALS['aAdminPageFramework']['aNotices'][ $_sID ] )  ) {
+		if ( $bOverride || ! isset( $GLOBALS['aAdminPageFramework']['aNotices'][ $_sID ] )  ) {		
 			
+			$_aAttributes = is_array( $asAttributes ) ? $asAttributes : array();
+			if ( is_string( $asAttributes ) && ! empty( $asAttributes ) ) {
+				$_aAttributes['id'] = $asAttributes;
+			}
 			$GLOBALS['aAdminPageFramework']['aNotices'][ $_sID ] = array(
 				'sMessage' => $sMessage,
-				'aAttributes' => ( is_array( $asAttributes ) ? $asAttributes : array( 'id' => $asAttributes )  )
-					+ array(
+				'aAttributes' => $_aAttributes + array(
 						'class'	=>	$sType,
 						'id'	=>	$this->oProp->sClassName . '_' . $_sID,
 					),
-					
-			
 			);
 		}
 							
 	}
 	
+	/**
+	 * Checks if an error settings notice has been set.
+	 * 
+	 * This is used in the internal validation callback method to decide whether the system error or update notice should be added or not.
+	 * If this method yields true, the framework discards the system message and displays the user set notification message.
+	 * 
+	 * @since	3.1.0
+	 * 
+	 * @param	string	$sType	If empty, the method will check if a message exists in all types. Otherwise, it checks the existence of a message of the specified type.
+	 * @return	boolean	True if a setting notice is set; otherwise, false.
+	 */
+	public function hasSettingNotice( $sType='' ) {
+		
+		// The framework user set notification messages are stored in this global array element.
+		$_aNotices = isset( $GLOBALS['aAdminPageFramework']['aNotices'] ) ? $GLOBALS['aAdminPageFramework']['aNotices'] : array();
+		if ( ! $sType ) {
+			return count( $_aNotices ) ? true : false;
+		}
+		
+		// Check if there is a message of the type.
+		foreach( $_aNotices as $aNotice ) {
+			if ( ! isset( $aNotice['aAttributes']['class'] ) ) {
+				continue;
+			}
+			if ( $aNotice['aAttributes']['class'] == $sType ) {
+				return true;
+			}
+		}
+		return false;
+		
+	}
 
 }
 endif;

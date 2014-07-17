@@ -45,12 +45,30 @@ abstract class AdminPageFramework_Factory_View extends AdminPageFramework_Factor
 		$_aNotices = get_transient( 'AdminPageFramework_Notices' );
 		if ( false === $_aNotices )	return;
 
-		foreach ( ( array ) $_aNotices as $__aNotice ) {
-			if ( ! isset( $__aNotice['aAttributes'], $__aNotice['sMessage'] ) ) continue;
-			echo "<div " . $this->oUtil->generateAttributes( $__aNotice['aAttributes'] ). "><p>" . $__aNotice['sMessage'] . "</p></div>";
-		}
-		
 		delete_transient( 'AdminPageFramework_Notices' );
+		
+		// By setting false to the 'settings-notice' key, it's possible to disable the notifications set with the framework.
+		if ( isset( $_GET['settings-notice'] ) && ! $_GET['settings-notice'] ) return;
+		
+		// Display the settings notices.
+		$_aPeventDuplicates = array();
+		foreach ( ( array ) $_aNotices as $__aNotice ) {
+			if ( ! isset( $__aNotice['aAttributes'], $__aNotice['sMessage'] ) || ! is_array( $__aNotice ) ) {
+				continue;
+			}
+			$_sNotificationKey = md5( serialize( $__aNotice ) );
+			if ( isset( $_aPeventDuplicates[ $_sNotificationKey ] ) ) {
+				continue;
+			}
+			$_aPeventDuplicates[ $_sNotificationKey ] = true;
+			$__aNotice['aAttributes']['class'] = isset( $__aNotice['aAttributes']['class'] )
+				? $__aNotice['aAttributes']['class'] . ' admin-page-framework-settings-notice-container'
+				: 'admin-page-framework-settings-notice-container';
+			echo "<div " . $this->oUtil->generateAttributes( $__aNotice['aAttributes'] ). ">"
+					. "<p class='admin-page-framework-settings-notice-message'>" . $__aNotice['sMessage'] . "</p>"
+				. "</div>";
+			
+		}
 		
 	}
 	

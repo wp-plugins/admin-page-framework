@@ -71,39 +71,10 @@ abstract class AdminPageFramework_Setting_Base extends AdminPageFramework_Menu {
 		
 		parent::__construct( $sOptionKey, $sCallerPath, $sCapability, $sTextDomain );
 
-		$this->oForm = new AdminPageFramework_FormElement_Page( $this->oProp->sFieldsType, $this->oProp->sCapability );
-		
+		// $this->oForm = new AdminPageFramework_FormElement_Page( $this->oProp->sFieldsType, $this->oProp->sCapability );
+				
 	}
 							
-	/**
-	 * Retrieves the settings error array set by the user in the validation callback.
-	 * 
-	 * @since				2.0.0
-	 * @since				2.1.2			Added the second parameter. 
-	 * @since				3.0.0			Changed the scope to private from protected since it is only used in this class.
-	 * @since				3.0.4			Changed the scope to protected from private since it is called from the page class.
-	 * @since				3.0.5			Fixed a bug that returning an non-empty array when the transient was null.
-	 * @access				protected
-	 * @internal
-	 */
-	protected function _getFieldErrors( $sPageSlug, $bDelete=true ) {
-		
-		// If a form submit button is not pressed, there is no need to set the setting errors.
-		if ( ! isset( $_GET['settings-updated'] ) ) return array();
-		
-		// Find the transient.
-		$_sTransient = md5( $this->oProp->sClassName . '_' . $sPageSlug );
-		$_aFieldErrors = get_transient( $_sTransient );
-		if ( $bDelete ) {
-			delete_transient( $_sTransient );	
-		}
-		
-		// Not cast array here as null will create an element of zero and it won't yield empty with empty().
-		return is_array( $_aFieldErrors )
-			? $_aFieldErrors
-			: array();	
-
-	}
 		
 	/**
 	 * Check if a redirect transient is set and if so it redirects to the set page.
@@ -116,27 +87,32 @@ abstract class AdminPageFramework_Setting_Base extends AdminPageFramework_Menu {
 		// So it's not options.php. Now check if it's one of the plugin's added page. If not, do nothing.
 		if ( ! ( isset( $_GET['page'] ) ) || ! $this->oProp->isPageAdded( $_GET['page'] ) ) return; 
 
-		// If the Settings API has not updated the options, do nothing.
-		if ( ! ( isset( $_GET['settings-updated'] ) && ! empty( $_GET['settings-updated'] ) ) ) return;
-
+		// If the settings have not updated the options, do nothing.
+		if ( ! ( isset( $_GET['settings-updated'] ) && ! empty( $_GET['settings-updated'] ) ) ) {
+			return;
+		}
+		
+		// The redirect transient key.
+		$_sTransient = md5( trim( "redirect_{$this->oProp->sClassName}_{$_GET['page']}" ) );
+		
 		// Check the settings error transient.
-		$aError = $this->_getFieldErrors( $_GET['page'], false );
-		if ( ! empty( $aError ) ) {
+		$_aError = $this->_getFieldErrors( $_GET['page'], false );
+		if ( ! empty( $_aError ) ) {
+			delete_transient( $_sTransient );	// we don't need it any more.
 			return;
 		}
 		
 		// Okay, it seems the submitted data have been updated successfully.
-		$sTransient = md5( trim( "redirect_{$this->oProp->sClassName}_{$_GET['page']}" ) );
-		$sURL = get_transient( $sTransient );
-		if ( false === $sURL  ) {
+		$_sURL = get_transient( $_sTransient );
+		if ( false === $_sURL ) {
 			return;
 		}
 		
 		// The redirect URL seems to be set.
-		delete_transient( $sTransient );	// we don't need it any more.
+		delete_transient( $_sTransient );	// we don't need it any more.
 					
 		// Go to the page.
-		die( wp_redirect( $sURL ) );
+		die( wp_redirect( $_sURL ) );
 		
 	}
 	
@@ -194,7 +170,7 @@ abstract class AdminPageFramework_Setting_Base extends AdminPageFramework_Menu {
 		$this->oForm->setDynamicElements( $this->oProp->aOptions );	// will update $this->oForm->aConditionedFields
 		
 		/* 2-5. If there is no section or field to add, do nothing. */
-		if ( 'options.php' != $this->oProp->sPageNow && ( count( $this->oForm->aConditionedFields ) == 0 ) ) return;
+		// if ( 'options.php' != $this->oProp->sPageNow && ( count( $this->oForm->aConditionedFields ) == 0 ) ) return;
 
 		/* 3. Define field types. This class adds filters for the field type definitions so that framework's built-in field types will be added. */
 		new AdminPageFramework_FieldTypeRegistration( $this->oProp->aFieldTypeDefinitions, $this->oProp->sClassName, $this->oMsg );
@@ -290,10 +266,12 @@ abstract class AdminPageFramework_Setting_Base extends AdminPageFramework_Menu {
 		$this->oProp->bEnableForm = true;	// Set the form enabling flag so that the <form></form> tag will be inserted in the page.
 		register_setting(	
 			$this->oProp->sOptionKey,	// the option group name.	
-			$this->oProp->sOptionKey,	// the option key name that will be stored in the option table in the database.
-			array( $this, 'validation_pre_' . $this->oProp->sClassName )	// the validation callback method
+			$this->oProp->sOptionKey	// the option key name that will be stored in the option table in the database.
+			// array( $this, 'validation_pre_' . $this->oProp->sClassName )	// the validation callback method
 		); 
 		
+		/* 7. Handle submitted data. */
+		$this->_handleSubmittedData();				
 	}
 		
 	/**
@@ -341,9 +319,9 @@ abstract class AdminPageFramework_Setting_Base extends AdminPageFramework_Menu {
 			? $aField['type']
 			: 'default';	// the predefined reserved field type is applied if the parsing field type is not defined(not found).
 
-		$oField = new AdminPageFramework_FormField( $aField, $this->oProp->aOptions, $this->aFieldErrors, $this->oProp->aFieldTypeDefinitions, $this->oMsg );
-		$sFieldOutput = $oField->_getFieldOutput();	// field output
-		unset( $oField );	// release the object for PHP 5.2.x or below.
+		$_oField = new AdminPageFramework_FormField( $aField, $this->oProp->aOptions, $this->aFieldErrors, $this->oProp->aFieldTypeDefinitions, $this->oMsg );
+		$_sFieldOutput = $_oField->_getFieldOutput();	// field output
+		unset( $_oField );	// release the object for PHP 5.2.x or below.
 
 		return $this->oUtil->addAndApplyFilters(
 			$this,
@@ -352,7 +330,7 @@ abstract class AdminPageFramework_Setting_Base extends AdminPageFramework_Menu {
 					? 'field_' . $this->oProp->sClassName . '_' . $aField['section_id'] . '_' . $_sFieldID
 					: 'field_' . $this->oProp->sClassName . '_' . $_sFieldID,
 			),
-			$sFieldOutput,
+			$_sFieldOutput,
 			$aField // the field array
 		);		
 		

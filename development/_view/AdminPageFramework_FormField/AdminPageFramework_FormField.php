@@ -83,69 +83,7 @@ class AdminPageFramework_FormField extends AdminPageFramework_FormField_Base {
 					
 		}	
 	}
-	
-	/**
-	 * Returns the stored field value.
-	 * 
-	 * @since			2.0.0
-	 * @since			3.0.0			Removed the check of the 'value' and 'default' keys. Made it use the '_fields_type' internal key.
-	 */
-	private function _getInputFieldValue( $aField, $aOptions ) {	
-
-		// Check if a previously saved option value exists or not. Regular setting pages and page meta boxes will be applied here.
-		// It's important to return null if not set as the returned value will be checked later on whether it is set or not. If an empty value is returned, they will think it's set.
-		switch( $aField['_fields_type'] ) {
-			default:
-			case 'page':
-			case 'page_meta_box':
-			case 'taxonomy':
-			
-				// If a section is not set, check the first dimension element.
-				if ( ! isset( $aField['section_id'] ) || $aField['section_id'] == '_default' )
-					return isset( $aOptions[ $aField['field_id'] ] )
-						? $aOptions[ $aField['field_id'] ]
-						: null;		
-					
-				// At this point, the section dimension is set.
-				
-				// If it belongs to a sub section,
-				if ( isset( $aField['_section_index'] ) )
-					return isset( $aOptions[ $aField['section_id'] ][ $aField['_section_index'] ][ $aField['field_id'] ] )
-						? $aOptions[ $aField['section_id'] ][ $aField['_section_index'] ][ $aField['field_id'] ]
-						: null;				
-				
-				// Otherwise, return the second dimension element.
-				return isset( $aOptions[ $aField['section_id'] ][ $aField['field_id'] ] )
-					? $aOptions[ $aField['section_id'] ][ $aField['field_id'] ]
-					: null;
-					
-			case 'post_meta_box':
-	
-				if ( ! isset( $_GET['action'], $_GET['post'] ) ) return null;
-			
-				// If a section is not set,
-				if ( ! isset( $aField['section_id'] ) || $aField['section_id'] == '_default' )
-					return get_post_meta( $_GET['post'], $aField['field_id'], true );
-					
-				// At this point, the section dimension is set.
-				$aSectionArray = get_post_meta( $_GET['post'], $aField['section_id'], true );
-				
-				// If it belongs to a sub section,
-				if ( isset( $aField['_section_index'] ) )
-					return isset( $aSectionArray[ $aField['_section_index'] ][ $aField['field_id'] ] )
-						? $aSectionArray[ $aField['_section_index'] ][ $aField['field_id'] ]
-						: null;								
-						
-				// Otherwise, return the second dimension element.
-				return isset( $aSectionArray[ $aField['field_id'] ] )
-					? $aSectionArray[ $aField['field_id'] ]
-					: null;
-					
-		}
-		return null;	
-						
-	}	
-	
+		
 	/**
 	 * Returns the input ID
 	 * 
@@ -185,131 +123,218 @@ class AdminPageFramework_FormField extends AdminPageFramework_FormField_Base {
 	public function _getFieldOutput() {
 		
 		$aFieldsOutput = array(); 
-		$aExtraOutput = array();
 
 		/* 1. Prepend the field error message. */
-		if ( isset( $this->aField['section_id'], $this->aErrors[ $this->aField['section_id'] ], $this->aErrors[ $this->aField['section_id'] ][ $this->aField['field_id'] ] ) )	// if this field has a section and the error element is set
-			$aFieldsOutput[] = "<span style='color:red;'>*&nbsp;{$this->aField['error_message']}" 
-				. $this->aErrors[ $this->aField['section_id'] ][ $this->aField['field_id'] ] 
-			. "</span><br />";
-		else if ( isset( $this->aErrors[ $this->aField['field_id'] ] ) )	// if this field does not have a section and the error element is set,
-			$aFieldsOutput[] = "<span style='color:red;'>*&nbsp;{$this->aField['error_message']}" 
-				. $this->aErrors[ $this->aField['field_id'] ] 
-			. "</span><br />";
+		$_sFieldError = $this->_getFieldError( $this->aErrors, $this->aField['section_id'], $this->aField['field_id'] );
+		if ( $_sFieldError ) {
+			$aFieldsOutput[] = $_sFieldError;
+		}
 					
-		/* 2. Set new elements */
+		/* 2. Set the teg ID used for the field container HTML tags. */
 		$this->aField['tag_id'] = $this->_getInputTagID( $this->aField );
 			
-		/* 3. Compose fields array for sub-fields	*/
-		$aFields = $this->_composeFieldsArray( $this->aField, $this->aOptions );
+		/* 3. Construct fields array for sub-fields	*/
+		$aFields = $this->_constructFieldsArray( $this->aField, $this->aOptions );
 
-		/* 4. Get the field output. */
-		foreach( $aFields as $sKey => $aField ) {
+		/* 4. Get the field and its sub-fields output. */
+		$aFieldsOutput[] = $this->_getFieldsOutput( $aFields );
+					
+		/* 5. Return the entire output */
+		return $this->_getFinalOutput( $this->aField, $aFieldsOutput, count( $aFields ) );
 
-			/* 4-1. Retrieve the field definition for this type - this process enables to have mixed field types in sub-fields */ 
-			$aFieldTypeDefinition = isset( $this->aFieldTypeDefinitions[ $aField['type'] ] )
-				? $this->aFieldTypeDefinitions[ $aField['type'] ] 
-				: $this->aFieldTypeDefinitions['default'];
-				
-			/* 4-2. Set some new elements */ 
-			$aField['_index'] = $sKey;
-			$aField['input_id'] = $this->_getInputID( $aField, $sKey );	//  ({section id}_){field_id}_{index}
-			$aField['_input_name']	= $this->_getInputName( $this->aField, $aField['_is_multiple_fields'] ? $sKey : '' );	
-			$aField['_input_name_flat']	= $this->_getFlatInputName( $this->aField, $aField['_is_multiple_fields'] ? $sKey : '' );	// used for submit, export, import field types			
-			$aField['_field_container_id'] = "field-{$aField['input_id']}";	// used in the attribute below plus it is also used in the sample custom field type.
-			$aField['_fields_container_id'] = "fields-{$this->aField['tag_id']}";
-			$aField['_fieldset_container_id'] = "fieldset-{$this->aField['tag_id']}";
-			
-			$aField['attributes'] = $this->uniteArrays(
-				( array ) $aField['attributes'],	// user set values
-				array(	// the automatically generated values
-					'id' => $aField['input_id'],
-					'name' => $aField['_input_name'],
-					'value' => $aField['value'],
-					'type' => $aField['type'],	// text, password, etc.
-					'disabled'	=> null,
-				),
-				( array ) $aFieldTypeDefinition['aDefaultKeys']['attributes']
-			);
+	}
+	
+		/**
+		 * Returns the output of the given fieldset(main field and its sub-fields) array.
+		 * 
+		 * @since		3.1.0
+		 */ 
+		private function _getFieldsOutput( array $aFields ) {
 
-			/* 4-3. Callback the registered function to output the field */
-			$_aFieldAttributes = array(
-				'id'	=>	$aField['_field_container_id'],
-				'class'	=>	"admin-page-framework-field admin-page-framework-field-{$aField['type']}" 
-					. ( $aField['attributes']['disabled'] ? ' disabled' : '' ),
-				'data-type'	=>	"{$aField['type']}",	// this is referred by the repeatable field JavaScript script.
-			) + $aField['attributes']['field'];
-			$aFieldsOutput[] = is_callable( $aFieldTypeDefinition['hfRenderField'] ) 
-				? $aField['before_field']
+			$_aOutput = array();
+			foreach( $aFields as $__sKey => $__aField ) {
+
+				/* Retrieve the field definition for this type - this process enables to have mixed field types in sub-fields 
+				 * The $this->aFieldTypeDefinitions property stores default key-values of all the registered field types.
+				 * */ 
+				$_aFieldTypeDefinition = isset( $this->aFieldTypeDefinitions[ $__aField['type'] ] )
+					? $this->aFieldTypeDefinitions[ $__aField['type'] ] 
+					: $this->aFieldTypeDefinitions['default'];
+					
+				if ( ! is_callable( $_aFieldTypeDefinition['hfRenderField'] ) ) {
+					continue;
+				}		
+
+				/* Set some internal keys */ 
+				$_bIsSubField = is_numeric( $__sKey ) && 0 < $__sKey;
+				$__aField['_index']					= $__sKey;
+				$__aField['input_id']				= $this->_getInputID( $__aField, $__sKey );	//  ({section id}_){field_id}_{index}
+				$__aField['_input_name']			= $this->_getInputName( $__aField, $__aField['_is_multiple_fields'] ? $__sKey : '' );	
+				$__aField['_input_name_flat']		= $this->_getFlatInputName( $__aField, $__aField['_is_multiple_fields'] ? $__sKey : '' );	// used for submit, export, import field types			
+				$__aField['_field_container_id']	= "field-{$__aField['input_id']}";	// used in the attribute below plus it is also used in the sample custom field type.
+				$__aField['_fields_container_id']	= "fields-{$this->aField['tag_id']}";
+				$__aField['_fieldset_container_id']	= "fieldset-{$this->aField['tag_id']}";
+				$__aField = $this->uniteArrays(
+					$__aField,	// includes the user-set values.
+					array(	// the automatically generated values.
+						'attributes'	=>	array(
+							'id'		=> $__aField['input_id'],
+							'name'		=> $__aField['_input_name'],
+							'value'		=> $__aField['value'],
+							'type'		=> $__aField['type'],	// text, password, etc.
+							'disabled'	=> null,						
+						),
+					),
+					( array ) $_aFieldTypeDefinition['aDefaultKeys']	// this allows sub-fields with different field types to set the default key-values for the sub-field.
+				);
+
+				/* Callback the registered function to output the field */		
+				$_aFieldAttributes = array(
+					'id'			=>	$__aField['_field_container_id'],
+					'data-type'		=>	"{$__aField['type']}",	// this is referred by the repeatable field JavaScript script.
+					'class'			=>	"admin-page-framework-field admin-page-framework-field-{$__aField['type']}" 
+						. ( $__aField['attributes']['disabled'] ? ' disabled' : '' )
+						. ( $_bIsSubField ? ' admin-page-framework-subfield' : '' ),
+				) + $__aField['attributes']['field'];	
+				$_aOutput[] = $__aField['before_field']
 					. "<div " . $this->generateAttributes( $_aFieldAttributes ) . ">"
 						. call_user_func_array(
-							$aFieldTypeDefinition['hfRenderField'],
-							array( $aField )
+							$_aFieldTypeDefinition['hfRenderField'],
+							array( $__aField )
 						)
-						. ( ( $sDelimiter = $aField['delimiter'] )
+						. ( ( $sDelimiter = $__aField['delimiter'] )
 							? "<div " . $this->generateAttributes( array(
 									'class'	=>	'delimiter',
-									'id'	=>	"delimiter-{$aField['input_id']}",
-									'style'	=>	$this->isLastElement( $aFields, $sKey ) ? "display:none;" : "",
+									'id'	=>	"delimiter-{$__aField['input_id']}",
+									'style'	=>	$this->isLastElement( $aFields, $__sKey ) ? "display:none;" : "",
 								) ) . ">{$sDelimiter}</div>"
-
 							: ""
 						)
 					. "</div>"
-					. $aField['after_field']
-				: "";
+					. $__aField['after_field'];
 
-		}
-				
-		/* 5. Add the description */
-		$aExtraOutput[] = ( isset( $this->aField['description'] ) && trim( $this->aField['description'] ) != '' ) 
-			? "<p class='admin-page-framework-fields-description'><span class='description'>{$this->aField['description']}</span></p>"
-			: '';
+			}		
 			
-		/* 6. Add the repeater script */
-		$aExtraOutput[] = $this->aField['repeatable']
-			? $this->_getRepeaterFieldEnablerScript( 'fields-' . $this->aField['tag_id'], count( $aFields ), $this->aField['repeatable'] )
-			: '';
-
-		/* 7. Add the sortable script */
-		$aExtraOutput[] = $this->aField['sortable'] && ( count( $aFields ) > 1 || $this->aField['repeatable'] )
-			? $this->_getSortableFieldEnablerScript( 'fields-' . $this->aField['tag_id'] )
-			: '';		
+			return implode( PHP_EOL, $_aOutput );
+			
+		}
+	
+		/**
+		 * Returns the final fields output.
+		 * 
+		 * @since	3.1.0
+		 */
+		private function _getFinalOutput( array $aField, array $aFieldsOutput, $iFieldsCount ) {
+							
+			// Construct attribute arrays.
+			$_aFieldsSetAttributes = array(
+				'id'	=> 'fieldset-' . $aField['tag_id'],
+				'class'	=> 'admin-page-framework-fieldset',
+				'data-field_id'	=>	$aField['tag_id'],	// <-- don't remember what this was for...
+			) + $aField['attributes']['fieldset'];
+			$_aFieldsContainerAttributes = array(
+				'id'	=> 'fields-' . $aField['tag_id'],
+				'class'	=> 'admin-page-framework-fields'
+					. ( $aField['repeatable'] ? ' repeatable' : '' )
+					. ( $aField['sortable'] ? ' sortable' : '' ),
+				'data-type'	=> $aField['type'],	// this is referred by the sortable field JavaScript script.
+			) + $aField['attributes']['fields'];
+			
+			return 
+				"<fieldset " . $this->generateAttributes( $_aFieldsSetAttributes ) . ">"
+					. "<div " . $this->generateAttributes( $_aFieldsContainerAttributes ) . ">"
+						. $aField['before_fields'] 
+							. implode( PHP_EOL, $aFieldsOutput )
+						. $aField['after_fields']
+					. "</div>"
+					. $this->_getExtras( $aField, $iFieldsCount )
+				. "</fieldset>";
+						
+		}
+			/**
+			 * Returns the output of the extra elements for the fields such as description and JavaScri
+			 * 
+			 * The additional but necessary elements are placed outside of the fields tag. 
+			 */
+			private function _getExtras( $aField, $iFieldsCount ) {
 				
-		/* 8. Return the entire output */
-		$_aFieldsSetAttributes = array(
-			'id'	=> 'fieldset-' . $this->aField['tag_id'],
-			'class'	=> 'admin-page-framework-fieldset',
-			'data-field_id'	=>	$this->aField['tag_id'],	// <-- don't remember what this was for...
-		) + $this->aField['attributes']['fieldset'];
-		$_aFieldsContainerAttributes = array(
-			'id'	=> 'fields-' . $this->aField['tag_id'],
-			'class'	=> 'admin-page-framework-fields'
-				. ( $this->aField['repeatable'] ? ' repeatable' : '' )
-				. ( $this->aField['sortable'] ? ' sortable' : '' ),
-			'data-type'	=> $this->aField['type'],	// this is referred by the sortable field JavaScript script.
-		) + $this->aField['attributes']['fields'];
-		return 
-			"<fieldset " . $this->generateAttributes( $_aFieldsSetAttributes ) . ">"
-				. "<div " . $this->generateAttributes( $_aFieldsContainerAttributes ) . ">"
-					. $this->aField['before_fields'] 
-					. implode( PHP_EOL, $aFieldsOutput )
-					. $this->aField['after_fields']
-				. "</div>"
-				. implode( PHP_EOL, $aExtraOutput )
-			. "</fieldset>";
-		
-	}
+				$_aOutput = array();
+				
+				// Add the description
+				if ( isset( $aField['description'] ) && trim( $aField['description'] ) != '' )  {
+					$_aOutput[] = "<p class='admin-page-framework-fields-description'><span class='description'>{$aField['description']}</span></p>";
+				}
+					
+				// Add the repeater & sortable scripts 
+				$_aOutput[] = $this->_getFieldScripts( $aField, $iFieldsCount );
+				
+				return implode( PHP_EOL, $_aOutput );
+				
+			}
+				/**
+				 * Returns the output of JavaScript scripts for the field (and its sub-fields).
+				 * 
+				 * @since	3.1.0
+				 */
+				private function _getFieldScripts( $aField, $iFieldsCount ) {
+					
+					$_aOutput = array();
+					
+					// Add the repeater script 
+					$_aOutput[] = $aField['repeatable']
+						? $this->_getRepeaterFieldEnablerScript( 'fields-' . $aField['tag_id'], $iFieldsCount, $aField['repeatable'] )
+						: '';
 
+					// Add the sortable script - if the number of fields is only one, no need to sort the field. 
+					// Repeatable fields can make the number increase so here it checkes the repeatability.
+					$_aOutput[] = $aField['sortable'] && ( $iFieldsCount > 1 || $aField['repeatable'] )
+						? $this->_getSortableFieldEnablerScript( 'fields-' . $aField['tag_id'] )
+						: '';				
+					
+					return implode( PHP_EOL, $_aOutput );
+					
+				}
+		
+		/**
+		 * Returns the set field error message to the section or field.
+		 * 
+		 * @since		3.1.0
+		 */
+		private function _getFieldError( $aErrors, $sSectionID, $sFieldID ) {
+			
+			// If this field has a section and the error element is set
+			if ( 
+				isset( 
+					$aErrors[ $sSectionID ], 
+					$aErrors[ $sSectionID ][ $sFieldID ]
+				)
+				&& is_array( $aErrors[ $sSectionID ] )
+				&& ! is_array( $aErrors[ $sSectionID ][ $sFieldID ] )
+				
+			) {							
+				return "<span style='color:red;'>*&nbsp;{$this->aField['error_message']}" 
+						. $aErrors[ $sSectionID ][ $sFieldID ]
+					. "</span><br />";
+			} 
+			
+			// if this field does not have a section and the error element is set,
+			if ( isset( $aErrors[ $sFieldID ] ) && ! is_array( $aErrors[ $sFieldID ] ) ) {
+				return "<span style='color:red;'>*&nbsp;{$this->aField['error_message']}" 
+						. $aErrors[ $sFieldID ]
+					. "</span><br />";
+			}		
+			
+		}	
+	
 		/**
 		 * Returns the array of fields 
 		 * 
 		 * @since			3.0.0
 		 */
-		protected function _composeFieldsArray( &$aField, &$aOptions ) {
+		protected function _constructFieldsArray( &$aField, &$aOptions ) {
 
 			/* Get the set value(s) */
-			$vSavedValue = $this->_getInputFieldValue( $aField, $aOptions );
+			$vSavedValue = $this->_getStoredInputFieldValue( $aField, $aOptions );
 
 			/* Separate the first field and sub-fields */
 			$aFirstField = array();
@@ -322,13 +347,14 @@ class AdminPageFramework_FormField extends AdminPageFramework_FormField_Base {
 			}		
 			
 			/* Create the sub-fields of repeatable fields based on the saved values */
-			if ( $aField['repeatable'] ) 
+			if ( $aField['repeatable'] ) {
 				foreach( ( array ) $vSavedValue as $iIndex => $vValue ) {
 					if ( $iIndex == 0 ) continue;
 					$aSubFields[ $iIndex - 1 ] = isset( $aSubFields[ $iIndex - 1 ] ) && is_array( $aSubFields[ $iIndex - 1 ] ) 
 						? $aSubFields[ $iIndex - 1 ] 
 						: array();			
 				}
+			}
 			
 			/* Put the initial field and the sub-fields together in one array */
 			foreach( $aSubFields as &$aSubField ) {
@@ -344,7 +370,7 @@ class AdminPageFramework_FormField extends AdminPageFramework_FormField_Base {
 				/* Do recursive array merging */
 				$aSubField = $this->uniteArrays( $aSubField, $aFirstField );	// the 'attributes' array of some field types have more than one dimensions. // $aSubField = $aSubField + $aFirstField;
 				
-				/* Restore the label elemnet */
+				/* Restore the label element */
 				$aSubField['label']	= $aLabel;
 				
 			}
@@ -379,6 +405,68 @@ class AdminPageFramework_FormField extends AdminPageFramework_FormField_Base {
 			return $aFields;
 			
 		}
-	
+		
+			/**
+			 * Returns the stored field value.
+			 * 
+			 * @since			2.0.0
+			 * @since			3.0.0			Removed the check of the 'value' and 'default' keys. Made it use the '_fields_type' internal key.
+			 * @since			3.1.0			Changed the name to _getStoredInputFieldValue from _getInputFieldValue
+			 */
+			private function _getStoredInputFieldValue( $aField, $aOptions ) {	
+
+				// Check if a previously saved option value exists or not. Regular setting pages and page meta boxes will be applied here.
+				// It's important to return null if not set as the returned value will be checked later on whether it is set or not. If an empty value is returned, they will think it's set.
+				switch( $aField['_fields_type'] ) {
+					default:
+					case 'page':
+					case 'page_meta_box':
+					case 'taxonomy':
+					
+						// If a section is not set, check the first dimension element.
+						if ( ! isset( $aField['section_id'] ) || $aField['section_id'] == '_default' )
+							return isset( $aOptions[ $aField['field_id'] ] )
+								? $aOptions[ $aField['field_id'] ]
+								: null;		
+							
+						// At this point, the section dimension is set.
+						
+						// If it belongs to a sub section,
+						if ( isset( $aField['_section_index'] ) )
+							return isset( $aOptions[ $aField['section_id'] ][ $aField['_section_index'] ][ $aField['field_id'] ] )
+								? $aOptions[ $aField['section_id'] ][ $aField['_section_index'] ][ $aField['field_id'] ]
+								: null;				
+						
+						// Otherwise, return the second dimension element.
+						return isset( $aOptions[ $aField['section_id'] ][ $aField['field_id'] ] )
+							? $aOptions[ $aField['section_id'] ][ $aField['field_id'] ]
+							: null;
+							
+					case 'post_meta_box':
+			
+						if ( ! isset( $_GET['action'], $_GET['post'] ) ) return null;
+					
+						// If a section is not set,
+						if ( ! isset( $aField['section_id'] ) || $aField['section_id'] == '_default' )
+							return get_post_meta( $_GET['post'], $aField['field_id'], true );
+							
+						// At this point, the section dimension is set.
+						$aSectionArray = get_post_meta( $_GET['post'], $aField['section_id'], true );
+						
+						// If it belongs to a sub section,
+						if ( isset( $aField['_section_index'] ) )
+							return isset( $aSectionArray[ $aField['_section_index'] ][ $aField['field_id'] ] )
+								? $aSectionArray[ $aField['_section_index'] ][ $aField['field_id'] ]
+								: null;								
+								
+						// Otherwise, return the second dimension element.
+						return isset( $aSectionArray[ $aField['field_id'] ] )
+							? $aSectionArray[ $aField['field_id'] ]
+							: null;
+							
+				}
+				return null;	
+								
+			}		
 }
 endif;

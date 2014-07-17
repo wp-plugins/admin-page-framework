@@ -15,7 +15,6 @@ if ( ! class_exists( 'AdminPageFramework_Menu' ) ) :
  * @extends			AdminPageFramework_Page
  * @package			AdminPageFramework
  * @subpackage		Page
- * @staticvar		array	$_aBuiltInRootMenuSlugs	stores the WordPress built-in menu slugs.
  * @staticvar		array	$_aStructure_SubMenuPageForUser	represents the structure of the sub-menu page array.
  */
 abstract class AdminPageFramework_Menu extends AdminPageFramework_Page {
@@ -24,12 +23,12 @@ abstract class AdminPageFramework_Menu extends AdminPageFramework_Page {
 	 * Used to refer the built-in root menu slugs.
 	 * 
 	 * @since			2.0.0
+	 * @since			3.1.0			Changed it non-static.
 	 * @remark			Not for the user.
 	 * @var				array			Holds the built-in root menu slugs.
-	 * @static
 	 * @internal
 	 */ 
-	protected static $_aBuiltInRootMenuSlugs = array(
+	protected $_aBuiltInRootMenuSlugs = array(
 		// All keys must be lower case to support case insensitive look-ups.
 		'dashboard' => 			'index.php',
 		'posts' => 				'edit.php',
@@ -136,13 +135,13 @@ abstract class AdminPageFramework_Menu extends AdminPageFramework_Page {
 	public function setRootMenuPage( $sRootMenuLabel, $sIcon16x16=null, $iMenuPosition=null ) {
 
 		$sRootMenuLabel = trim( $sRootMenuLabel );
-		$sSlug = $this->_isBuiltInMenuItem( $sRootMenuLabel );	// if true, this method returns the slug
+		$_sSlug = $this->_isBuiltInMenuItem( $sRootMenuLabel );	// if true, this method returns the slug
 		$this->oProp->aRootMenu = array(
 			'sTitle'			=> $sRootMenuLabel,
-			'sPageSlug' 		=> $sSlug ? $sSlug : $this->oProp->sClassName,	
+			'sPageSlug' 		=> $_sSlug ? $_sSlug : $this->oProp->sClassName,	
 			'sIcon16x16'		=> $this->oUtil->resolveSRC( $sIcon16x16 ),
 			'iPosition'			=> $iMenuPosition,
-			'fCreateRoot'		=> $sSlug ? false : true,
+			'fCreateRoot'		=> $_sSlug ? false : true,
 		);	
 					
 	}
@@ -156,11 +155,11 @@ abstract class AdminPageFramework_Menu extends AdminPageFramework_Page {
 		private function _isBuiltInMenuItem( $sMenuLabel ) {
 			
 			$sMenuLabelLower = strtolower( $sMenuLabel );
-			if ( array_key_exists( $sMenuLabelLower, self::$_aBuiltInRootMenuSlugs ) )
-				return self::$_aBuiltInRootMenuSlugs[ $sMenuLabelLower ];
+			if ( array_key_exists( $sMenuLabelLower, $this->_aBuiltInRootMenuSlugs ) )
+				return $this->_aBuiltInRootMenuSlugs[ $sMenuLabelLower ];
 			
 		}	
-	
+
 	/**
 	 * Sets the top level menu page by page slug.
 	 * 
@@ -378,10 +377,11 @@ abstract class AdminPageFramework_Menu extends AdminPageFramework_Page {
 	 * @internal
 	 */
 	public function _replyToBuildMenu() {
-		
+
 		// If the root menu label is not set but the slug is set, 
-		if ( $this->oProp->aRootMenu['fCreateRoot'] ) 
+		if ( $this->oProp->aRootMenu['fCreateRoot'] ) {
 			$this->_registerRootMenuPage();
+		}
 		
 		// Apply filters to let other scripts add sub menu pages.
 		$this->oProp->aPages = $this->oUtil->addAndApplyFilter(		// Parameters: $oCallerObject, $sFilter, $vInput, $vArgs...
@@ -407,10 +407,13 @@ abstract class AdminPageFramework_Menu extends AdminPageFramework_Page {
 			$aSubMenuItem = $this->_formatSubMenuItemArray( $aSubMenuItem );	// needs to be sanitized because there are hook filters applied to this array.
 			$aSubMenuItem['_page_hook'] = $this->_registerSubMenuItem( $aSubMenuItem );	// store the page hook; this is same as the value stored in the global $page_hook or $hook_suffix variable. 
 		}
-						
+
 		// After adding the sub menus, if the root menu is created, remove the page that is automatically created when registering the root menu.
-		if ( $this->oProp->aRootMenu['fCreateRoot'] ) 
+		if ( $this->oProp->aRootMenu['fCreateRoot'] ) {
 			remove_submenu_page( $this->oProp->aRootMenu['sPageSlug'], $this->oProp->aRootMenu['sPageSlug'] );
+		}
+
+		$this->oProp->_bBuiltMenu = true;
 		
 	}	
 		
@@ -508,7 +511,9 @@ abstract class AdminPageFramework_Menu extends AdminPageFramework_Page {
 		 * @internal
 		 */ 
 		private function _registerSubMenuItem( $aArgs ) {
-				
+
+			if ( ! isset( $aArgs['type'] ) ) return;
+
 			// Variables
 			$sType = $aArgs['type'];	// page or link
 			$sTitle = $sType == 'page' ? $aArgs['title'] : $aArgs['title'];
@@ -516,7 +521,9 @@ abstract class AdminPageFramework_Menu extends AdminPageFramework_Page {
 			$_sPageHook = '';
 
 			// Check the capability
-			if ( ! current_user_can( $sCapability ) ) return;		
+			if ( ! current_user_can( $sCapability ) ) {		
+				return;		
+			}
 			
 			// Add the sub-page to the sub-menu			
 			$sRootPageSlug = $this->oProp->aRootMenu['sPageSlug'];
@@ -548,8 +555,15 @@ abstract class AdminPageFramework_Menu extends AdminPageFramework_Page {
 						
 						// the array structure is defined in plugin.php - $submenu[$parent_slug][] = array ( $menu_title, $capability, $menu_slug, $page_title ) 
 						if ( $aSubMenu[0] == $sTitle && $aSubMenu[3] == $sTitle && $aSubMenu[2] == $sPageSlug ) {
-							unset( $GLOBALS['submenu'][ $sMenuLabel ][ $iIndex ] );
-							
+
+							// Remove from the menu. If the current page is being accessed, do not remove it from the menu.
+							// If it is in the network admin area, do not remove the menu; otherwise, it gets not accessible. 
+							if ( ! is_network_admin() ) {
+								unset( $GLOBALS['submenu'][ $sMenuLabel ][ $iIndex ] );
+							} else if ( isset( $_GET['page'] ) && $sPageSlug != $_GET['page'] ) {
+								unset( $GLOBALS['submenu'][ $sMenuLabel ][ $iIndex ] );
+							}
+
 							// The page title in the browser window title bar will miss the page title as this is left as it is.
 							$this->oProp->aHiddenPages[ $sPageSlug ] = $sTitle;
 							add_filter( 'admin_title', array( $this, '_replyToFixPageTitleForHiddenPages' ), 10, 2 );

@@ -5,7 +5,7 @@
 	Description: Demonstrates the features of the Admin Page Framework class.
 	Author: Michael Uno
 	Author URI: http://michaeluno.jp
-	Version: 3.0.6
+	Version: 3.1.0
 	Requirements: PHP 5.2.4 or above, WordPress 3.3 or above.
 */ 
 
@@ -21,22 +21,19 @@ define( 'APFDEMO_DIRNAME', dirname( APFDEMO_FILE ) );
 if ( ! class_exists( 'AdminPageFramework' ) ) {
 	include_once( 
 		defined( 'APFDEMO_DEVMODE' ) && APFDEMO_DEVMODE
-			? APFDEMO_DIRNAME . '/development/admin-page-framework.php'
-			: APFDEMO_DIRNAME . '/library/admin-page-framework.min.php'
+			? APFDEMO_DIRNAME . '/development/admin-page-framework.php'	// use the development version when you need to do debugging.
+			: APFDEMO_DIRNAME . '/library/admin-page-framework.min.php'	// use the minified version in your plugins or themes.
 	);
 }
 
+/* Examples */
+
+// Create a custom post type - this class deals with front-end components so checking with is_admin() is not necessary.
+include_once( APFDEMO_DIRNAME . '/example/APF_PostType.php' );
+new APF_PostType( 'apf_posts' ); 	// post type slug
 if ( is_admin() ) :
-	
- 	// Create an example page group
-	include_once( APFDEMO_DIRNAME . '/example/APF_BasicUsage.php' );	// Include the basic usage example that creates a root page and its sub-pages.
-	new APF_BasicUsage;
 
-	// Adds pages and forms in the custom post type root page  - 2.2 seconds
-	include_once( APFDEMO_DIRNAME . '/example/APF_Demo.php' );	// Include the demo class that creates various forms.
-	new APF_Demo; 
-
-	// Create a meta box with form fields
+	// Create meta boxes with form fields that appear in post definition pages (where you create a post) of the given post type.
 	include_once( APFDEMO_DIRNAME . '/example/APF_MetaBox_BuiltinFieldTypes.php' );	
 	new APF_MetaBox_BuiltinFieldTypes(
 		'sample_custom_meta_box',	// meta box ID
@@ -45,82 +42,94 @@ if ( is_admin() ) :
 		'normal',	// context (what kind of metabox this is)
 		'default'	// priority
 	);
-
 	include_once( APFDEMO_DIRNAME . '/example/APF_MetaBox_CustomFieldTypes.php' );	
 	new APF_MetaBox_CustomFieldTypes(
 		'sample_custom_meta_box_with_custom_field_types',	// meta box ID
 		__( 'Demo Meta Box with Custom Field Types', 'admin-page-framework-demo' ),		// title
 		array( 'apf_posts' ),	// post type slugs: post, page, etc.
-		'normal',	// context (what kind of metabox this is)
-		'default'	// priority
-	);
-	
-	// Create meta boxes in the pages added with the framework 
-	include_once( APFDEMO_DIRNAME . '/example/APF_MetaBox_For_Pages_Normal.php' );
-	new APF_MetaBox_For_Pages_Normal(
-		'apf_metabox_for_pages_normal',		// meta box id
-		__( 'Sample Meta Box For Admin Pages Inserted in Normal Area', 'admin-page-framework-demo' ),	// title
-		'apf_first_page',	// page slugs
 		'normal',	// context
 		'default'	// priority
 	);
-	include_once( APFDEMO_DIRNAME . '/example/APF_MetaBox_For_Pages_Advanced.php' );
-	new APF_MetaBox_For_Pages_Advanced(	
-		'apf_metabox_for_pages_advanced',	// meta box id
-		__( 'Sample Meta Box For Admin Pages Inserted in Advanced Area', 'admin-page-framework-demo' ),	// title
-		'apf_first_page',	// page slugs
-		'advanced',		// context
-		'default'	// priority
-	);	
-	include_once( APFDEMO_DIRNAME . '/example/APF_MetaBox_For_Pages_Side.php' );	
-	new APF_MetaBox_For_Pages_Side(	
-		'apf_metabox_for_pages_side',	// meta box id
-		__( 'Sample Meta Box For Admin Pages Inserted in Advanced Area', 'admin-page-framework-demo' ),	// title
-		array( 'apf_first_page', 'apf_second_page' ),	// page slugs - setting multiple slugs is possible
-		'side',		// context
-		'default'	// priority
-	);		 
-
+	
 	// Add fields in the taxonomy page
 	include_once( APFDEMO_DIRNAME . '/example/APF_TaxonomyField.php' );
 	new APF_TaxonomyField( 'apf_sample_taxonomy' );		// taxonomy slug
+
+endif;
+
+
+if ( is_admin() ) :
+	
+ 	// Create an example page group and add sub-pages including a page with the slug 'apf_first_page'.
+	include_once( APFDEMO_DIRNAME . '/example/APF_BasicUsage.php' );	// Include the basic usage example that creates a root page and its sub-pages.
+	new APF_BasicUsage;
+
+		// Create meta boxes that belongs to the 'apf_first_page' page.
+		include_once( APFDEMO_DIRNAME . '/example/APF_MetaBox_For_Pages_Normal.php' );
+		new APF_MetaBox_For_Pages_Normal(
+			'apf_metabox_for_pages_normal',		// meta box id
+			__( 'Sample Meta Box for Admin Pages Inserted in Normal Area', 'admin-page-framework-demo' ),	// title
+			'apf_first_page',	// page slugs
+			'normal',	// context
+			'default'	// priority
+		);
+		include_once( APFDEMO_DIRNAME . '/example/APF_MetaBox_For_Pages_Advanced.php' );
+		new APF_MetaBox_For_Pages_Advanced(	
+			'apf_metabox_for_pages_advanced',	// meta box id
+			__( 'Sample Meta Box for Admin Pages Inserted in Advanced Area', 'admin-page-framework-demo' ),	// title
+			'apf_first_page',	// page slugs
+			'advanced',		// context
+			'default'	// priority
+		);	
+		include_once( APFDEMO_DIRNAME . '/example/APF_MetaBox_For_Pages_Side.php' );	
+		new APF_MetaBox_For_Pages_Side(	
+			'apf_metabox_for_pages_side',	// meta box id
+			__( 'Sample Meta Box for Admin Pages Inserted in Advanced Area', 'admin-page-framework-demo' ),	// title
+			array( 'apf_first_page', 'apf_second_page' ),	// page slugs - setting multiple slugs is possible
+			'side',		// context
+			'default'	// priority
+		);		  	
+	
+	
+	// Add pages and forms in the custom post type root page - all the settings should be defined in the setUp() method in each class.
+	include_once( APFDEMO_DIRNAME . '/example/APF_Demo.php' );	// Include the demo class that creates various forms.
+	new APF_Demo;
+
+		// Add pages and forms in the custom post type root page
+		include_once( APFDEMO_DIRNAME . '/example/APF_Demo_CustomFieldTypes.php' );	// Include the demo class that creates various forms.
+		new APF_Demo_CustomFieldTypes( 'APF_Demo' );	// passing the option key used by the main pages.
+			
+		// Add the Manage Options page.
+		include_once( APFDEMO_DIRNAME . '/example/APF_Demo_ManageOptions.php' );
+		new APF_Demo_ManageOptions( 'APF_Demo' );	// passing the option key used by the main pages.
+		
+		// Add a hidden page.
+		include_once( APFDEMO_DIRNAME . '/example/APF_Demo_HiddenPage.php' );
+		new APF_Demo_HiddenPage;
+		
+		// Add the readme and the documentation sub-menu items to the above main demo plugin root page.
+		include_once( APFDEMO_DIRNAME . '/example/APF_Demo_Readme.php' );
+		new APF_Demo_Readme; 	 
+			
+			
+	if ( is_network_admin() ) :
+	
+		// Add pages and forms in the network admin area.
+		include_once( APFDEMO_DIRNAME . '/example/APF_NetworkAdmin.php' );	// Include the demo class that creates various forms.
+		new APF_NetworkAdmin; 	
+		
+		new APF_MetaBox_For_Pages_Side(	
+			'apf_metabox_for_pages_side',	// meta box id
+			__( 'Sample Meta Box for Admin Pages Inserted in Advanced Area', 'admin-page-framework-demo' ),	// title
+			array( 'apf_builtin_field_types' ),	// page slugs - setting multiple slugs is possible
+			'side',		// context
+			'default'	// priority
+		);		  
+		
+	endif;
 	
 endif;
 
-// Creates a custom post type
-include_once( APFDEMO_DIRNAME . '/example/APF_PostType.php' );
-new APF_PostType( 	// this class deals with front-end components so checking with is_admin() is not necessary.
-	'apf_posts', 	// post type slug - you can pass multiple slugs with an array e.g. array( 'apf_posts', 'post', 'page' )
-	array(			// argument - for the array structure, refer to http://codex.wordpress.org/Function_Reference/register_post_type#Arguments
-		'labels' => array(
-			'name' => 'Admin Page Framework',
-			'all_items' => __( 'Sample Posts', 'admin-page-framework-demo' ),
-			'singular_name' => 'Admin Page Framework',
-			'add_new' => 'Add New',
-			'add_new_item' => 'Add New APF Post',
-			'edit' => 'Edit',
-			'edit_item' => 'Edit APF Post',
-			'new_item' => 'New APF Post',
-			'view' => 'View',
-			'view_item' => 'View APF Post',
-			'search_items' => 'Search APF Post',
-			'not_found' => 'No APF Post found',
-			'not_found_in_trash' => 'No APF Post found in Trash',
-			'parent' => 'Parent APF Post',
-			'plugin_listing_table_title_cell_link'	=>	__( 'APF Posts', 'admin-page-framework-demo' ),		// framework specific key. [3.0.6+]
-		),
-		'public' => true,
-		'menu_position' => 110,
-		'supports' => array( 'title' ), // 'supports' => array( 'title', 'editor', 'comments', 'thumbnail' ),	// 'custom-fields'
-		'taxonomies' => array( '' ),
-		'has_archive' => true,
-		'show_admin_column' => true,	// this is for custom taxonomies to automatically add the column in the listing table.
-		'menu_icon' => plugins_url( 'asset/image/wp-logo_16x16.png', APFDEMO_FILE ),
-		// ( framework specific key ) this sets the screen icon for the post type for WordPress v3.7.1 or below.
-		'screen_icon' => dirname( APFDEMO_FILE  ) . '/asset/image/wp-logo_32x32.png', // a file path can be passed instead of a url, plugins_url( 'asset/image/wp-logo_32x32.png', APFDEMO_FILE )
-	)
-);
-	
 /*
  * If you find this framework useful, include it in your project!
  * And please leave a nice comment in the review page, http://wordpress.org/support/view/plugin-reviews/admin-page-framework

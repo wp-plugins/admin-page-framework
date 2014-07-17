@@ -71,7 +71,7 @@ class DialCustomFieldType extends AdminPageFramework_FieldType {
 						var oDialInput = oCopied.find( 'input.knob' );
 						if ( oDialInput.length <= 0 ) {
 							return;
-						}
+						}											
 						
 						// Find the wrapper element
 						var oWrapper = oDialInput.closest( 'label' ).children( 'div' );

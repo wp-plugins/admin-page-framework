@@ -28,19 +28,24 @@ abstract class AdminPageFramework_Factory_Router {
 	public $oProp;	
 	/**
 	* @internal
+	* @access			public
 	* @since			2.0.0
+	* @since			3.1.0			Changed the scope to public from protected.
 	*/ 	
-	protected $oDebug;
+	public $oDebug;
 	/**
 	* @internal
 	* @since			2.0.0
+	* @since			3.1.0			Changed the scope to public from protected.
 	*/ 		
-	protected $oUtil;
+	public $oUtil;
 	/**
 	* @since			2.0.0
+	* @access			public
 	* @internal
+	* @since			3.1.0			Changed the scope to public from protected.
 	*/ 		
-	protected $oMsg;	
+	public $oMsg;	
 	
 	/**
 	* @internal
@@ -75,11 +80,11 @@ abstract class AdminPageFramework_Factory_Router {
 		// Objects - Model
 		$this->oProp = $oProp;
 		$this->oMsg = AdminPageFramework_Message::instantiate( $oProp->sTextDomain );
-		
+
 		if ( $this->_isInThePage() ) :
 	
 			// Objects - Model
-			$this->oForm = new AdminPageFramework_FormElement( $oProp->sFieldsType, $oProp->sCapability );
+			$this->oForm = $this->_getFormInstance( $oProp );
 		
 			// Objects - Control
 			$this->oHeadTag = $this->_getHeadTagInstance( $oProp );
@@ -91,12 +96,21 @@ abstract class AdminPageFramework_Factory_Router {
 			
 		endif;
 		
+		// Call the start method.
+		$this->start();	// defined in the controller class.
+		
 	}	
 	
-		
+	/**
+	 * Determines whether the class object is instantiatable in the current page.
+	 * 
+	 * @since			3.1.0
+	 * @internal
+	 */ 
+	protected function _isInstantiatabe() { return true; }
 	
 	/**
-	 * Determines whether the meta box belongs to the loading page.
+	 * Determines whether the instantiated object and its producing elements belong to the loading page.
 	 * 
 	 * This method should be redefined in the extended class.
 	 * 
@@ -110,6 +124,27 @@ abstract class AdminPageFramework_Factory_Router {
 	 * Route
 	 */
 	/**
+	 * Instantiate a form object based on the type.
+	 * 
+	 * @since			3.1.0
+	 */
+	protected function _getFormInstance( $oProp ) {
+		
+		switch ( $oProp->sFieldsType ) {
+			case 'page':
+			case 'network_admin_page':
+				return new AdminPageFramework_FormElement_Page( $oProp->sFieldsType, $oProp->sCapability );
+			case 'post_meta_box':
+			case 'page_meta_box':
+			case 'post_type':
+			case 'taxonomy':
+				return new AdminPageFramework_FormElement( $oProp->sFieldsType, $oProp->sCapability );
+	
+		}		
+		
+	}
+	
+	/**
 	 * Instantiate a head tag object based on the type.
 	 * 
 	 * @since			3.0.4
@@ -119,6 +154,7 @@ abstract class AdminPageFramework_Factory_Router {
 		
 		switch ( $oProp->sFieldsType ) {
 			case 'page':
+			case 'network_admin_page':
 				return new AdminPageFramework_HeadTag_Page( $oProp );
 			case 'post_meta_box':
 				return new AdminPageFramework_HeadTag_MetaBox( $oProp );
@@ -143,6 +179,7 @@ abstract class AdminPageFramework_Factory_Router {
 
 		switch ( $oProp->sFieldsType ) {
 			case 'page':
+			case 'network_admin_page':
 				return new AdminPageFramework_HelpPane_Page( $oProp );
 			case 'post_meta_box':
 				return new AdminPageFramework_HelpPane_MetaBox( $oProp );
@@ -165,7 +202,8 @@ abstract class AdminPageFramework_Factory_Router {
 		
 		switch ( $oProp->sFieldsType ) {
 			case 'page':
-				return null;
+			case 'network_admin_page':
+				return new AdminPageFramework_Link_Page( $oProp, $oMsg );
 			case 'post_meta_box':
 				return null;
 			case 'page_meta_box':
@@ -189,6 +227,8 @@ abstract class AdminPageFramework_Factory_Router {
 		switch ( $oProp->sFieldsType ) {
 			case 'page':
 				return AdminPageFramework_PageLoadInfo_Page::instantiate( $oProp, $oMsg );
+			case 'network_admin_page':
+				return AdminPageFramework_PageLoadInfo_NetworkAdminPage::instantiate( $oProp, $oMsg );
 			case 'post_meta_box':
 				return null;
 			case 'page_meta_box':
@@ -198,6 +238,7 @@ abstract class AdminPageFramework_Factory_Router {
 			case 'taxonomy':
 				return null;
 		}		
+		
 	}
 	
 	/**
@@ -214,6 +255,9 @@ abstract class AdminPageFramework_Factory_Router {
 		
 		// the field_{class name}_{...} filter.
 		if ( substr( $sMethodName, 0, strlen( 'field_' . $this->oProp->sClassName . '_' ) ) == 'field_' . $this->oProp->sClassName . '_' ) return $aArgs[ 0 ];
+
+		// the options_ + class name filter. [3.1.0+]
+		if ( substr( $sMethodName, 0, strlen( "options_{$this->oProp->sClassName}" ) ) == "options_{$this->oProp->sClassName}" ) return $aArgs[ 0 ];
 		
 		// the field_types_ + class name filter. [2.1.5+]
 		if ( substr( $sMethodName, 0, strlen( "field_types_{$this->oProp->sClassName}" ) ) == "field_types_{$this->oProp->sClassName}" ) return $aArgs[ 0 ];
