@@ -50,7 +50,10 @@ class AdminPageFramework_FieldType_radio extends AdminPageFramework_FieldType_Ba
 			}			
 			.admin-page-framework-field-radio .admin-page-framework-input-container {
 				display: inline;
-			}			
+			}		
+			.admin-page-framework-field-radio .admin-page-framework-input-label-string  {
+				display: inline;	/* radio labels should not fold(wrap) after the check box */
+			}				
 		";
 	}
 
@@ -120,7 +123,7 @@ class AdminPageFramework_FieldType_radio extends AdminPageFramework_FieldType_Ba
 			/* Insert the output */
 			$aOutput[] = 
 				$this->getFieldElementByKey( $aField['before_label'], $sKey )
-				. "<div class='admin-page-framework-input-label-container admin-page-framework-radio-label' style='min-width: {$aField['label_min_width']}px;'>"
+				. "<div class='admin-page-framework-input-label-container admin-page-framework-radio-label' style='min-width: " . $this->sanitizeLength( $aField['label_min_width'] ) . ";'>"
 					. "<label " . $this->generateAttributes( $aLabelAttributes ) . ">"
 						. $this->getFieldElementByKey( $aField['before_input'], $sKey )
 						. "<span class='admin-page-framework-input-container'>"

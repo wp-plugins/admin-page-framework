@@ -155,8 +155,10 @@ class AdminPageFramework_FormElement extends AdminPageFramework_FormElement_Util
 		$aSection = $aSection + self::$_aStructure_Section;
 		$aSection['section_id'] = $this->sanitizeSlug( $aSection['section_id'] );
 		
-		$this->aSections[ $aSection['section_id'] ] = $aSection;	
-		$this->aFields[ $aSection['section_id'] ] = isset( $this->aFields[ $aSection['section_id'] ] ) ? $this->aFields[ $aSection['section_id'] ] : array();
+		$this->aSections[ $aSection['section_id'] ]	= $aSection;	
+		$this->aFields[ $aSection['section_id'] ]	= isset( $this->aFields[ $aSection['section_id'] ] ) 
+			? $this->aFields[ $aSection['section_id'] ] 
+			: array();
 
 	}
 	
@@ -167,7 +169,7 @@ class AdminPageFramework_FormElement extends AdminPageFramework_FormElement_Util
 	 */
 	public function removeSection( $sSectionID ) {
 		
-		if ( $sSectionID == '_default' ) return;
+		if ( $sSectionID == '_default' ){  return; }
 		
 		unset( $this->aSections[ $sSectionID ] );
 		unset( $this->aFields[ $sSectionID ] );
@@ -184,7 +186,7 @@ class AdminPageFramework_FormElement extends AdminPageFramework_FormElement_Util
 		
 		if ( ! is_array( $asField ) ) {
 			$this->_sTargetSectionID = is_string( $asField ) ? $asField : $this->_sTargetSectionID;
-			return $this->_sTargetSectionID;	// result
+			return $this->_sTargetSectionID;
 		}
 		$aField = $asField;
 		$this->_sTargetSectionID = isset( $aField['section_id'] ) ? $aField['section_id'] : $this->_sTargetSectionID;
@@ -195,14 +197,14 @@ class AdminPageFramework_FormElement extends AdminPageFramework_FormElement_Util
 			array( 'section_id' => $this->_sTargetSectionID ),
 			self::$_aStructure_Field
 		);
-		if ( ! isset( $aField['field_id'], $aField['type'] ) ) return null;	// Check the required keys as these keys are necessary.
+		if ( ! isset( $aField['field_id'], $aField['type'] ) ) { return null; }	// Check the required keys as these keys are necessary.
 			
 		// Sanitize the IDs since they are used as a callback method name.
-		$aField['field_id'] = $this->sanitizeSlug( $aField['field_id'] );
-		$aField['section_id'] = $this->sanitizeSlug( $aField['section_id'] );		
+		$aField['field_id']		= $this->sanitizeSlug( $aField['field_id'] );
+		$aField['section_id']	= $this->sanitizeSlug( $aField['section_id'] );		
 		
 		$this->aFields[ $aField['section_id'] ][ $aField['field_id'] ] = $aField;
-		return $aField;	// result
+		return $aField;
 		
 	}	
 		
@@ -237,17 +239,18 @@ class AdminPageFramework_FormElement extends AdminPageFramework_FormElement_Util
 		 */
 		foreach( $this->aFields as $_sSectionID => $_aSubSectionsOrFields ) {
 
-			if ( array_key_exists( $sFieldID, $_aSubSectionsOrFields ) ) 
+			if ( array_key_exists( $sFieldID, $_aSubSectionsOrFields ) ) {
 				unset( $this->aFields[ $_sSectionID ][ $sFieldID ] );
+			}
 			
 			// Check sub-sections.
 			foreach ( $_aSubSectionsOrFields as $_sIndexOrFieldID => $_aSubSectionOrFields ) {
 				
 				if ( is_numeric( $_sIndexOrFieldID ) && is_int( $_sIndexOrFieldID + 0 ) ) {	// means it's a sub-section
 					
-					if ( array_key_exists( $sFieldID, $_aSubSectionOrFields ) )
+					if ( array_key_exists( $sFieldID, $_aSubSectionOrFields ) ) {
 						unset( $this->aFields[ $_sSectionID ][ $_sIndexOrFieldID ] );
-					
+					}
 					continue;
 					
 				}
@@ -264,31 +267,33 @@ class AdminPageFramework_FormElement extends AdminPageFramework_FormElement_Util
 	 */
 	public function format() {
 		
-		$this->formatSections( $this->sFieldsType, $this->sCapability );
-		$this->formatFields( $this->sFieldsType, $this->sCapability );
+		$this->aSections	= $this->formatSections( $this->aSections, $this->sFieldsType, $this->sCapability );
+		$this->aFields		= $this->formatFields( $this->aFields, $this->sFieldsType, $this->sCapability );
 		
 	}
 	
 	/**
 	 * Formats the stored sections definition array.
 	 * 
-	 * @since			3.0.0
+	 * @since	3.0.0
+	 * @since	3.1.1	Added a parameter. Changed to return the formatted sections array.
+	 * @return	array	the formatted sections array.
 	 */
-	public function formatSections( $sFieldsType, $sCapability ) {
+	public function formatSections( array $aSections, $sFieldsType, $sCapability ) {
 		
 		$_aNewSectionArray = array();
-		foreach( $this->aSections as $_sSectionID => $_aSection ) {
+		foreach( $aSections as $_sSectionID => $_aSection ) {
 			
-			if ( ! is_array( $_aSection ) ) continue;
+			if ( ! is_array( $_aSection ) ) { continue; }
 			
 			$_aSection = $this->formatSection( $_aSection, $sFieldsType, $sCapability, count( $_aNewSectionArray ) );
-			if ( ! $_aSection ) continue;
+			if ( ! $_aSection ) { continue; }
 			
 			$_aNewSectionArray[ $_sSectionID ] = $_aSection;
 			
 		}
 		uasort( $_aNewSectionArray, array( $this, '_sortByOrder' ) ); 
-		$this->aSections = $_aNewSectionArray;
+		return $_aNewSectionArray;
 		
 	}
 	
@@ -302,10 +307,10 @@ class AdminPageFramework_FormElement extends AdminPageFramework_FormElement_Util
 			$aSection = $this->uniteArrays(
 				$aSection,
 				array( 
-					'_fields_type' => $sFieldsType,
-					'capability' => $sCapability,
-				),
-				self::$_aStructure_Section
+					'_fields_type'	=> $sFieldsType,
+					'capability'	=> $sCapability,
+				)
+				+ self::$_aStructure_Section
 			);
 				
 			$aSection['order'] = is_numeric( $aSection['order'] ) ? $aSection['order'] : $iCountOfElements + 10;
@@ -318,13 +323,14 @@ class AdminPageFramework_FormElement extends AdminPageFramework_FormElement_Util
 	 * Formats the stored fields definition array.
 	 * 
 	 * @since			3.0.0
+	 * @since	3.1.1	Added a parameter. Changed to return the formatted sections array.
 	 */
-	public function formatFields( $sFieldsType, $sCapability ) {
+	public function formatFields( array $aFields, $sFieldsType, $sCapability ) {
 
 		$_aNewFields = array();
-		foreach ( $this->aFields as $_sSectionID => $_aSubSectionsOrFields ) {
+		foreach ( $aFields as $_sSectionID => $_aSubSectionsOrFields ) {
 			
-			if ( ! isset( $this->aSections[ $_sSectionID ] ) ) continue;
+			if ( ! isset( $this->aSections[ $_sSectionID ] ) ) { continue; }
 
 			$_aNewFields[ $_sSectionID ] = isset( $_aNewFields[ $_sSectionID ] ) ? $_aNewFields[ $_sSectionID ] : array();
 			
@@ -338,8 +344,9 @@ class AdminPageFramework_FormElement extends AdminPageFramework_FormElement_Util
 						
 						$_iCountElement = isset( $_aNewFields[ $_sSectionID ][ $_iSectionIndex ] ) ? count( $_aNewFields[ $_sSectionID ][ $_iSectionIndex ] ) : 0 ;
 						$_aField = $this->formatField( $_aField, $sFieldsType, $sCapability, $_iCountElement, $_iSectionIndex, $_abSectionRepeatable );
-						if ( $_aField )
+						if ( $_aField ) {
 							$_aNewFields[ $_sSectionID ][ $_iSectionIndex ][ $_aField['field_id'] ] = $_aField;						
+						}
 						
 					}
 					uasort( $_aNewFields[ $_sSectionID ][ $_iSectionIndex ], array( $this, '_sortByOrder' ) ); 				
@@ -356,8 +363,9 @@ class AdminPageFramework_FormElement extends AdminPageFramework_FormElement_Util
 				// Insert the formatted field definition array.
 				$_iCountElement = isset( $_aNewFields[ $_sSectionID ] ) ? count( $_aNewFields[ $_sSectionID ] ) : 0;	// the count is needed to set each order value.
 				$_aField = $this->formatField( $_aField, $sFieldsType, $sCapability, $_iCountElement, null, $_abSectionRepeatable );
-				if ( $_aField )
+				if ( $_aField ) {
 					$_aNewFields[ $_sSectionID ][ $_aField['field_id'] ] = $_aField;
+				}
 				
 			}
 			uasort( $_aNewFields[ $_sSectionID ], array( $this, '_sortByOrder' ) ); 
@@ -367,13 +375,15 @@ class AdminPageFramework_FormElement extends AdminPageFramework_FormElement_Util
 		// Sort by the order of the sections.
 		if ( ! empty( $this->aSections ) && ! empty( $_aNewFields ) ) :	// as taxonomy fields don't have sections
 			$_aSortedFields = array();
-			foreach( $this->aSections as $sSectionID => $aSeciton ) 	// will be parsed in the order of the $aSections array. Therefore, the sections must be formatted before this method.
-				if ( isset( $_aNewFields[ $sSectionID ] ) )
+			foreach( $this->aSections as $sSectionID => $aSeciton ) {	// will be parsed in the order of the $aSections array. Therefore, the sections must be formatted before this method.
+				if ( isset( $_aNewFields[ $sSectionID ] ) ) {
 					$_aSortedFields[ $sSectionID ] = $_aNewFields[ $sSectionID ];
+				}
+			}
 			$_aNewFields = $_aSortedFields;
 		endif;
 		
-		$this->aFields = $_aNewFields;
+		return $_aNewFields;
 		
 	}
 		/**
@@ -383,23 +393,23 @@ class AdminPageFramework_FormElement extends AdminPageFramework_FormElement_Util
 		 */
 		protected function formatField( $aField, $sFieldsType, $sCapability, $iCountOfElements, $iSectionIndex, $bIsSectionRepeatable ) {
 			
-			if ( ! isset( $aField['field_id'], $aField['type'] ) ) return;
+			if ( ! isset( $aField['field_id'], $aField['type'] ) ) { return; }
 			
 			$_aField = $this->uniteArrays(
-				array( '_fields_type' => $sFieldsType ),
-				$aField,
+				array( '_fields_type' => $sFieldsType )
+				+ $aField,
 				array( 
-					'capability' => $sCapability,
-					'section_id' => '_default',
-					'_section_index' => $iSectionIndex,
-					'_section_repeatable' => $bIsSectionRepeatable,
-				),
-				self::$_aStructure_Field
+					'capability'			=> $sCapability,
+					'section_id'			=> '_default',
+					'_section_index'		=> $iSectionIndex,
+					'_section_repeatable'	=> $bIsSectionRepeatable,
+				)
+				+ self::$_aStructure_Field
 			);
-			$_aField['field_id'] = $this->sanitizeSlug( $_aField['field_id'] );
-			$_aField['section_id'] = $this->sanitizeSlug( $_aField['section_id'] );			
-			$_aField['tip'] = esc_attr( strip_tags( isset( $_aField['tip'] ) ? $_aField['tip'] : $_aField['description'] ) );
-			$_aField['order'] = is_numeric( $_aField['order'] ) ? $_aField['order'] : $iCountOfElements + 10;
+			$_aField['field_id']	= $this->sanitizeSlug( $_aField['field_id'] );
+			$_aField['section_id']	= $this->sanitizeSlug( $_aField['section_id'] );			
+			$_aField['tip']			= esc_attr( strip_tags( isset( $_aField['tip'] ) ? $_aField['tip'] : $_aField['description'] ) );
+			$_aField['order']		= is_numeric( $_aField['order'] ) ? $_aField['order'] : $iCountOfElements + 10;
 						
 			return $_aField;
 			
@@ -425,14 +435,13 @@ class AdminPageFramework_FormElement extends AdminPageFramework_FormElement_Util
 	 */
 	public function getConditionedSections( $aSections=null ) {
 		
-		$aSections = is_null( $aSections ) ? $this->aSections : $aSections;
-		$aNewSections = array();
+		$aSections		= is_null( $aSections ) ? $this->aSections : $aSections;
+		$aNewSections	= array();
 		foreach( $aSections as $_sSectionID => $_aSection ) {
-			
 			$_aSection = $this->getConditionedSection( $_aSection );
-			if ( $_aSection )
+			if ( $_aSection ) {
 				$aNewSections[ $_sSectionID ] = $_aSection;
-			
+			}
 		}
 		$this->aConditionedSections = $aNewSections;
 		return $aNewSections;
@@ -448,8 +457,8 @@ class AdminPageFramework_FormElement extends AdminPageFramework_FormElement_Util
 		protected function getConditionedSection( array $aSection ) {
 			
 			// Check capability. If the access level is not sufficient, skip.
-			if ( ! current_user_can( $aSection['capability'] ) ) return;
-			if ( ! $aSection['if'] ) return;	
+			if ( ! current_user_can( $aSection['capability'] ) ) { return; }
+			if ( ! $aSection['if'] ) { return; }
 			
 			return $aSection;
 			
@@ -464,17 +473,17 @@ class AdminPageFramework_FormElement extends AdminPageFramework_FormElement_Util
 	 */
 	public function getConditionedFields( $aFields=null, $aSections=null ) {
 		
-		$aFields = is_null( $aFields ) ? $this->aFields : $aFields;
-		$aSections = is_null( $aSections ) ? $this->aSections : $aSections;
+		$aFields	= is_null( $aFields )	? $this->aFields	: $aFields;
+		$aSections	= is_null( $aSections )	? $this->aSections	: $aSections;
 
 		// Drop keys of fields-array which do not exist in the sections-array. For this reasons, the sections-array should be conditioned first before applying this method.
-		$aFields = ( array ) $this->castArrayContents( $aSections, $aFields );
+		$aFields	= ( array ) $this->castArrayContents( $aSections, $aFields );
 
 		$_aNewFields = array();
 		foreach( $aFields as $_sSectionID => $_aSubSectionOrFields ) {
 			
-			if ( ! is_array( $_aSubSectionOrFields ) ) continue;
-			if ( ! array_key_exists( $_sSectionID, $aSections ) ) continue;
+			if ( ! is_array( $_aSubSectionOrFields ) ) { continue; }
+			if ( ! array_key_exists( $_sSectionID, $aSections ) ) { continue; }
 			
 			foreach( $_aSubSectionOrFields as $_sIndexOrFieldID => $_aSubSectionOrField ) {
 				
@@ -484,11 +493,10 @@ class AdminPageFramework_FormElement extends AdminPageFramework_FormElement_Util
 					$_sSubSectionIndex = $_sIndexOrFieldID;
 					$_aFields = $_aSubSectionOrField;
 					foreach( $_aFields as $_aField ) {
-						
 						$_aField = $this->getConditionedField( $_aField );
-						if ( $_aField )
+						if ( $_aField ) {
 							$_aNewFields[ $_sSectionID ][ $_sSubSectionIndex ][ $_aField['field_id'] ] = $_aField;						
-						
+						}
 					}
 					continue;
 					
@@ -497,8 +505,9 @@ class AdminPageFramework_FormElement extends AdminPageFramework_FormElement_Util
 				// Otherwise, insert the formatted field definiton array.
 				$_aField = $_aSubSectionOrField;
 				$_aField = $this->getConditionedField( $_aField );
-				if ( $_aField )
+				if ( $_aField ) {
 					$_aNewFields[ $_sSectionID ][ $_aField['field_id'] ] = $_aField;
+				}
 				
 			}
 			
@@ -518,8 +527,8 @@ class AdminPageFramework_FormElement extends AdminPageFramework_FormElement_Util
 		protected function getConditionedField( $aField ) {
 			
 			// Check capability. If the access level is not sufficient, skip.
-			if ( ! current_user_can( $aField['capability'] ) ) return null;
-			if ( ! $aField['if'] ) return null;		
+			if ( ! current_user_can( $aField['capability'] ) ) { return null; }
+			if ( ! $aField['if'] ) { return null; }
 			return $aField;
 			
 		}
@@ -539,15 +548,14 @@ class AdminPageFramework_FormElement extends AdminPageFramework_FormElement_Util
 		
 		foreach( $aOptions as $_sSectionID => $_aSubSectionOrFields ) {
 			
-			if ( ! is_array( $_aSubSectionOrFields ) ) continue;
+			if ( ! is_array( $_aSubSectionOrFields ) ) { continue; }
 			
 			$_aSubSection = array();
 			foreach( $_aSubSectionOrFields as $_isIndexOrFieldID => $_aSubSectionOrFieldOptions ) {
 			
 				// If it is not a sub-section array, skip
-				if ( ! ( is_numeric( $_isIndexOrFieldID ) && is_int( $_isIndexOrFieldID + 0 ) ) ) continue;
+				if ( ! ( is_numeric( $_isIndexOrFieldID ) && is_int( $_isIndexOrFieldID + 0 ) ) ) { continue; }
 				
-				// Rename variables
 				$_iIndex = $_isIndexOrFieldID;
 				
 				// Insert the fields definition array into a temporary sub section array.
@@ -562,17 +570,19 @@ class AdminPageFramework_FormElement extends AdminPageFramework_FormElement_Util
 					);
 				
 				// Update the internal section index key
-				foreach( $_aSubSection[ $_iIndex ] as &$_aField ) 
+				foreach( $_aSubSection[ $_iIndex ] as &$_aField ) {
 					$_aField['_section_index'] = $_iIndex;
+				}
 				unset( $_aField ); // to be safe in PHP
 				
-					
 				$_iPrevIndex = $_iIndex;
 				
 			}
 
-			if ( ! empty( $_aSubSection ) )
-				$this->aConditionedFields[ $_sSectionID ] = $_aSubSection;	// at this point, the associative keys will be gone but the element only consists of numeric keys.
+			if ( ! empty( $_aSubSection ) ) {
+				// At this point, the associative keys will be gone but the element only consists of numeric keys.
+				$this->aConditionedFields[ $_sSectionID ] = $_aSubSection;	
+			}
 			
 		}
 

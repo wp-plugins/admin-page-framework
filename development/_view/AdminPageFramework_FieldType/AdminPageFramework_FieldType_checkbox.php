@@ -55,6 +55,9 @@ class AdminPageFramework_FieldType_checkbox extends AdminPageFramework_FieldType
 			.admin-page-framework-field-checkbox .admin-page-framework-input-label-container {
 				padding-right: 1em;
 			}
+			.admin-page-framework-field-checkbox .admin-page-framework-input-label-string  {
+				display: inline;	/* Checkbox labels should not fold(wrap) after the check box */
+			}
 		";
 	}
 	
@@ -88,7 +91,7 @@ class AdminPageFramework_FieldType_checkbox extends AdminPageFramework_FieldType
 			
 			$aOutput[] =
 				$this->getFieldElementByKey( $aField['before_label'], $sKey )
-				. "<div class='admin-page-framework-input-label-container admin-page-framework-checkbox-label' style='min-width: {$aField['label_min_width']}px;'>"
+				. "<div class='admin-page-framework-input-label-container admin-page-framework-checkbox-label' style='min-width: " . $this->sanitizeLength( $aField['label_min_width'] ) . ";'>"
 					. "<label " . $this->generateAttributes( $aLabelAttributes ) . ">"
 						. $this->getFieldElementByKey( $aField['before_input'], $sKey )
 						. "<span class='admin-page-framework-input-container'>"
