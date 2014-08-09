@@ -57,24 +57,18 @@ abstract class AdminPageFramework_NetworkAdmin extends AdminPageFramework {
 	 */
 	public function __construct( $sOptionKey=null, $sCallerPath=null, $sCapability='manage_network', $sTextDomain='admin-page-framework' ){
 			
-		if ( ! $this->_isInstantiatabe() ) {
+		if ( ! $this->_isInstantiatable() ) {
 			return;
 		}
 		
 		add_action( 'network_admin_menu', array( $this, '_replyToBuildMenu' ), 98 );					
 		add_action( 'network_admin_menu', array( $this, '_replyToFinalizeInPageTabs' ), 99 );	// must be called before the _replyToRegisterSettings() method which uses the same hook.
-		add_action( 'network_admin_menu', array( $this, '_replyToRegisterSettings' ), 100 );	// registers the settings
-		// add_action( 'admin_init', array( $this, '_replyToCheckRedirects' ) );	// redirects		
 
 		$sCallerPath = $sCallerPath ? $sCallerPath : AdminPageFramework_Utility::getCallerScriptPath( __FILE__ ); 	// this is important to attempt to find the caller script path here when separating the library into multiple files.
 		
 		$this->oProp = new AdminPageFramework_Property_NetworkAdmin( $this, $sCallerPath, get_class( $this ), $sOptionKey, $sCapability, $sTextDomain );
 		
 		parent::__construct( $sOptionKey, $sCallerPath, $sCapability, $sTextDomain );
-
-		add_action( 'admin_menu', array( $this, '_replyToBuildMenu' ), 98 );
-		add_action( 'admin_menu', array( $this, '_replyToFinalizeInPageTabs' ), 99 );
-		add_action( 'admin_menu', array( $this, '_replyToRegisterSettings' ), 100 );
 		
 	}	
 
@@ -84,7 +78,7 @@ abstract class AdminPageFramework_NetworkAdmin extends AdminPageFramework {
 	 * @since			3.1.0
 	 * @internal
 	 */
-	protected function _isInstantiatabe() {
+	protected function _isInstantiatable() {
 		
 		// Nothing to do in the non-network admin area.
 		if ( is_network_admin() ) {

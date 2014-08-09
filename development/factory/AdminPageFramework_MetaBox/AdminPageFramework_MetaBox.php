@@ -97,15 +97,16 @@ abstract class AdminPageFramework_MetaBox extends AdminPageFramework_MetaBox_Bas
 		 * @internal
 		 */
 		protected function _isInThePage() {
-			
+
 			if ( ! in_array( $this->oProp->sPageNow, array( 'post.php', 'post-new.php' ) ) ) {
 				return false;
 			}
-						
-			if ( ! in_array( $this->oUtil->getCurrentPostType(), $this->oProp->aPostTypes ) ) {
-				return false;				
-			}	
 			
+			$_sCurrentPostType = $this->oUtil->getCurrentPostType();
+			if ( $_sCurrentPostType && ! in_array( $_sCurrentPostType, $this->oProp->aPostTypes ) ) {			
+				return false;	
+			}	
+		
 			return true;
 			
 		}
@@ -242,10 +243,12 @@ abstract class AdminPageFramework_MetaBox extends AdminPageFramework_MetaBox_Bas
 	 * @since			3.0.0
 	 * @internal
 	 */
-	public function _replyToRegisterFormElements() {
+	public function _replyToRegisterFormElements( $oScreen ) {
 				
 		// Schedule to add head tag elements and help pane contents. 
 		if ( ! $this->oUtil->isPostDefinitionPage( $this->oProp->aPostTypes ) ) return;
+	
+		$this->_loadDefaultFieldTypeDefinitions();
 	
 		// Format the fields array.
 		$this->oForm->format();
