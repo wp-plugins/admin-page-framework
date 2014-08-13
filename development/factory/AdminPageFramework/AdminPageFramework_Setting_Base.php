@@ -66,17 +66,20 @@ abstract class AdminPageFramework_Setting_Base extends AdminPageFramework_Menu {
 	 */
 	function __construct( $sOptionKey=null, $sCallerPath=null, $sCapability='manage_options', $sTextDomain='admin-page-framework' ) {
 		
-		if ( is_admin() ) {
-			add_action( 'current_screen', array( $this, '_replyToRegisterSettings' ), 20 );	// Have a low priority to let the load_{...} callbacks being loaded earlier.
-			add_action( 'current_screen', array( $this, '_replyToCheckRedirects' ), 21 );	// should be loaded after registering the settings.
-		}
-		
 		parent::__construct( $sOptionKey, $sCallerPath, $sCapability, $sTextDomain );
 
-		// $this->oForm = new AdminPageFramework_FormElement_Page( $this->oProp->sFieldsType, $this->oProp->sCapability );
-				
+		if ( $this->oProp->bIsAdminAjax ) {
+			return;
+		}
+		
+		if ( $this->oProp->bIsAdmin ) {
+		
+			add_action( "load_after_{$this->oProp->sClassName}", array( $this, '_replyToRegisterSettings' ), 20 );	// Have a low priority to let in-page finalization done earlier.
+			add_action( "load_after_{$this->oProp->sClassName}", array( $this, '_replyToCheckRedirects' ), 21 );	// should be loaded after registering the settings.
+			
+		}
+					
 	}
-							
 		
 	/**
 	 * Check if a redirect transient is set and if so it redirects to the set page.
@@ -86,8 +89,11 @@ abstract class AdminPageFramework_Setting_Base extends AdminPageFramework_Menu {
 	 */
 	public function _replyToCheckRedirects() {
 
-		// So it's not options.php. Now check if it's one of the plugin's added page. If not, do nothing.
-		if ( ! ( isset( $_GET['page'] ) ) || ! $this->oProp->isPageAdded( $_GET['page'] ) ) return; 
+		// Check if it's one of the plugin's added page. If not, do nothing.
+		// if ( ! ( isset( $_GET['page'] ) ) || ! $this->oProp->isPageAdded( $_GET['page'] ) ) return; 
+		if ( ! $this->_isInThePage() ) {
+			return;
+		}
 
 		// If the settings have not updated the options, do nothing.
 		if ( ! ( isset( $_GET['settings-updated'] ) && ! empty( $_GET['settings-updated'] ) ) ) {
@@ -100,18 +106,18 @@ abstract class AdminPageFramework_Setting_Base extends AdminPageFramework_Menu {
 		// Check the settings error transient.
 		$_aError = $this->_getFieldErrors( $_GET['page'], false );
 		if ( ! empty( $_aError ) ) {
-			delete_transient( $_sTransient );	// we don't need it any more.
+			$this->oUtil->deleteTransient( $_sTransient );	// we don't need it any more.
 			return;
 		}
 		
 		// Okay, it seems the submitted data have been updated successfully.
-		$_sURL = get_transient( $_sTransient );
+		$_sURL = $this->oUtil->getTransient( $_sTransient );
 		if ( false === $_sURL ) {
 			return;
 		}
 		
 		// The redirect URL seems to be set.
-		delete_transient( $_sTransient );	// we don't need it any more.
+		$this->oUtil->deleteTransient( $_sTransient );	// we don't need it any more.
 					
 		// Go to the page.
 		die( wp_redirect( $_sURL ) );
@@ -130,23 +136,18 @@ abstract class AdminPageFramework_Setting_Base extends AdminPageFramework_Menu {
 	 * @since			2.0.0
 	 * @since			2.1.5			Added the ability to define custom field types.
 	 * @since			3.1.2			Changed the hook from the <em>admin_menu</em> to <em>current_screen</em> so that the user can add forms in <em>load_{...}</em> callback methods.
+	 * @since			3.1.3			Removed the Settings API related functions entirely.
 	 * @remark			This method is not intended to be used by the user.
 	 * @remark			The callback method for the <em>admin_init</em> hook.
 	 * @return			void
 	 * @internal
 	 */ 
-	public function _replyToRegisterSettings( $oScreen ) {
-		
-		if ( ! is_object( $oScreen ) ) {
-			return;
-		}
-		if ( ! in_array( $oScreen->id, $this->oProp->aPageHooks ) ) {
-			return;
-		}
+	public function _replyToRegisterSettings() {
+
 		if ( ! $this->_isInThePage() ) { 
 			return;
 		}
-		
+
 		/* 1. Apply filters to added sections and fields */
 		$this->oForm->aSections = $this->oUtil->addAndApplyFilter( $this, "sections_{$this->oProp->sClassName}", $this->oForm->aSections );
 		foreach( $this->oForm->aFields as $_sSectionID => &$_aFields ) {
@@ -180,11 +181,8 @@ abstract class AdminPageFramework_Setting_Base extends AdminPageFramework_Menu {
 		$this->oForm->applyConditions();
 		$this->oForm->setDynamicElements( $this->oProp->aOptions );	// will update $this->oForm->aConditionedFields
 		
-		/* 2-5. If there is no section or field to add, do nothing. */
-		// if ( 'options.php' != $this->oProp->sPageNow && ( count( $this->oForm->aConditionedFields ) == 0 ) ) return;
-
 		/* 3. Define field types. This class adds filters for the field type definitions so that framework's built-in field types will be added. */
-		new AdminPageFramework_FieldTypeRegistration( $this->oProp->aFieldTypeDefinitions, $this->oProp->sClassName, $this->oMsg );
+		$this->oProp->aFieldTypeDefinitions = AdminPageFramework_FieldTypeRegistration::register( $this->oProp->aFieldTypeDefinitions, $this->oProp->sClassName, $this->oMsg );
 		$this->oProp->aFieldTypeDefinitions = $this->oUtil->addAndApplyFilter(		// Parameters: $oCallerObject, $sFilter, $vInput, $vArgs...
 			$this,
 			'field_types_' . $this->oProp->sClassName,	// 'field_types_' . {extended class name}
@@ -193,16 +191,8 @@ abstract class AdminPageFramework_Setting_Base extends AdminPageFramework_Menu {
 
 		/* 4. Register settings sections */ 
 		foreach( $this->oForm->aConditionedSections as $_aSection ) {
-			
-			/* 4-1. Add the given section */
-			add_settings_section(
-				$_aSection['section_id'],	//  section ID
-				"<a id='{$_aSection['section_id']}'></a>" . $_aSection['title'],	// title - place the anchor in front of the title.
-				array( $this, 'section_pre_' . $_aSection['section_id'] ), 		// callback function -  this will trigger the __call() magic method.
-				$_aSection['page_slug']	// page
-			);
-						
-			/* 4-2. For the contextual help pane */
+									
+			/* For the contextual help pane */
 			if ( ! empty( $_aSection['help'] ) )
 				$this->addHelpTab( 
 					array(
@@ -216,8 +206,8 @@ abstract class AdminPageFramework_Setting_Base extends AdminPageFramework_Menu {
 				);
 				
 		}
-		
-		/* 5. Register settings fields	*/
+
+		/* 5. Set head tag and help pane elements */
 		foreach( $this->oForm->aConditionedFields as $_sSectionID => $_aSubSectionOrFields ) {
 			
 			foreach( $_aSubSectionOrFields as $_sSubSectionIndexOrFieldID => $_aSubSectionOrField ) {
@@ -227,14 +217,7 @@ abstract class AdminPageFramework_Setting_Base extends AdminPageFramework_Menu {
 					
 					$_iSubSectionIndex = $_sSubSectionIndexOrFieldID;
 					$_aSubSection = $_aSubSectionOrField;
-					foreach( $_aSubSection as $__sFieldID => $__aField ) {												
-						add_settings_field(
-							$__aField['section_id'] . '_' . $_iSubSectionIndex . '_' . $__aField['field_id'],	// id
-							"<a id='{$__aField['section_id']}_{$_iSubSectionIndex}_{$__aField['field_id']}'></a><span title='{$__aField['tip']}'>{$__aField['title']}</span>",
-							null,	// callback function - no longer used by the framework
-							$this->oForm->getPageSlugBySectionID( $__aField['section_id'] ), // page slug
-							$__aField['section_id']	// section
-						);							
+					foreach( $_aSubSection as $__sFieldID => $__aField ) {																		
 						AdminPageFramework_FieldTypeRegistration::_setFieldHeadTagElements( $__aField, $this->oProp, $this->oHeadTag );	// Set relevant scripts and styles for the input field.
 					}
 					continue;
@@ -243,13 +226,6 @@ abstract class AdminPageFramework_Setting_Base extends AdminPageFramework_Menu {
 					
 				/* 5-1. Add the given field. */
 				$aField = $_aSubSectionOrField;
-				add_settings_field(
-					$aField['section_id'] . '_' . $aField['field_id'],	// id
-					"<a id='{$aField['section_id']}_{$aField['field_id']}'></a><span title='{$aField['tip']}'>{$aField['title']}</span>",
-					null,	// callback function - no longer used by the framework
-					$this->oForm->getPageSlugBySectionID( $aField['section_id'] ), // page slug
-					$aField['section_id']	// section
-				);	
 
 				/* 5-2. Set relevant scripts and styles for the input field. */
 				AdminPageFramework_FieldTypeRegistration::_setFieldHeadTagElements( $aField, $this->oProp, $this->oHeadTag );	// Set relevant scripts and styles for the input field.
@@ -273,16 +249,12 @@ abstract class AdminPageFramework_Setting_Base extends AdminPageFramework_Menu {
 			
 		}
 		
-		/* 6. Register the settings. */
-		$this->oProp->bEnableForm = true;	// Set the form enabling flag so that the <form></form> tag will be inserted in the page.
-		register_setting(	
-			$this->oProp->sOptionKey,	// the option group name.	
-			$this->oProp->sOptionKey	// the option key name that will be stored in the option table in the database.
-			// array( $this, 'validation_pre_' . $this->oProp->sClassName )	// the validation callback method
-		); 
+		/* 6. Enable the form - Set the form enabling flag so that the <form></form> tag will be inserted in the page. */
+		$this->oProp->bEnableForm = true;	
 		
 		/* 7. Handle submitted data. */
-		$this->_handleSubmittedData();				
+		$this->_handleSubmittedData();	
+		
 	}
 		
 	/**

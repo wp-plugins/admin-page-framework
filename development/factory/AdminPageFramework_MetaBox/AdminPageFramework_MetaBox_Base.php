@@ -22,13 +22,6 @@ if ( ! class_exists( 'AdminPageFramework_MetaBox_Base' ) ) :
  */
 abstract class AdminPageFramework_MetaBox_Base extends AdminPageFramework_Factory {
 	
-	// Objects
-	/**
-	 * @since			2.1.5
-	 * @internal
-	 */
-	protected $oHeadTag;
-	
 	/**
 	 * Defines the fields type.
 	 * @since			3.0.0
@@ -85,6 +78,19 @@ abstract class AdminPageFramework_MetaBox_Base extends AdminPageFramework_Factor
 	public function _replyToRegisterFormElements( $oScreen ) {}
 
 	/**
+	 * Determines whether the meta box class components should be loaded in the currently loading page.
+	 * @since			3.1.3	
+	 */
+	protected  function _isInstantiatable() {
+		
+		// Disable in admin-ajax.php
+		if ( isset( $GLOBALS['pagenow'] ) && 'admin-ajax.php' === $GLOBALS['pagenow'] ) {
+			return false;
+		}
+		return true;
+		
+	}
+	/**
 	 * Determines whether the meta box should be loaded in the currently loading page.
 	 * 
 	 * 
@@ -95,6 +101,7 @@ abstract class AdminPageFramework_MetaBox_Base extends AdminPageFramework_Factor
 		if ( ! $this->_isInThePage() ) return;
 		
 		$this->_setUp();
+		$this->oUtil->addAndDoAction( $this, "set_up_{$this->oProp->sClassName}", $this );
 		$this->oProp->_bSetupLoaded = true;
 		add_action( 'current_screen', array( $this, '_replyToRegisterFormElements' ), 20 );	// the screen object should be established to detect the loaded page. 
 		add_action( 'add_meta_boxes', array( $this, '_replyToAddMetaBox' ) );
@@ -137,7 +144,7 @@ abstract class AdminPageFramework_MetaBox_Base extends AdminPageFramework_Factor
 		$_aOutput[]		= $_oFieldsTable->getFormTables( $this->oForm->aConditionedSections, $this->oForm->aConditionedFields, array( $this, '_replyToGetSectionHeaderOutput' ), array( $this, '_replyToGetFieldOutput' ) );
 
 		/* Do action */
-		$this->oUtil->addAndDoActions( $this, 'do_' . $this->oProp->sClassName );
+		$this->oUtil->addAndDoActions( $this, 'do_' . $this->oProp->sClassName, $this );
 		
 		/* Render the filtered output */
 		echo $this->oUtil->addAndApplyFilters( $this, 'content_' . $this->oProp->sClassName, implode( PHP_EOL, $_aOutput ) );

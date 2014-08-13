@@ -130,11 +130,11 @@ abstract class AdminPageFramework_PostType_Model extends AdminPageFramework_Post
 	public function _replyToRegisterPostType() {
 
 		register_post_type( $this->oProp->sPostType, $this->oProp->aPostTypeArgs );
-		
-		if ( true !== get_option( "post_type_rules_flased_{$this->oProp->sPostType}" ) ) {
-		   flush_rewrite_rules( false );
-		   update_option( "post_type_rules_flased_{$this->oProp->sPostType}", true );
-		}
+
+		// if ( ! get_option( "post_type_rules_flased_{$this->oProp->sPostType}" ) ) {
+		   // flush_rewrite_rules( false );
+		   // update_option( "post_type_rules_flased_{$this->oProp->sPostType}", true );
+		// }
 
 	}
 
@@ -142,20 +142,20 @@ abstract class AdminPageFramework_PostType_Model extends AdminPageFramework_Post
 	 * Registers the set custom taxonomies.
 	 * 
 	 * @internal
+	 * @remark			0.01 elapsed for this function call in the demo plugin which has two custom taxonomies.
 	 */
 	public function _replyToRegisterTaxonomies() {
-		
+
 		foreach( $this->oProp->aTaxonomies as $_sTaxonomySlug => $_aArgs ) {
 			$_aObjectTypes		= is_array( $this->oProp->aTaxonomyObjectTypes[ $_sTaxonomySlug ] ) ? $this->oProp->aTaxonomyObjectTypes[ $_sTaxonomySlug ] : array();
 			$_aObjectTypes[]	= $this->oProp->sPostType;
-			$_aObjectTypes		= array_unique( $_aObjectTypes );
 			register_taxonomy(
 				$_sTaxonomySlug,
-				$_aObjectTypes,	// object types
+				array_unique( $_aObjectTypes ),	// object types
 				$_aArgs			// for the argument array keys, refer to: http://codex.wordpress.org/Function_Reference/register_taxonomy#Arguments
 			);	
 		}
-			
+
 	}
 
 	/**
@@ -164,11 +164,11 @@ abstract class AdminPageFramework_PostType_Model extends AdminPageFramework_Post
 	 * @internal
 	 */
 	public function _replyToRemoveTexonomySubmenuPages() {
-		
+	
 		foreach( $this->oProp->aTaxonomyRemoveSubmenuPages as $sSubmenuPageSlug => $sTopLevelPageSlug ) {
 			remove_submenu_page( $sTopLevelPageSlug, $sSubmenuPageSlug );
 		}
-		
+
 	}
 	
 	

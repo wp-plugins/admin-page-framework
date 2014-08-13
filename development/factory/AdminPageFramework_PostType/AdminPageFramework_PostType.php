@@ -15,7 +15,8 @@ if ( ! class_exists( 'AdminPageFramework_PostType' ) ) :
  * The class methods corresponding to the name of the below actions and filters can be extended to modify the page output. Those methods are the callbacks of the filters and actions.</p>
  * <h3>Methods and Action Hooks</h3>
  * <ul>
- * 	<li><strong>start_ + extended class name</strong> – triggered at the end of the class constructor.</li>
+ * 	<li><strong>start_{instantiated class name}</strong> – triggered at the end of the class constructor. This receives the class object in the first parameter.</li>
+ * 	<li><strong>set_up_{instantiated class name}</strong> – triggered after the setUp() method is called. This receives the class object in the first parameter.</li>
  * </ul>
  * <h3>Methods and Filter Hooks</h3>
  * <ul>
@@ -32,20 +33,6 @@ if ( ! class_exists( 'AdminPageFramework_PostType' ) ) :
  * @subpackage		PostType
  */
 abstract class AdminPageFramework_PostType extends AdminPageFramework_PostType_Controller {	
-
-	// Objects
-	/**
-	 * @since			2.0.0
-	 * @since			3.1.0			Changed the scope to public from protected.
-	 * @access			public
-	 * @internal
-	 */ 
-	public $oUtil;
-	/**
-	 * @since			2.0.0
-	 * @internal
-	 */ 	
-	protected $oLink;
 		
 	/**
 	* The constructor of the class object.
@@ -92,23 +79,27 @@ abstract class AdminPageFramework_PostType extends AdminPageFramework_PostType_C
 	public function __construct( $sPostType, $aArgs=array(), $sCallerPath=null, $sTextDomain='admin-page-framework' ) {
 		
 		if ( empty( $sPostType ) ) return;
-		
+
 		// Properties
-		$this->oProp = new AdminPageFramework_Property_PostType( 
+		$this->oProp				= new AdminPageFramework_Property_PostType( 
 			$this, 
-			$sCallerPath ? trim( $sCallerPath ) : AdminPageFramework_Utility::getCallerScriptPath( __FILE__ ), 	// this is important to attempt to find the caller script path here when separating the library into multiple files.			
+			$sCallerPath ? trim( $sCallerPath ) : ( 
+				( is_admin() && isset( $GLOBALS['pagenow'] ) && in_array( $GLOBALS['pagenow'], array( 'edit.php', 'post.php', 'post-new.php', 'plugins.php', 'tags.php', 'edit-tags.php', ) ) )
+					? AdminPageFramework_Utility::getCallerScriptPath( __FILE__ ) 
+					: null 
+				), 	// this is important to attempt to find the caller script path here when separating the library into multiple files.	
 			get_class( $this ),	// class name
-			'post',			// capability
-			$sTextDomain,	// text domain
-			'post_type'		// fields type
+			'post',				// capability
+			$sTextDomain,		// text domain
+			'post_type'			// fields type
 		);
-		$this->oProp->sPostType = AdminPageFramework_WPUtility::sanitizeSlug( $sPostType );
-		$this->oProp->aPostTypeArgs = $aArgs;	// for the argument array structure, refer to http://codex.wordpress.org/Function_Reference/register_post_type#Arguments
-		
+		$this->oProp->sPostType		= AdminPageFramework_WPUtility::sanitizeSlug( $sPostType );
+		$this->oProp->aPostTypeArgs	= $aArgs;	// for the argument array structure, refer to http://codex.wordpress.org/Function_Reference/register_post_type#Arguments
+
 		parent::__construct( $this->oProp );
 				
-		$this->oUtil->addAndDoAction( $this, "start_{$this->oProp->sClassName}" );
-		
+		$this->oUtil->addAndDoAction( $this, "start_{$this->oProp->sClassName}", $this );
+							
 	}
 				
 }

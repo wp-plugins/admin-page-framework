@@ -23,11 +23,36 @@ class APF_Demo_CustomFieldTypes extends AdminPageFramework {
 		/* ( required ) Add sub-menu items (pages or links) */
 		$this->addSubMenuItems(	
 			array(
-				'title'	=>	__( 'Custom Field Types', 'admin-page-framework-demo' ),
-				'page_slug'	=>	'apf_custom_field_types',
+				'title'			=>	__( 'Custom Field Types', 'admin-page-framework-demo' ),
+				'page_slug'		=>	'apf_custom_field_types',
 				'screen_icon'	=>	'options-general',
 			)
 		);
+		
+		/* ( optional ) Disable the automatic settings link in the plugin listing table. */	
+		$this->setPluginSettingsLinkLabel( '' );	// pass an empty string.			
+			
+    }
+		
+	/**
+	 * The pre-defined callback method triggered when one of the added pages loads
+	 */
+	public function load_APF_Demo_CustomFieldTypes( $oAdminPage ) {	// load_{instantiated class name}
+		
+		/* ( optional ) Determine the page style */
+		$this->setPageHeadingTabsVisibility( false );	// disables the page heading tabs by passing false.
+		$this->setInPageTabTag( 'h2' );		// sets the tag used for in-page tabs
+						
+		/* ( optional ) Determine the page style */
+		$this->setPageHeadingTabsVisibility( false );	// disables the page heading tabs by passing false.
+		$this->setInPageTabTag( 'h2' );		// sets the tag used for in-page tabs
+		
+	}
+		
+	/**
+	 * The pre-defined callback method that is triggered when the page loads.
+	 */ 
+	public function load_apf_custom_field_types( $oAdminPage ) {	// load_{page slug}
 		
 		/*
 		 * ( optional ) Add in-page tabs - In Admin Page Framework, there are two kinds of tabs: page-heading tabs and in-page tabs.
@@ -35,9 +60,6 @@ class APF_Demo_CustomFieldTypes extends AdminPageFramework {
 		 * In-page tabs show tabs that you define to be embedded within an individual page.
 		 */
 		$this->addInPageTabs(	
-			/*
-			 * In-page tabs for custom field types
-			 */
 			'apf_custom_field_types',	// target page slug
 			array(
 				'tab_slug'	=>	'geometry',
@@ -71,26 +93,12 @@ class APF_Demo_CustomFieldTypes extends AdminPageFramework {
 				'tab_slug'	=>	'autocomplete',
 				'title'		=>	__( 'Autocomplete', 'admin-page-framework-demo' ),	
 			),
+			array(
+				'tab_slug'	=>	'link',
+				'title'		=>	__( 'Links', 'admin-page-framework-demo' ),	
+			),			
 			array()			
-		);
-		
-		/* ( optional ) Determine the page style */
-		$this->setPageHeadingTabsVisibility( false );	// disables the page heading tabs by passing false.
-		$this->setInPageTabTag( 'h2' );		// sets the tag used for in-page tabs
-						
-		/* ( optional ) Determine the page style */
-		$this->setPageHeadingTabsVisibility( false );	// disables the page heading tabs by passing false.
-		$this->setInPageTabTag( 'h2' );		// sets the tag used for in-page tabs
-	
-		/* ( optional ) Disable the automatic settings link in the plugin listing table. */	
-		$this->setPluginSettingsLinkLabel( '' );	// pass an empty string.		
-		
-    }
-		
-	/**
-	 * The pre-defined callback method that is triggered when the page loads.
-	 */ 
-	public function load_apf_custom_field_types( $oAdminPage ) {	// load_{page slug}
+		);	
 		
 		/*
 		 * ( Optional ) Register custom field types.
@@ -109,10 +117,11 @@ class APF_Demo_CustomFieldTypes extends AdminPageFramework {
 			dirname( APFDEMO_FILE ) . '/third-party/revealer-custom-field-type/RevealerCustomFieldType.php',
 			dirname( APFDEMO_FILE ) . '/third-party/grid-custom-field-type/GridCustomFieldType.php',
 			dirname( APFDEMO_FILE ) . '/third-party/autocomplete-custom-field-type/AutocompleteCustomFieldType.php',			
+			dirname( APFDEMO_FILE ) . '/third-party/link-custom-field-type/LinkCustomFieldType.php',			
 		);
 		foreach( $_aFiles as $_sFilePath ) {
 			if ( file_exists( $_sFilePath ) ) {				
-				include_once( $_sFilePath );
+				include( $_sFilePath );
 			}
 		}
 					
@@ -130,6 +139,7 @@ class APF_Demo_CustomFieldTypes extends AdminPageFramework {
 		new RevealerCustomFieldType( $_sClassName );
 		new GridCustomFieldType( $_sClassName );
 		new AutocompleteCustomFieldType( $_sClassName );		
+		new LinkCustomFieldType( $_sClassName );		
 		
 		/*
 		 * ( optional ) Create a form - To create a form in Admin Page Framework, you need two kinds of components: sections and fields.
@@ -137,9 +147,9 @@ class APF_Demo_CustomFieldTypes extends AdminPageFramework {
 		 * Use the addSettingSections() method to create sections and use the addSettingFields() method to create fields.
 		 */
 		$this->addSettingSections(	
+			'apf_custom_field_types',	// the target page slug
 			array(
 				'section_id'	=>	'geometry',
-				'page_slug'		=>	'apf_custom_field_types',	// renew the target page slug
 				'tab_slug'		=>	'geometry',	
 				'title'			=>	__( 'Geometry Custom Field Type', 'admin-page-framework-demo' ),
 				'description'	=>	__( 'This is a custom field type defined externally.', 'admin-page-framework-demo' ),
@@ -184,7 +194,13 @@ class APF_Demo_CustomFieldTypes extends AdminPageFramework {
 				'tab_slug'		=>	'autocomplete',
 				'title'			=>	__( 'Autocomplete Custom Field Type', 'admin-page-framework-demo' ),
 				'description'	=>	__( 'This field will show predefined list when the user type something on the input field.', 'admin-page-framework-demo' ),				
-			),				
+			),
+			array(
+				'section_id'	=>	'link',
+				'tab_slug'		=>	'link',
+				'title'			=>	__( 'Link Custom Field Type', 'admin-page-framework-demo' ),
+				'description'	=>	__( 'Allows to insert page and post links.', 'admin-page-framework-demo' ),		
+			),			
 			array()
 		);
 
@@ -712,24 +728,72 @@ class APF_Demo_CustomFieldTypes extends AdminPageFramework {
 				'description'	=>	__( 'Predefined items are Ruby, Python, JavaScript, ActionScript, Scheme, Lisp, C#, Fortran, Vidual Basic, C, C++, Java.', 'admin-page-framework-demo' ),	
 			),
 			array(
-				'type'	=>	'autocomplete',		
-				'field_id'	=>	'autocomplete_custom_post_type',
-				'title'		=>	__( 'Custom Post Type', 'admin-page-framework-demo' ),
-				'settings'	=> add_query_arg( array( 'request' => 'autocomplete', 'post_type' => 'apf_posts' ) + $_GET, admin_url( AdminPageFramework_WPUtility::getPageNow() ) ),
-				'settings2'	=>	array(	// equivalent to the second parameter of the tokenInput() method
+				'type'			=>	'autocomplete',		
+				'field_id'		=>	'autocomplete_custom_post_type',
+				'title'			=>	__( 'Custom Post Type', 'admin-page-framework-demo' ),
+				'settings'		=>	add_query_arg( array( 'request' => 'autocomplete', 'post_type' => 'apf_posts' ) + $_GET, admin_url( AdminPageFramework_WPUtility::getPageNow() ) ),
+				'settings2'		=>	array(	// equivalent to the second parameter of the tokenInput() method
 					'tokenLimit'		=>	5,
 					'preventDuplicates'	=>	true,
 					'theme'				=>	'facebook',	
 					'searchDelay'		=>	50,	// 50 milliseconds. Default: 300
 				),
 				'description'	=>	__( 'To set a custom post type, you need to compose the query url. This field is for the titles of this demo plugin\'s custom post type.', 'admin-page-framework-demo' ),	//' syntax fixer
-			),
+			),		
+			array(
+				'type'		=>	'autocomplete',		
+				'field_id'	=>	'autocomplete_mixed_field_types',
+				'title'		=>	__( 'Mixed Post Types', 'admin-page-framework-demo' ),
+				'settings'	=>	add_query_arg( 
+					array( 
+						'request'		=>	'autocomplete', 
+						'post_types'	=>	'post, page, apf_posts', // Note that the argument key is not 'post_type'
+						'post_status'	=>	'publish, private',
+					) + $_GET,
+					admin_url( AdminPageFramework_WPUtility::getPageNow() )
+				),
+				'description'	=>	__( 'To seatch from multiple post types use the \'post_types\' argument (not \'post_type\') and pass comma delimited post type slugs.', 'admin-page-framework-demo' ),	//' syntax fixer
+			),			
 			array(
 				'type'	=>	'autocomplete',		
 				'field_id'	=>	'autocomplete_repeatable_field',
 				'title'		=>	__( 'Repeatable', 'admin-page-framework-demo' ),
 				'repeatable'	=> true,
 			),
+			array()
+		);		
+		
+		$this->addSettingFields(
+			'link',	// the target section id
+			array(
+				'field_id'		=>	'link_field',
+				'type'			=>	'link',			
+				'title'			=>	__( 'Single Link' ),
+			),
+			array(
+				'field_id'		=>	'link_repeatable_field',
+				'type'			=>	'link',			
+				'title'			=>	__( 'Repeatable Links' ),
+				'repeatable'	=>	true,
+			),			
+			// array(
+				// 'field_id'	=>	'revealer_field_option_a',
+				// 'type'	=>	'textarea',		
+				// 'default'	=>	__( 'Hi there!', 'admin-page-framework-demo' ),
+				// 'hidden'	=> true,
+			// ),
+			// array(
+				// 'field_id'	=>	'revealer_field_option_b',				
+				// 'type'	=>	'password',		
+				// 'description'	=>	__( 'Type a password.', 'admin-page-framework-demo' ),			
+				// 'hidden'	=> true,
+			// ),
+			// array(
+				// 'field_id'	=>	'revealer_field_option_c',
+				// 'type'	=>	'text',		
+				// 'description'	=>	__( 'Type text.', 'admin-page-framework-demo' ),			
+				// 'hidden'	=> true,
+			// ),
 			array()
 		);		
 		
@@ -751,13 +815,15 @@ class APF_Demo_CustomFieldTypes extends AdminPageFramework {
 				
 		/* 1. Include the file that defines the custom field type. 
 		 This class should extend the predefined abstract class that the library prepares already with necessary methods. */
-		$sFilePath = dirname( APFDEMO_FILE ) . '/third-party/geometry-custom-field-type/GeometryCustomFieldType.php';
-		if ( file_exists( $sFilePath ) ) include_once( $sFilePath );
+		$_sFilePath = dirname( APFDEMO_FILE ) . '/third-party/geometry-custom-field-type/GeometryCustomFieldType.php';
+		if ( file_exists( $_sFilePath ) ) {
+			include( $_sFilePath );	
+		}
 		
 		/* 2. Instantiate the class - use the getDefinitionArray() method to get the field type definition array.
 		 Then assign it to the filtering array with the key of the field type slug. */
-		$oFieldType = new GeometryCustomFieldType( 'APF_Demo' );
-		$aFieldTypeDefinitions['geometry'] = $oFieldType->getDefinitionArray();
+		$_oFieldType = new GeometryCustomFieldType( 'APF_Demo' );
+		$aFieldTypeDefinitions['geometry'] = $_oFieldType->getDefinitionArray();
 		
 		/* 3. Return the modified array. */
 		return $aFieldTypeDefinitions;

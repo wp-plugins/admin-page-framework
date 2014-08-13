@@ -35,6 +35,15 @@ abstract class AdminPageFramework_Factory_Model extends AdminPageFramework_Facto
 	}	
 	
 	/**
+	 * Stores the default field definitions. 
+	 * 
+	 * Once they are set, it no longer needs to be done.
+	 * 
+	 * @since			3.1.3
+	 */
+	static private $_aFieldTypeDefinitions = array();
+	
+	/**
 	 * Loads the default field type definition.
 	 * 
 	 * @since			2.1.5
@@ -42,19 +51,21 @@ abstract class AdminPageFramework_Factory_Model extends AdminPageFramework_Facto
 	 */
 	public function _loadDefaultFieldTypeDefinitions() {
 		
-		static $_aFieldTypeDefinitions = array();	// Stores the default field definitions. Once they are set, it no longer needs to be done.
-		
-		if ( empty( $_aFieldTypeDefinitions ) ) {
+		if ( empty( self::$_aFieldTypeDefinitions ) ) {
 			
 			// This class adds filters for the field type definitions so that framework's default field types will be added.
-			new AdminPageFramework_FieldTypeRegistration( $_aFieldTypeDefinitions, $this->oProp->sClassName, $this->oMsg );					
+			self::$_aFieldTypeDefinitions = AdminPageFramework_FieldTypeRegistration::register( 
+				array(), 
+				$this->oProp->sClassName, 
+				$this->oMsg 
+			);			
 			
 		} 
 				
 		$this->oProp->aFieldTypeDefinitions = $this->oUtil->addAndApplyFilter(		// Parameters: $oCallerObject, $sFilter, $vInput, $vArgs...
 			$this,
 			'field_types_' . $this->oProp->sClassName,	// 'field_types_' . {extended class name}
-			$_aFieldTypeDefinitions
+			self::$_aFieldTypeDefinitions
 		);				
 		
 	}	
@@ -128,9 +139,8 @@ abstract class AdminPageFramework_Factory_Model extends AdminPageFramework_Facto
 		$_sTransientKey = 'AdminPageFramework_FieldErrors';
 		$_sID = md5( $this->oProp->sClassName );
 
-		$_aFieldErrors = isset( $_aFieldErrors ) ? $_aFieldErrors : get_transient( $_sTransientKey );
+		$_aFieldErrors = isset( $_aFieldErrors ) ? $_aFieldErrors : $this->oUtil->getTransient( $_sTransientKey );
 		if ( $bDelete ) {
-			// delete_transient( $_sTransientKey );	
 			add_action( 'shutdown', array( $this, '_replyToDeleteFieldErrors' ) );
 		}
 		return isset( $_aFieldErrors[ $_sID ] ) 
@@ -151,7 +161,7 @@ abstract class AdminPageFramework_Factory_Model extends AdminPageFramework_Facto
 			return true;
 		}
 			
-		return get_transient( 'AdminPageFramework_FieldErrors' );
+		return $this->oUtil->getTransient( 'AdminPageFramework_FieldErrors' );
 
 	}
 	
@@ -165,7 +175,7 @@ abstract class AdminPageFramework_Factory_Model extends AdminPageFramework_Facto
 		 * @internal
 		 */
 		public function _replyToDeleteFieldErrors() {
-			delete_transient( 'AdminPageFramework_FieldErrors' );
+			$this->oUtil->deleteTransient( 'AdminPageFramework_FieldErrors' );
 		}
 		
 	/**
@@ -178,7 +188,7 @@ abstract class AdminPageFramework_Factory_Model extends AdminPageFramework_Facto
 		
 		if ( ! isset( $GLOBALS['aAdminPageFramework']['aFieldErrors'] ) ) return;
 
-		set_transient( 
+		$this->oUtil->setTransient( 
 			'AdminPageFramework_FieldErrors',  
 			$GLOBALS['aAdminPageFramework']['aFieldErrors'], 
 			300 	// store it for 5 minutes ( 60 seconds * 5 )
@@ -198,7 +208,7 @@ abstract class AdminPageFramework_Factory_Model extends AdminPageFramework_Facto
 		if ( ! isset( $GLOBALS['aAdminPageFramework']['aNotices'] ) ) return;
 		if ( empty( $GLOBALS['aAdminPageFramework']['aNotices'] ) ) return;
 				
-		set_transient( 'AdminPageFramework_Notices', $GLOBALS['aAdminPageFramework']['aNotices'] );
+		$this->oUtil->setTransient( 'AdminPageFramework_Notices', $GLOBALS['aAdminPageFramework']['aNotices'] );
 		
 	}
 	

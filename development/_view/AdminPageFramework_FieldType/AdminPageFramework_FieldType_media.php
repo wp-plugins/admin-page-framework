@@ -344,8 +344,13 @@ class AdminPageFramework_FieldType_media extends AdminPageFramework_FieldType_im
 				margin-right: 0.5em;
 				vertical-align: middle;	
 			}
+			@media screen and (max-width: 782px) {
+				.admin-page-framework-field-media input {
+					margin: 0.5em 0.5em 0.5em 0;
+				}
+			}				
 			.select_media.button.button-small {
-				margin-top: 0.1em;
+				vertical-align: middle;	
 			}
 		";
 	}

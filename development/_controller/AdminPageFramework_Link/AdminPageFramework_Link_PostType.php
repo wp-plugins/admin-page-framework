@@ -30,22 +30,82 @@ class AdminPageFramework_Link_PostType extends AdminPageFramework_Link_Base {
 	
 	public function __construct( $oProp, $oMsg=null ) {
 		
-		if ( ! is_admin() ) return;
-		
-		$this->oProp = $oProp;
-		$this->oMsg = $oMsg;
+		if ( ! $oProp->bIsAdmin ) return;
 				
-		// Add script info into the footer 
-		add_filter( 'update_footer', array( $this, '_replyToAddInfoInFooterRight' ), 11 );
-		add_filter( 'admin_footer_text' , array( $this, '_replyToAddInfoInFooterLeft' ) );	
-		$this->_setFooterInfoLeft( $this->oProp->aScriptInfo, $this->aFooterInfo['sLeft'] );
-		$aLibraryData = $this->oProp->_getLibraryData();
-		$aLibraryData['sVersion'] = $this->oProp->bIsMinifiedVersion ? $aLibraryData['sVersion'] . '.min' : $aLibraryData['sVersion'];
-		$this->_setFooterInfoRight( $aLibraryData, $this->aFooterInfo['sRight'] );
+		$this->oProp	= $oProp;
+		$this->oMsg		= $oMsg;
 				
+		// The property object needs to be set as there are some public methods accesses the property object.
+		if ( $oProp->bIsAdminAjax ) {
+			return;
+		}		
+				
+		add_action( 'in_admin_footer', array( $this, '_replyToSetFooterInfo' ) );		
+								
 		// For post type posts listing table page ( edit.php )
-		if ( isset( $_GET['post_type'] ) && $_GET['post_type'] == $this->oProp->sPostType )
+		if ( isset( $_GET['post_type'] ) && $_GET['post_type'] == $this->oProp->sPostType ) {			
 			add_action( 'get_edit_post_link', array( $this, '_replyToAddPostTypeQueryInEditPostLink' ), 10, 3 );
+		}
+
+		// Add an action link in the plugin listing page
+		if ( 'plugins.php' === $this->oProp->sPageNow && 'plugin' === $this->oProp->aScriptInfo['sType'] ) {
+			add_filter( 
+				'plugin_action_links_' . plugin_basename( $this->oProp->aScriptInfo['sPath'] ),
+				array( $this, '_replyToAddSettingsLinkInPluginListingPage' ), 
+				20 	// set a lower priority so that the link will be embedded at the beginning ( the most left hand side ).
+			);				
+		}
+		
+	}
+
+	/**
+	 * Adds the post type link in the title cell of the plugin listing table in plugins.php.
+	 * 
+	 * @since	3.0.6			Moved from the link class.
+	 * @since	3.1.0			Made it not insert the link if the user sets an empty string to the 'plugin_listing_table_title_cell_link' key of the label argument array.
+	 * @since	3.1.3			Moved from the post type class.
+	 */
+	public function _replyToAddSettingsLinkInPluginListingPage( $aLinks ) {
+		
+		$_sLinkLabel = isset( $this->oProp->aPostTypeArgs['labels']['plugin_listing_table_title_cell_link'] )
+			? $this->oProp->aPostTypeArgs['labels']['plugin_listing_table_title_cell_link']
+			: $this->oMsg->__( 'manage' );
+
+		// If the user explicitly sets an empty string to the label key, do not insert a link.
+		if ( ! $_sLinkLabel ) {
+			return $aLinks;
+		}
+
+		// http://.../wp-admin/edit.php?post_type=[...]
+		array_unshift(	
+			$aLinks,
+			"<a href='" . esc_url( "edit.php?post_type={$this->oProp->sPostType}" ) . "'>" . $_sLinkLabel . "</a>"
+		); 
+		return $aLinks;		
+		
+	}
+	
+	/**
+	 * Sets up footer information.
+	 * 
+	 * @since			3.1.3
+	 */
+	public function _replyToSetFooterInfo() {
+
+		if ( 
+			! $this->isPostDefinitionPage( $this->oProp->sPostType ) 
+			&& ! $this->isPostListingPage( $this->oProp->sPostType ) 
+			&& ! $this->isCustomTaxonomyPage( $this->oProp->sPostType )
+		) {
+			return;
+		}
+
+		$this->_setFooterInfoLeft( $this->oProp->aScriptInfo, $this->aFooterInfo['sLeft'] );
+		$this->_setFooterInfoRight( $this->oProp->_getLibraryData(), $this->aFooterInfo['sRight'] );
+		
+		// Add script info into the footer 
+		add_filter( 'admin_footer_text' , array( $this, '_replyToAddInfoInFooterLeft' ) );	
+		add_filter( 'update_footer', array( $this, '_replyToAddInfoInFooterRight' ), 11 );
 		
 	}
 	
@@ -71,10 +131,6 @@ class AdminPageFramework_Link_PostType extends AdminPageFramework_Link_Base {
 	 */ 
 	public function _replyToAddInfoInFooterLeft( $sLinkHTML='' ) {
 		
-		// Check if it's in the post definition page and the post listing page
-		if ( ! $this->isPostDefinitionPage( $this->oProp->sPostType ) && ! $this->isPostListingPage( $this->oProp->sPostType ) )	
-			return $sLinkHTML;	// $sLinkHTML is given by the hook.
-			
 		if ( empty( $this->oProp->aScriptInfo['sName'] ) ) return $sLinkHTML;
 					
 		return $this->aFooterInfo['sLeft'];
@@ -87,10 +143,6 @@ class AdminPageFramework_Link_PostType extends AdminPageFramework_Link_Base {
 	 * @internal
 	 */ 	
 	public function _replyToAddInfoInFooterRight( $sLinkHTML='' ) {
-
-		// Check if it's in the post definition page and the post listing page
-		if ( ! $this->isPostDefinitionPage( $this->oProp->sPostType ) && ! $this->isPostListingPage( $this->oProp->sPostType ) )	
-			return $sLinkHTML;	// $sLinkHTML is given by the hook.
 			
 		return $this->aFooterInfo['sRight'];		
 			

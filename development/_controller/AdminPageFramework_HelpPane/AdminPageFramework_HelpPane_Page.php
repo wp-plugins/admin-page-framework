@@ -40,6 +40,10 @@ class AdminPageFramework_HelpPane_Page extends AdminPageFramework_HelpPane_Base 
 		
 		parent::__construct( $oProp );
 		
+		if ( $oProp->bIsAdminAjax ) {
+			return;
+		}
+		
 		// The contextual help pane.
 		add_action( 'admin_head', array( $this, '_replyToRegisterHelpTabs' ), 200 );		
 		

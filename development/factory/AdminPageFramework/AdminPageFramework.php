@@ -19,19 +19,24 @@ if ( ! class_exists( 'AdminPageFramework' ) ) :
  * The class methods corresponding to the name of the below actions and filters can be extended to modify the page output. Those methods are the callbacks of the filters and the actions.</p>
  * <h3>Methods and Action Hooks</h3>
  * <ul>
- * 	<li><strong>start_{instantiated class name}</strong> – triggered at the end of the class constructor. This will be triggered in any admin page.</li>
- * 	<li><strong>load_{instantiated class name}</strong>[2.1.0+] – triggered when the framework's page is loaded before the header gets sent. This will not be triggered in the admin pages that are not registered by the framework.</li>
- * 	<li><strong>load_{page slug}</strong>[2.1.0+] – triggered when the framework's page is loaded before the header gets sent. This will not be triggered in the admin pages that are not registered by the framework.</li>
- * 	<li><strong>load_{page slug}_{tab slug}</strong>[2.1.0+] – triggered when the framework's page is loaded before the header gets sent. This will not be triggered in the admin pages that are not registered by the framework.</li>
- * 	<li><strong>do_before_{instantiated class name}</strong> – triggered before rendering the page. It applies to all the pages created by the instantiated class object.</li>
- * 	<li><strong>do_before_{page slug}</strong> – triggered before rendering the page.</li>
- * 	<li><strong>do_before_{page slug}_{tab slug}</strong> – triggered before rendering the page.</li>
- * 	<li><strong>do_{instantiated class name}</strong> – triggered in the middle of rendering the page. It applies to all the pages created by the instantiated class object.</li>
- * 	<li><strong>do_{page slug}</strong> – triggered in the middle of rendering the page.</li>
- * 	<li><strong>do_{page slug}_{tab slug}</strong> – triggered in the middle of rendering the page.</li>
- * 	<li><strong>do_after_{instantiated class name}</strong> – triggered after rendering the page. It applies to all the pages created by the instantiated class object.</li>
- * 	<li><strong>do_after_{page slug}</strong> – triggered after rendering the page.</li>
- * 	<li><strong>do_after_{page slug}_{tab slug}</strong> – triggered after rendering the page.</li>
+ * 	<li><strong>start_{instantiated class name}</strong> – triggered at the end of the class constructor. This will be triggered in any admin page except admin-ajax.php. The class object will be passed to the first parameter [3.1.3+].</li>
+ * 	<li><strong>set_up_{instantiated class name}</strong> – [3.1.3+] triggered after the setUp() method is called. The class object will be passed to the first parameter.</li>
+ * 	<li><strong>load_{instantiated class name}</strong> – [2.1.0+] triggered when the framework's page is loaded before the header gets sent. This will not be triggered in the admin pages that are not registered by the framework. The first parameter: class object [3.1.2+].</li>
+ * 	<li><strong>load_{page slug}</strong> – [2.1.0+] triggered when the framework's page is loaded before the header gets sent. This will not be triggered in the admin pages that are not registered by the framework. The first parameter: class object [3.1.2+].</li>
+ * 	<li><strong>load_{page slug}_{tab slug}</strong> – [2.1.0+] triggered when the framework's page is loaded before the header gets sent. This will not be triggered in the admin pages that are not registered by the framework. The first parameter: class object [3.1.2+].</li>
+ * 	<li><strong>load_after_{instantiated class name}</strong> – [3.1.3+] triggered when one of the framework's pages is loaded before the header gets sent. This will not be triggered in the admin pages that are not registered by the framework. The first parameter: class object.</li>
+ * 	<li><strong>do_before_{instantiated class name}</strong> – triggered before rendering the page. It applies to all the pages created by the instantiated class object. The class object will be passed to the first parameter [3.1.3+].</li>
+ * 	<li><strong>do_before_{page slug}</strong> – triggered before rendering the page. The class object will be passed to the first parameter [3.1.3+].</li>
+ * 	<li><strong>do_before_{page slug}_{tab slug}</strong> – triggered before rendering the page. The class object will be passed to the first parameter [3.1.3+].</li>
+ * 	<li><strong>do_form_{instantiated class name}</strong> – triggered right after the form opening tag. It applies to all the pages created by the instantiated class object. The class object will be passed to the first parameter [3.1.3+].</li>
+ * 	<li><strong>do_form_{page slug}</strong> – triggered right after the form opening tag. The class object will be passed to the first parameter [3.1.3+].</li>
+ * 	<li><strong>do_form_{page slug}_{tab slug}</strong> – triggered right after the form opening tag. The class object will be passed to the first parameter [3.1.3+].</li>
+ * 	<li><strong>do_{instantiated class name}</strong> – triggered in the middle of rendering the page. It applies to all the pages created by the instantiated class object. The class object will be passed to the first parameter [3.1.3+].</li>
+ * 	<li><strong>do_{page slug}</strong> – triggered in the middle of rendering the page. The class object will be passed to the first parameter [3.1.3+].</li>
+ * 	<li><strong>do_{page slug}_{tab slug}</strong> – triggered in the middle of rendering the page. The class object will be passed to the first parameter [3.1.3+].</li>
+ * 	<li><strong>do_after_{instantiated class name}</strong> – triggered after rendering the page. It applies to all the pages created by the instantiated class object. The class object will be passed to the first parameter [3.1.3+].</li>
+ * 	<li><strong>do_after_{page slug}</strong> – triggered after rendering the page. The class object will be passed to the first parameter [3.1.3+].</li>
+ * 	<li><strong>do_after_{page slug}_{tab slug}</strong> – triggered after rendering the page. The class object will be passed to the first parameter [3.1.3+].</li>
  * 	<li><strong>submit_{instantiated class name}_{submit input id}</strong> – [3.0.0+] triggered after the form is submitted with the submit button of the specified input id.</li>
  * 	<li><strong>submit_{instantiated class name}_{submit field id}</strong> – [3.0.0+] triggered after the form is submitted with the submit button of the specified field that does not hava section is submitted.</li>
  * 	<li><strong>submit_{instantiated class name}_{submit section id}_{submit field id}</strong> – [3.0.0+] triggered after the form is submitted with the submit button of the specified section and field is submitted.</li>
@@ -65,6 +70,9 @@ if ( ! class_exists( 'AdminPageFramework' ) ) :
  * 	<li><strong>validation_{page slug}_{tab slug}</strong> – receives the form submission values as array. The first parameter: submitted input array. The second parameter: the original array stored in the database. The third parameter: ( object ) [3.1.0+] the caller object.</li>
  * 	<li><strong>validation_{page slug}</strong> – receives the form submission values as array. The first parameter: submitted input array. The second parameter: the original array stored in the database. The third parameter: ( object ) [3.1.0+] the caller object.</li>
  * 	<li><strong>validation_{instantiated class name}</strong> – receives the form submission values as array. The first parameter: submitted input array. The second parameter: the original array stored in the database. The third parameter: ( object ) [3.1.0+] the caller object.</li>
+ * 	<li><strong>validation_saved_options_{instantiated class name}</strong> – [3.1.2+] receives the saved form options as an array. The first parameter: the stored options array. The second parameter: the caller object.</li>
+ * 	<li><strong>validation_saved_options_{page slug}</strong> – [3.0.0+] receives the saved form options as an array of the page. The first parameter: the stored options array of the page. The second parameter: the caller object.</li>
+ * 	<li><strong>validation_saved_options_{page slug}_{tab slug}</strong> – [3.0.0+] receives the saved form options as an array of the tab. The first parameter: the stored options array of the tab. The second parameter: the caller object.</li>
  * 	<li><strong>style_{page slug}_{tab slug}</strong> – receives the output of the CSS rules applied to the tab page of the slug.</li>
  * 	<li><strong>style_{page slug}</strong> – receives the output of the CSS rules applied to the page of the slug.</li>
  * 	<li><strong>style_{instantiated class name}</strong> – receives the output of the CSS rules applied to the pages added by the instantiated class object.</li>
@@ -136,19 +144,45 @@ if ( ! class_exists( 'AdminPageFramework' ) ) :
  * ...
  * }</code>
  * <h3>Timing of Hooks</h3>
- * <code>------ When the class is instantiated ------
+ * <code>------ After the class is instantiated ------
  *  
  *  start_{instantiated class name}
+ * 
+ * ------ When the page starts loading  ------
+ * 
  *  load_{instantiated class name}
  *  load_{page slug}
  *  load_{page slug}_{tab slug}
+ *  load_after_{instantiated class name}
  * 
  *  sections_{instantiated class name}
  *  fields_{instantiated class name}
  *  pages_{instantiated class name}
  *  tabs_{instantiated class name}_{page slug}
+ *  
+ *  submit_{instantiated class name}_{pressed submit field id}
+ *  submit_{instantiated class name}_{section id}
+ *  submit_{instantiated class name}_{section id}_{field id}
+ *  submit_{instantiated class name}_{page slug}
+ *  submit_{instantiated class name}_{page slug}_{tab slug}
+ *  submit_{instantiated class name}
+ *  validation_saved_options_{instantiated class name}
+ *  validation_saved_options_{page slug}_{tab slug}
+ *  validation_saved_options_{page slug}
+ *  validation_{instantiated class name}_{field id (which does not have a section)}
+ *  validation_{instantiated class name}_{section_id}
+ *  validation_{instantiated class name}_{section id}_{field id}
+ *  validation_{page slug}_{tab slug}
+ *  validation_{page slug }
+ *  validation_{instantiated class name }
+ *  export_{page slug}_{tab slug}
+ *  export_{page slug}
+ *  export_{instantiated class name}
+ *  import_{page slug}_{tab slug}
+ *  import_{page slug}
+ *  import_{instantiated class name}
  * 
- *  ------ Start Rendering HTML ------
+ *  ------ Start Rendering HTML - after HTML header is sent ------
  *  
  *  <head>
  *      <style type="text/css" name="admin-page-framework">
@@ -168,19 +202,19 @@ if ( ! class_exists( 'AdminPageFramework' ) ) :
  *  
  *  <div class="wrap">
  *  
- *      content_foot_{page slug}_{tab slug}
- *      content_foot_{page slug}
- *      content_foot_{instantiated class name}
+ *      content_top_{page slug}_{tab slug}
+ *      content_top_{page slug}
+ *      content_top_{instantiated class name}
  *  
- *      <div class="acmin-page-framework-container">
- *          <form action="options.php" method="post">
+ *      <div class="admin-page-framework-container">
+ *          <form action="current page" method="post">
  *  
- *              do_form_{page slug}_{tab slug}
- *              do_form_{page slug}
  *              do_form_{instantiated class name}
+ *              do_form_{page slug}
+ *              do_form_{page slug}_{tab slug}
  *  			
- * 				field_definition_{instantiated class name}_{section ID}_{field ID}
- * 				field_definition_{instantiated class name}_{field ID (which does not have a section)}
+ *              field_definition_{instantiated class name}_{section ID}_{field ID}
+ *              field_definition_{instantiated class name}_{field ID (which does not have a section)}
  *              section_head_{instantiated class name}_{section ID}
  *              field_{instantiated class name}_{field ID}
  *  
@@ -205,26 +239,6 @@ if ( ! class_exists( 'AdminPageFramework' ) ) :
  *  do_after_{page slug}
  *  do_after_{page slug}_{tab slug}
  *  
- *  ----- After Submitting the Form ------
- * 
- *  submit_{instantiated class name}_{pressed submit field id}
- *  submit_{instantiated class name}_{section id}
- *  submit_{instantiated class name}_{section id}_{field id}
- *  submit_{instantiated class name}_{page slug}
- *  submit_{instantiated class name}_{page slug}_{tab slug}
- *  submit_{instantiated class name}
- *  validation_{instantiated class name}_{field id (which does not have a section)}
- *  validation_{instantiated class name}_{section_id}
- *  validation_{instantiated class name}_{section id}_{field id}
- *  validation_{page slug}_{tab slug}
- *  validation_{page slug }
- *  validation_{instantiated class name }
- *  export_{page slug}_{tab slug}
- *  export_{page slug}
- *  export_{instantiated class name}
- *  import_{page slug}_{tab slug}
- *  import_{page slug}
- *  import_{instantiated class name}
  * </code>
  * @abstract
  * @since			2.0.0
@@ -262,16 +276,21 @@ abstract class AdminPageFramework extends AdminPageFramework_Setting {
 						
 		if ( ! $this->_isInstantiatable() ) {
 			return;
-		 }
+		}
 						
 		parent::__construct( 
 			$sOptionKey, 
-			$sCallerPath ? $sCallerPath : AdminPageFramework_Utility::getCallerScriptPath( __FILE__ ), 	// this is important to attempt to find the caller script path here when separating the library into multiple files.
+			$sCallerPath 
+				? trim( $sCallerPath )
+				: $sCallerPath = ( is_admin() && ( isset( $GLOBALS['pagenow'] ) && in_array( $GLOBALS['pagenow'], array( 'plugins.php', ) ) || isset( $_GET['page'] ) ) 
+					? AdminPageFramework_Utility::getCallerScriptPath( __FILE__ ) 
+					: null 
+				), 	// this is important to attempt to find the caller script path here when separating the library into multiple files.	
 			$sCapability, 
 			$sTextDomain 
 		);
-					
-		$this->oUtil->addAndDoAction( $this, 'start_' . $this->oProp->sClassName );	// fire the start_{instantiated class name} action.
+		
+		$this->oUtil->addAndDoAction( $this, 'start_' . $this->oProp->sClassName, $this );	
 
 	}	
 
@@ -549,8 +568,12 @@ abstract class AdminPageFramework extends AdminPageFramework_Setting {
 	 * @access			public
 	 */ 
 	public function setCapability( $sCapability ) {
+
 		$this->oProp->sCapability = $sCapability;
-		$this->oForm->sCapability = $sCapability;
+		if ( isset( $this->oForm ) ) {
+			$this->oForm->sCapability = $sCapability;
+		}
+		
 	}
 
 	/**
@@ -612,11 +635,15 @@ abstract class AdminPageFramework extends AdminPageFramework_Setting {
 			
 		$sID = $sID ? $sID : md5( $sMessage );
 		$this->oProp->aAdminNotices[ md5( $sMessage ) ] = array(  
-			'sMessage' => $sMessage,
-			'sClassSelector' => $sClassSelector,
-			'sID' => $sID,
+			'sMessage'			=> $sMessage,
+			'sClassSelector'	=> $sClassSelector,
+			'sID'				=> $sID,
 		);
-		add_action( 'admin_notices', array( $this, '_replyToPrintAdminNotices' ) );
+		if ( is_network_admin() ) {
+			add_action( 'network_admin_notices', array( $this, '_replyToPrintAdminNotices' ) );
+		} else {
+			add_action( 'admin_notices', array( $this, '_replyToPrintAdminNotices' ) );
+		}
 		
 	}
 		/**
@@ -626,6 +653,7 @@ abstract class AdminPageFramework extends AdminPageFramework_Setting {
 		 */
 		public function _replyToPrintAdminNotices() {
 			
+			if ( ! $this->_isInThePage() ) { return; }
 			foreach( $this->oProp->aAdminNotices as $aAdminNotice ) {
 				echo "<div class='{$aAdminNotice['sClassSelector']}' id='{$aAdminNotice['sID']}'>"
 						. "<p>" . $aAdminNotice['sMessage'] . "</p>"
@@ -695,22 +723,6 @@ abstract class AdminPageFramework extends AdminPageFramework_Setting {
 	static public function getOption( $sOptionKey, $asKey=null , $vDefault=null ) {
 		return AdminPageFramework_WPUtility::getOption( $sOptionKey,$asKey, $vDefault );
 	}
-	
-	
-	/**
-	 * Disables the functionality to save submitted form data into the options table.
-	 * 
-	 * <h4>Example</h4>
-	 * <code>
-	 * $this->disableSavingOptions();
-	 * </code>
-	 * @since			3.1.0
-	 * @deprecated		3.1.0b27		Passing an empty string to the first parameter of the constructor should be sufficient.
-	 */
-	// public function disableSavingOptions() {
-		// $this->oProp->_bDisableSavingOptions = true;
-	// }
-	
-	
+		
 }
 endif;

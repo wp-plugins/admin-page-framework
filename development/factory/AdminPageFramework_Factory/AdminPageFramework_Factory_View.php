@@ -21,13 +21,22 @@ abstract class AdminPageFramework_Factory_View extends AdminPageFramework_Factor
 		
 		parent::__construct( $oProp );
 
-		if ( $this->_isInThePage() && 'admin-ajax.php' != $this->oProp->sPageNow ) {
-				
-			add_action( 'admin_notices', array( $this, '_replyToPrintSettingNotice' ) );
-			
+		if ( $this->_isInThePage() && ! $this->oProp->bIsAdminAjax ) {	
+			if ( is_network_admin() ) {
+				add_action( 'network_admin_notices', array( $this, '_replyToPrintSettingNotice' ) );
+			} else {
+				add_action( 'admin_notices', array( $this, '_replyToPrintSettingNotice' ) );
+			}			
 		}
 		
 	}		
+	
+	/**
+	 * Stores a flag value indicating whether the setting notice method is called or not.
+	 * 
+	 * @since			3.1.3
+	 */
+	static private $_bSettingNoticeLoaded = false;
 	
 	/**
 	 * Displays stored setting notification messages.
@@ -35,20 +44,19 @@ abstract class AdminPageFramework_Factory_View extends AdminPageFramework_Factor
 	 * @since			3.0.4
 	 */
 	public function _replyToPrintSettingNotice() {
-		
-		// Only do this per a page load. PHP static variables will remain in different instantiated objects.
-		static $_fIsLoaded;
-		
-		if ( $_fIsLoaded ) return;
-		$_fIsLoaded = true;
-		
-		$_aNotices = get_transient( 'AdminPageFramework_Notices' );
-		if ( false === $_aNotices )	return;
+			
+		if ( ! $this->_isInThePage() ) { return; }
+			
+		// Ensure this method is called only once per a page load.
+		if ( self::$_bSettingNoticeLoaded ) { return; }
+		self::$_bSettingNoticeLoaded = true;
 
-		delete_transient( 'AdminPageFramework_Notices' );
-		
+		$_aNotices = $this->oUtil->getTransient( 'AdminPageFramework_Notices' );
+		if ( false === $_aNotices )	{ return; }
+		$this->oUtil->deleteTransient( 'AdminPageFramework_Notices' );
+	
 		// By setting false to the 'settings-notice' key, it's possible to disable the notifications set with the framework.
-		if ( isset( $_GET['settings-notice'] ) && ! $_GET['settings-notice'] ) return;
+		if ( isset( $_GET['settings-notice'] ) && ! $_GET['settings-notice'] ) { return; }
 		
 		// Display the settings notices.
 		$_aPeventDuplicates = array();

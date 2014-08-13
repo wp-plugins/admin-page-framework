@@ -30,18 +30,18 @@ abstract class AdminPageFramework_HeadTag_Base {
 	
 		/* The system internal keys. */
 		'sSRC'			=> null,
-		'aPostTypes' => array(),		// for meta box class
-		'sPageSlug' => null,	
-		'sTabSlug' => null,
-		'sType' => null,		// script or style
+		'aPostTypes'	=> array(),		// for meta box class
+		'sPageSlug'		=> null,	
+		'sTabSlug'		=> null,
+		'sType'			=> null,		// script or style
 		
 		/* The below keys are for users. */
-		'handle_id' => null,
-		'dependencies' => array(),
-        'version' => false,		// although the type should be string, the wp_enqueue_...() functions want false as the default value.
-        'translation' => array(),	// only for scripts
-        'in_footer' => false,	// only for scripts
-		'media' => 'all',	// only for styles		
+		'handle_id'		=> null,
+		'dependencies'	=> array(),
+        'version'		=> false,		// although the type should be string, the wp_enqueue_...() functions want false as the default value.
+        'translation'	=> array(),	// only for scripts
+        'in_footer'		=> false,	// only for scripts
+		'media'			=> 'all',	// only for styles		
 		
 	);	
 	
@@ -49,7 +49,11 @@ abstract class AdminPageFramework_HeadTag_Base {
 		
 		$this->oProp = $oProp;
 		$this->oUtil = new AdminPageFramework_WPUtility;
-				
+		
+		if ( in_array( $this->oProp->sPageNow, array( 'admin-ajax.php' ) ) ) {
+			return;
+		}		
+		
 		// Hook the admin header to insert custom admin stylesheet.
 		add_action( 'admin_head', array( $this, '_replyToAddStyle' ), 999 );
 		add_action( 'admin_head', array( $this, '_replyToAddScript' ), 999 );
@@ -103,8 +107,9 @@ abstract class AdminPageFramework_HeadTag_Base {
 	 * @internal
 	 */	
 	public function _replyToEnqueueStyles() {	
-		foreach( $this->oProp->aEnqueuingStyles as $sKey => $aEnqueuingStyle ) 
+		foreach( $this->oProp->aEnqueuingStyles as $sKey => $aEnqueuingStyle ) {
 			$this->_enqueueSRCByConditoin( $aEnqueuingStyle );
+		}
 	}
 	
 	/**
@@ -117,8 +122,9 @@ abstract class AdminPageFramework_HeadTag_Base {
 	 * @internal
 	 */
 	public function _replyToEnqueueScripts() {							
-		foreach( $this->oProp->aEnqueuingScripts as $sKey => $aEnqueuingScript ) 
+		foreach( $this->oProp->aEnqueuingScripts as $sKey => $aEnqueuingScript ) {
 			$this->_enqueueSRCByConditoin( $aEnqueuingScript );				
+		}
 	}
 	
 }

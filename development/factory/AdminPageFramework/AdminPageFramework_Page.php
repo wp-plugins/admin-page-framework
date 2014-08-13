@@ -63,9 +63,12 @@ abstract class AdminPageFramework_Page extends AdminPageFramework_Page_MetaBox {
 	 */
 	function __construct( $sOptionKey=null, $sCallerPath=null, $sCapability='manage_options', $sTextDomain='admin-page-framework' ) {	
 	
-		add_action( 'admin_menu', array( $this, '_replyToFinalizeInPageTabs' ), 99 );	// must be called before the _replyToRegisterSettings() method which uses the same hook.
-				
 		parent::__construct( $sOptionKey, $sCallerPath, $sCapability, $sTextDomain );
+		
+		if ( $this->oProp->bIsAdminAjax ) {
+			return;
+		}		
+		add_action( "load_after_{$this->oProp->sClassName}", array( $this, '_replyToFinalizeInPageTabs' ), 19 );	// must be called before the _replyToRegisterSettings() method 
 				
 	}
 	
@@ -299,15 +302,19 @@ abstract class AdminPageFramework_Page extends AdminPageFramework_Page_MetaBox {
 	 * @internal
 	 */ 
 	protected function _renderPage( $sPageSlug, $sTabSlug=null ) {
-				
+
 		// Do actions before rendering the page. In this order, global -> page -> in-page tab
-		$this->oUtil->addAndDoActions( $this, $this->oUtil->getFilterArrayByPrefix( 'do_before_', $this->oProp->sClassName, $sPageSlug, $sTabSlug, true ) );	
+		$this->oUtil->addAndDoActions( 
+			$this, 	// the caller object
+			$this->oUtil->getFilterArrayByPrefix( 'do_before_', $this->oProp->sClassName, $sPageSlug, $sTabSlug, true ),	// the action hooks
+			$this	// the argument 1
+		);
 		?>
 		<div class="wrap">
 			<?php
 				// Screen icon, page heading tabs(page title), and in-page tabs.
 				$sContentTop = $this->_getScreenIcon( $sPageSlug );	
-				$sContentTop .= $this->_getPageHeadingTabs( $sPageSlug, $this->oProp->sPageHeadingTabTag ); 	
+				$sContentTop .= $this->_getPageHeadingTabs( $sPageSlug, $this->oProp->sPageHeadingTabTag );
 				$sContentTop .= $this->_getInPageTabs( $sPageSlug, $this->oProp->sInPageTabTag );
 
 				// Apply filters in this order, in-page tab -> page -> global.
@@ -316,7 +323,11 @@ abstract class AdminPageFramework_Page extends AdminPageFramework_Page_MetaBox {
 			?>
 			<div class="admin-page-framework-container">	
 				<?php
-					$this->oUtil->addAndDoActions( $this, $this->oUtil->getFilterArrayByPrefix( 'do_form_', $this->oProp->sClassName, $sPageSlug, $sTabSlug, true ) );	
+					$this->oUtil->addAndDoActions( 
+						$this,	// the caller object
+						$this->oUtil->getFilterArrayByPrefix( 'do_form_', $this->oProp->sClassName, $sPageSlug, $sTabSlug, true ),	// the action hooks
+						$this	// the argument 1
+					);
 					$this->_printFormOpeningTag( $this->oProp->bEnableForm );	// <form ... >
 				?>
 				<div id="poststuff">
@@ -340,7 +351,11 @@ abstract class AdminPageFramework_Page extends AdminPageFramework_Page_MetaBox {
 		</div><!-- .wrap -->
 		<?php
 		// Do actions after rendering the page.
-		$this->oUtil->addAndDoActions( $this, $this->oUtil->getFilterArrayByPrefix( 'do_after_', $this->oProp->sClassName, $sPageSlug, $sTabSlug, true ) );
+		$this->oUtil->addAndDoActions( 
+			$this,	// the caller object
+			$this->oUtil->getFilterArrayByPrefix( 'do_after_', $this->oProp->sClassName, $sPageSlug, $sTabSlug, true ), // the action hooks
+			$this	// the argument 1
+		);
 		
 	}
 
@@ -388,7 +403,11 @@ abstract class AdminPageFramework_Page extends AdminPageFramework_Page_MetaBox {
 			echo $this->oUtil->addAndApplyFilters( $this, $this->oUtil->getFilterArrayByPrefix( 'content_', $this->oProp->sClassName, $sPageSlug, $sTabSlug, false ), $_sContent );
 
 			// Do the page actions.
-			$this->oUtil->addAndDoActions( $this, $this->oUtil->getFilterArrayByPrefix( 'do_', $this->oProp->sClassName, $sPageSlug, $sTabSlug, true ) );			
+			$this->oUtil->addAndDoActions(
+				$this,	// the caller object
+				$this->oUtil->getFilterArrayByPrefix( 'do_', $this->oProp->sClassName, $sPageSlug, $sTabSlug, true ), // the action hooks
+				$this	// the argument 1
+			);			
 			
 			if ( $_bIsSideMetaboxExist )
 				echo "</div><!-- #post-body-content -->";
@@ -437,7 +456,7 @@ abstract class AdminPageFramework_Page extends AdminPageFramework_Page_MetaBox {
 			}
 			
 			$_sNonce = '_admin_page_framework_form_nonce_' . uniqid();
-			set_transient( 'form_' . md5( $this->oProp->sClassName . get_current_user_id() ), $_sNonce, 60*60 );	// 60 minutes
+			$this->oUtil->setTransient( 'form_' . md5( $this->oProp->sClassName . get_current_user_id() ), $_sNonce, 60*60 );	// 60 minutes
 			echo "<input type='hidden' name='page_slug' value='{$sPageSlug}' />" . PHP_EOL
 				. "<input type='hidden' name='tab_slug' value='{$sTabSlug}' />" . PHP_EOL			
 				. "<input type='hidden' name='_is_admin_page_framework' value='{$_sNonce}' />" . PHP_EOL
@@ -628,16 +647,16 @@ abstract class AdminPageFramework_Page extends AdminPageFramework_Page_MetaBox {
 	 * This must be done before registering settings sections because the default tab needs to be determined in the process.
 	 * 
 	 * @since			2.0.0
-	 * @remark			A callback for the <em>admin_menu</em> hook.
+	 * @remark			A callback for the <em>admin_menu</em> hook. It must be called earlier than _replyToRegisterSettings() method.
 	 * @return			void
 	 */ 		
 	public function _replyToFinalizeInPageTabs() {
-	
-		if ( ! $this->oProp->isPageAdded() ) return;
-		
+
+		if ( ! $this->oProp->isPageAdded() ) { return; }
+
 		foreach( $this->oProp->aPages as $sPageSlug => $aPage ) {
 			
-			if ( ! isset( $this->oProp->aInPageTabs[ $sPageSlug ] ) ) continue;
+			if ( ! isset( $this->oProp->aInPageTabs[ $sPageSlug ] ) ) { continue; }
 			
 			// Apply filters to let modify the in-page tab array.
 			$this->oProp->aInPageTabs[ $sPageSlug ] = $this->oUtil->addAndApplyFilter(		// Parameters: $oCallerObject, $sFilter, $vInput, $vArgs...
@@ -658,7 +677,7 @@ abstract class AdminPageFramework_Page extends AdminPageFramework_Page_MetaBox {
 			// Read the value as reference; otherwise, a strange bug occurs. It may be due to the variable name, $aInPageTab, is also used as reference in the above foreach.
 			foreach( $this->oProp->aInPageTabs[ $sPageSlug ] as $sTabSlug => &$aInPageTab ) { 	
 			
-				if ( ! isset( $aInPageTab['tab_slug'] ) ) continue;	
+				if ( ! isset( $aInPageTab['tab_slug'] ) ) { continue; }
 				
 				// Regardless of whether it's a hidden tab, it is stored as the default in-page tab.
 				$this->oProp->aDefaultInPageTabs[ $sPageSlug ] = $aInPageTab['tab_slug'];
@@ -666,6 +685,7 @@ abstract class AdminPageFramework_Page extends AdminPageFramework_Page_MetaBox {
 				break;	// The first iteration item is the default one.
 			}
 		}
+
 	}			
 	
 }

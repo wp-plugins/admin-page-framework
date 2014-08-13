@@ -16,7 +16,7 @@ if ( ! class_exists( 'AdminPageFramework_TaxonomyField' ) ) :
  * <h3>Methods and Action Hooks</h3>
  * <ul>
  * 	<li><strong>start_{instantiated class name}</strong> – triggered at the end of the class constructor.</li>
- * 	<li><strong>do_{instantiated class name}</strong> – triggered when the meta box gets rendered.</li>
+ * 	<li><strong>do_{instantiated class name}</strong> – triggered when the meta box gets rendered. The first parameter: the class object [3.1.3+]. </li>
  * </ul>
  * <h3>Methods and Filter Hooks</h3>
  * <ul>
@@ -52,29 +52,6 @@ if ( ! class_exists( 'AdminPageFramework_TaxonomyField' ) ) :
  */
 abstract class AdminPageFramework_TaxonomyField extends AdminPageFramework_Factory {
 	
-	/**
-	 * Stores the property object.
-	 * 
-	 * @since			3.0.0
-	 * @acess			public			Inherited from the ancestor class.
-	 */
-	public $oProp;
-	
-	/**
-	 * Stores the head tag object.
-	 * 
-	 * @since			3.0.0
-	 * @internal
-	 */
-	protected $oHeadTag;
-	
-	/**
-	 * Stores the contextual help pane object.
-	 * @since			3.0.0
-	 * @internal
-	 */
-	protected $oHelpPane;
-
 	/**
 	 * Defines the fields type.
 	 * @since			3.0.0
@@ -143,6 +120,7 @@ abstract class AdminPageFramework_TaxonomyField extends AdminPageFramework_Facto
 		if ( ! $this->_isInThePage() ) return;
 		
 		$this->_setUp();
+		$this->oUtil->addAndDoAction( $this, "set_up_{$this->oProp->sClassName}", $this );
 		$this->oProp->_bSetupLoaded = true;
 		add_action( 'current_screen', array( $this, '_replyToRegisterFormElements' ), 20 );	// the screen object should be established to detect the loaded page. 
 	
@@ -291,7 +269,7 @@ abstract class AdminPageFramework_TaxonomyField extends AdminPageFramework_Facto
 		$_sOutput = $this->oUtil->addAndApplyFilters( $this, 'content_' . $this->oProp->sClassName, implode( PHP_EOL, $_aOutput ) );
 		
 		/* Do action */
-		$this->oUtil->addAndDoActions( $this, 'do_' . $this->oProp->sClassName );
+		$this->oUtil->addAndDoActions( $this, 'do_' . $this->oProp->sClassName, $this );
 			
 		return $_sOutput;
 	
@@ -305,7 +283,8 @@ abstract class AdminPageFramework_TaxonomyField extends AdminPageFramework_Facto
 	 */
 	public function _replyToValidateOptions( $iTermID ) {
 		
-		if ( ! wp_verify_nonce( $_POST[ $this->oProp->sClassHash ], $this->oProp->sClassHash ) ) return;
+		if ( ! isset( $_POST[ $this->oProp->sClassHash ] ) ) { return; }
+		if ( ! wp_verify_nonce( $_POST[ $this->oProp->sClassHash ], $this->oProp->sClassHash ) ) { return; }
 		
 		$aTaxonomyFieldOptions = get_option( $this->oProp->sOptionKey, array() );
 		$aOldOptions = isset( $aTaxonomyFieldOptions[ $iTermID ] ) ? $aTaxonomyFieldOptions[ $iTermID ] : array();
@@ -350,11 +329,11 @@ abstract class AdminPageFramework_TaxonomyField extends AdminPageFramework_Facto
 	 * Redirects undefined callback methods.
 	 * @internal
 	 * @since			3.0.0
+	 * @deprecated
 	 */
+	function ___call( $sMethodName, $aArgs=null ) {		
 	
-	function __call( $sMethodName, $aArgs=null ) {		
-	
-		if ( isset( $_GET['taxonomy'] ) && $_GET['taxonomy'] ) :
+	 /* 	if ( isset( $_GET['taxonomy'] ) && $_GET['taxonomy'] ) :
 			if ( substr( $sMethodName, 0, strlen( 'columns_' . $_GET['taxonomy'] ) ) == 'columns_' . $_GET['taxonomy'] ) return $aArgs[ 0 ];
 			if ( substr( $sMethodName, 0, strlen( 'sortable_columns_' . $_GET['taxonomy'] ) ) == 'sortable_columns_' . $_GET['taxonomy'] ) return $aArgs[ 0 ];
 			if ( substr( $sMethodName, 0, strlen( 'cell_' . $_GET['taxonomy'] ) ) == 'cell_' . $_GET['taxonomy'] ) return $aArgs[ 0 ];
@@ -363,7 +342,12 @@ abstract class AdminPageFramework_TaxonomyField extends AdminPageFramework_Facto
 		if ( substr( $sMethodName, 0, strlen( 'columns_' . $this->oProp->sClassName ) ) == 'columns_' . $this->oProp->sClassName ) return $aArgs[ 0 ];
 		if ( substr( $sMethodName, 0, strlen( 'sortable_columns_' . $this->oProp->sClassName ) ) == 'sortable_columns_' . $this->oProp->sClassName ) return $aArgs[ 0 ];
 		if ( substr( $sMethodName, 0, strlen( 'cell_' . $this->oProp->sClassName ) ) == 'cell_' . $this->oProp->sClassName ) return $aArgs[ 0 ];
+	*/
 
+		if ( has_filter( $sMethodName ) ) {
+			return isset( $aArgs[ 0 ] ) ? $aArgs[ 0 ] : null;
+		}		 
+		
 		return parent::__call( $sMethodName, $aArgs );
 		
 	}

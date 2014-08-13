@@ -22,7 +22,7 @@ abstract class AdminPageFramework_PostType_View extends AdminPageFramework_PostT
 	function __construct( $oProp ) {
 		
 		parent::__construct( $oProp );
-			
+						
 		if ( $this->_isInThePage() ) {			
 	
 			// Table filters
@@ -34,46 +34,9 @@ abstract class AdminPageFramework_PostType_View extends AdminPageFramework_PostT
 			add_action( 'admin_head', array( $this, '_replyToPrintStyle' ) );
 			
 		}		
-		
-		// Add an action link in the plugin listing page
-		if ( in_array( $this->oProp->sPageNow, array( 'plugins.php' ) ) && 'plugin' == $this->oProp->aScriptInfo['sType'] ) {
-			add_filter( 
-				'plugin_action_links_' . plugin_basename( $this->oProp->aScriptInfo['sPath'] ),
-				array( $this, '_replyToAddSettingsLinkInPluginListingPage' ), 
-				20 	// set a lower priority so that the link will be embedded at the beginning ( the most left hand side ).
-			);				
-		}
-		
-	}
-	
-	
-	/**
-	 * Adds the post type link in the title cell of the plugin listing table in plugins.php.
-	 * 
-	 * @since			3.0.6			Moved from the Link_PostType class.
-	 * @since			3.1.0			Made it not insert the link if the user sets an empty string to the 'plugin_listing_table_title_cell_link' key of the label argument array.
-	 */
-	public function _replyToAddSettingsLinkInPluginListingPage( $aLinks ) {
-		
-		$_sLinkLabel = isset( $this->oProp->aPostTypeArgs['labels']['plugin_listing_table_title_cell_link'] )
-			? $this->oProp->aPostTypeArgs['labels']['plugin_listing_table_title_cell_link']
-			: $this->oMsg->__( 'manage' );
-			
-		// If the user explicitly sets an empty string to the label key, do not insert a link.
-		if ( ! $_sLinkLabel ) {
-			return $aLinks;
-		}
-						
-		// http://.../wp-admin/edit.php?post_type=[...]
-		array_unshift(	
-			$aLinks,
-			"<a href='" . esc_url( "edit.php?post_type={$this->oProp->sPostType}" ) . "'>" . $_sLinkLabel . "</a>"
-		); 
-		return $aLinks;		
-		
+				
 	}
 		
-	
 	/**
 	 * Adds a drop-down list to filter posts by author, placed above the post type listing table.
 	 * 
@@ -81,11 +44,14 @@ abstract class AdminPageFramework_PostType_View extends AdminPageFramework_PostT
 	 */ 
 	public function _replyToAddAuthorTableFilter() {
 		
-		if ( ! $this->oProp->bEnableAuthorTableFileter ) return;
+		if ( ! $this->oProp->bEnableAuthorTableFileter ) { return; }
 		
-		if ( ! ( isset( $_GET['post_type'] ) && post_type_exists( $_GET['post_type'] ) 
-			&& in_array( strtolower( $_GET['post_type'] ), array( $this->oProp->sPostType ) ) ) )
+		if ( 
+			! ( isset( $_GET['post_type'] ) && post_type_exists( $_GET['post_type'] ) 
+			&& in_array( strtolower( $_GET['post_type'] ), array( $this->oProp->sPostType ) ) ) 
+		) {
 			return;
+		}
 		
 		wp_dropdown_users( array(
 			'show_option_all'	=> 'Show all Authors',
@@ -146,7 +112,7 @@ abstract class AdminPageFramework_PostType_View extends AdminPageFramework_PostT
 		if ( 'edit.php' != $this->oProp->sPageNow ) return $oQuery;
 		
 		if ( ! isset( $GLOBALS['typenow'] ) ) return $oQuery;
-		
+
 		foreach ( get_object_taxonomies( $GLOBALS['typenow'] ) as $sTaxonomySlug ) {
 			
 			if ( ! in_array( $sTaxonomySlug, $this->oProp->aTaxonomyTableFilters ) ) continue;
@@ -159,6 +125,7 @@ abstract class AdminPageFramework_PostType_View extends AdminPageFramework_PostT
 				$sVar = $oTerm->slug;
 
 		}
+		
 		return $oQuery;
 		
 	}
@@ -169,21 +136,24 @@ abstract class AdminPageFramework_PostType_View extends AdminPageFramework_PostT
 	 * @internal
 	 */
 	public function _replyToPrintStyle() {
-
-		if ( ! isset( $_GET['post_type'] ) || $_GET['post_type'] != $this->oProp->sPostType )
+		
+		if ( $this->oUtil->getCurrentPostType() !== $this->oProp->sPostType ) {
 			return;
+		}
 
 		// If the screen icon url is specified
-		if ( isset( $this->oProp->aPostTypeArgs['screen_icon'] ) && $this->oProp->aPostTypeArgs['screen_icon'] )
+		if ( isset( $this->oProp->aPostTypeArgs['screen_icon'] ) && $this->oProp->aPostTypeArgs['screen_icon'] ) {
 			$this->oProp->sStyle .= $this->_getStylesForPostTypeScreenIcon( $this->oProp->aPostTypeArgs['screen_icon'] );
+		}
 			
 		$this->oProp->sStyle = $this->oUtil->addAndApplyFilters( $this, "style_{$this->oProp->sClassName}", $this->oProp->sStyle );
 		
 		// Print out the filtered styles.
-		if ( ! empty( $this->oProp->sStyle ) )
+		if ( ! empty( $this->oProp->sStyle ) ) {
 			echo "<style type='text/css' id='admin-page-framework-style-post-type'>" 
 				. $this->oProp->sStyle
 				. "</style>";			
+		}
 		
 	}
 		/**

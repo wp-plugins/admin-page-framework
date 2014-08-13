@@ -7,7 +7,7 @@
 	<title>Class AdminPageFramework_PostType | Admin Page Framework Documentation</title>
 
 	<script type="text/javascript" src="resources/combined.js?1723033208"></script>
-	<script type="text/javascript" src="elementlist.js?734727412"></script>
+	<script type="text/javascript" src="elementlist.js?1864300470"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/bootstrap.min.css?2514636104">
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?2754522461">
 
@@ -71,6 +71,8 @@
 				<li class="main"><a href="package-AdminPageFramework.TaxonomyField.html">TaxonomyField</a>
 						</li>
 							</ul></li>
+				<li><a href="package-None.html">None</a>
+						</li>
 			</ul>
 		</div>
 
@@ -115,8 +117,13 @@ the callbacks of the filters and actions.</p>
 <h3>Methods and Action Hooks</h3>
 
 <ul>
-	<li><strong>start_ + extended class name</strong> – triggered at the end of
-	the class constructor.</li>
+	<li><strong>start_{instantiated class name}</strong> – triggered at the end of
+	the class constructor. This receives the class object in the first
+	parameter.</li>
+
+	<li><strong>set_up_{instantiated class name}</strong> – triggered after the
+	setUp() method is called. This receives the class object in the first
+	parameter.</li>
 </ul>
 
 <h3>Methods and Filter Hooks</h3>
@@ -224,7 +231,7 @@ AdminPageFramework_Factory
 
 				<b>Since:</b>
 				2.0.0<br>
-		<b>Located at</b> <a href="source-class-AdminPageFramework_PostType.html#10-114" title="Go to source code">factory/AdminPageFramework_PostType/AdminPageFramework_PostType.php</a><br>
+		<b>Located at</b> <a href="source-class-AdminPageFramework_PostType.html#10-105" title="Go to source code">factory/AdminPageFramework_PostType/AdminPageFramework_PostType.php</a><br>
 	</div>
 
 
@@ -242,7 +249,7 @@ AdminPageFramework_Factory
 
 			<td class="name"><div>
 			<a class="anchor" href="#___construct">#</a>
-			<code><a href="source-class-AdminPageFramework_PostType.html#50-112" title="Go to source code">__construct</a>( <span>string <var>$sPostType</var></span>, <span>array <var>$aArgs</var> = <span class="php-keyword1">array</span>()</span>, <span>string <var>$sCallerPath</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$sTextDomain</var> = <span class="php-quote">'admin-page-framework'</span> </span> )</code>
+			<code><a href="source-class-AdminPageFramework_PostType.html#37-103" title="Go to source code">__construct</a>( <span>string <var>$sPostType</var></span>, <span>array <var>$aArgs</var> = <span class="php-keyword1">array</span>()</span>, <span>string <var>$sCallerPath</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$sTextDomain</var> = <span class="php-quote">'admin-page-framework'</span> </span> )</code>
 
 			<div class="description short" style="display:none;">
 				
@@ -387,10 +394,6 @@ href="http://codex.wordpress.org/Function_Reference/register_post_type#Arguments
 			<code><a href="class-AdminPageFramework_PostType_Controller.html#_setPostTypeArgs">setPostTypeArgs()</a></code>, 
 			<code><a href="class-AdminPageFramework_PostType_Controller.html#_setUp">setUp()</a></code>
 		</p>
-		<h3>Methods inherited from <a href="class-AdminPageFramework_PostType_View.html#methods">AdminPageFramework_PostType_View</a></h3>
-		<p class="elementList">
-			<code><a href="class-AdminPageFramework_PostType_View.html#__replyToAddSettingsLinkInPluginListingPage">_replyToAddSettingsLinkInPluginListingPage()</a></code>
-		</p>
 		<h3>Methods inherited from <a href="class-AdminPageFramework_PostType_Model.html#methods">AdminPageFramework_PostType_Model</a></h3>
 		<p class="elementList">
 			<code><a href="class-AdminPageFramework_PostType_Model.html#__isInThePage">_isInThePage()</a></code>
@@ -426,12 +429,14 @@ href="http://codex.wordpress.org/Function_Reference/register_post_type#Arguments
 		<h3>Methods inherited from AdminPageFramework_Factory_Router</h3>
 		<p class="elementList">
 			<code>__call()</code>, 
+			<code>__get()</code>, 
 			<code>_getFormInstance()</code>, 
 			<code>_getHeadTagInstance()</code>, 
 			<code>_getHelpPaneInstance()</code>, 
 			<code>_getLinkInstancce()</code>, 
 			<code>_getPageLoadInfoInstance()</code>, 
-			<code>_isInstantiatabe()</code>
+			<code>_isInstantiatable()</code>, 
+			<code>_replyToLoadComponents()</code>
 		</p>
 
 
@@ -448,15 +453,7 @@ href="http://codex.wordpress.org/Function_Reference/register_post_type#Arguments
 
 		<h3>Properties inherited from AdminPageFramework_Factory_Router</h3>
 		<p class="elementList">
-			<code><var>$oDebug</var></code>, 
-			<code><var>$oForm</var></code>, 
-			<code><var>$oHeadTag</var></code>, 
-			<code><var>$oHelpPane</var></code>, 
-			<code><var>$oLink</var></code>, 
-			<code><var>$oMsg</var></code>, 
-			<code><var>$oPageLoadInfo</var></code>, 
-			<code><var>$oProp</var></code>, 
-			<code><var>$oUtil</var></code>
+			<code><var>$oProp</var></code>
 		</p>
 
 

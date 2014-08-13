@@ -97,10 +97,13 @@ abstract class AdminPageFramework_Menu extends AdminPageFramework_Page {
 	  */
 	function __construct( $sOptionKey=null, $sCallerPath=null, $sCapability='manage_options', $sTextDomain='admin-page-framework' ) {
 		
-		add_action( 'admin_menu', array( $this, '_replyToBuildMenu' ), 98 );		
-		
 		parent::__construct( $sOptionKey, $sCallerPath, $sCapability, $sTextDomain );
 		
+		if ( $this->oProp->bIsAdminAjax ) {
+			return;
+		}
+		
+		add_action( 'admin_menu', array( $this, '_replyToBuildMenu' ), 98 );		
 	} 
 	 
 	/**
@@ -515,10 +518,10 @@ abstract class AdminPageFramework_Menu extends AdminPageFramework_Page {
 			if ( ! isset( $aArgs['type'] ) ) return;
 
 			// Variables
-			$sType = $aArgs['type'];	// page or link
-			$sTitle = $sType == 'page' ? $aArgs['title'] : $aArgs['title'];
-			$sCapability = isset( $aArgs['capability'] ) ? $aArgs['capability'] : $this->oProp->sCapability;
-			$_sPageHook = '';
+			$sType			= $aArgs['type'];	// page or link
+			$sTitle			= $sType == 'page' ? $aArgs['title'] : $aArgs['title'];
+			$sCapability	= isset( $aArgs['capability'] ) ? $aArgs['capability'] : $this->oProp->sCapability;
+			$_sPageHook		= '';
 
 			// Check the capability
 			if ( ! current_user_can( $sCapability ) ) {		
@@ -526,14 +529,14 @@ abstract class AdminPageFramework_Menu extends AdminPageFramework_Page {
 			}
 			
 			// Add the sub-page to the sub-menu			
-			$sRootPageSlug = $this->oProp->aRootMenu['sPageSlug'];
-			$sMenuLabel = plugin_basename( $sRootPageSlug );	// Make it compatible with the add_submenu_page() function.
+			$sRootPageSlug	= $this->oProp->aRootMenu['sPageSlug'];
+			$sMenuLabel		= plugin_basename( $sRootPageSlug );	// Make it compatible with the add_submenu_page() function.
 			
 			// If it's a page - it's possible that the page_slug key is not set if the user uses a method like setPageHeadingTabsVisibility() prior to addSubMenuItam().
 			if ( $sType == 'page' && isset( $aArgs['page_slug'] ) ) {		
 				
-				$sPageSlug = $aArgs['page_slug'];
-				$_sPageHook = add_submenu_page( 
+				$sPageSlug	= $aArgs['page_slug'];
+				$_sPageHook	= add_submenu_page( 
 					$sRootPageSlug,						// the root(parent) page slug
 					$sTitle,								// page_title
 					$sTitle,								// menu_title
@@ -542,9 +545,13 @@ abstract class AdminPageFramework_Menu extends AdminPageFramework_Page {
 					// In admin.php ( line 149 of WordPress v3.6.1 ), do_action($page_hook) ( where $page_hook is $_sPageHook )
 					// will be executed and it triggers the __call() magic method with the method name of "md5 class hash + _page_ + this page slug".
 					array( $this, $this->oProp->sClassHash . '_page_' . $sPageSlug )
-				);			
-				$this->oProp->aPageHooks[ $_sPageHook ] = is_network_admin() ? $_sPageHook . '-network' : $_sPageHook;
-				add_action( 'current_screen' , array( $this, "load_pre_" . $sPageSlug ) );
+				);		
+				
+				// Ensure only it is added one time per page slug.
+				if ( ! isset( $this->oProp->aPageHooks[ $_sPageHook ] ) ) {
+					add_action( 'current_screen' , array( $this, "load_pre_" . $sPageSlug ) );	
+				}
+				$this->oProp->aPageHooks[ $sPageSlug ] = is_network_admin() ? $_sPageHook . '-network' : $_sPageHook;
 
 				// If the visibility option is false, remove the one just added from the sub-menu array
 				if ( ! $aArgs['show_in_menu'] ) {
