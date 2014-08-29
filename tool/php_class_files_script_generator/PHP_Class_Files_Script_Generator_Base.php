@@ -1,6 +1,6 @@
 <?php
 /**
- * Provides basic methods for PHP Class Files Script Creator.
+ * Provides shared methods for PHP Class Files Script Generator.
  * 
  * @author		Michael Uno <michael@michaeluno.jp>
  * @copyright	2013-2014 (c) Michael Uno
@@ -10,24 +10,24 @@
 /**
  * The base class of script creator.
  * 
- * @version		1.0.1
+ * @version		1.0.2
  */
-abstract class PHP_Class_Files_Script_Creator_Base {
+abstract class PHP_Class_Files_Script_Generator_Base {
 
 	static protected $_aStructure_Options = array(
 	
-		'header_class_name'	=>	'',
-		'header_class_path'	=>	'',		
-		'output_buffer'		=>	true,
-		'header_type'		=>	'DOCBLOCK',	
-		'exclude_classes'	=>	array(),
+		'header_class_name' => '',
+		'header_class_path' => '',		
+		'output_buffer'     => true,
+		'header_type'       => 'DOCBLOCK',	
+		'exclude_classes'   => array(),
 		
 		// Search options
 		'search'	=>	array(
-			'allowed_extensions'	=>	array( 'php' ),	// e.g. array( 'php', 'inc' )
-			'exclude_dir_paths'		=>	array(),
-			'exclude_dir_names'		=>	array(),
-			'is_recursive'			=>	true,
+			'allowed_extensions'    => array( 'php' ),	// e.g. array( 'php', 'inc' )
+			'exclude_dir_paths'     => array(),
+			'exclude_dir_names'     => array(),
+			'is_recursive'          => true,
 		),		
 		
 	);
@@ -55,9 +55,9 @@ abstract class PHP_Class_Files_Script_Creator_Base {
 			if ( ! is_dir( $sDirPath ) ) {
 				return $_aFileList;
 			}
-			$_oDir				= new RecursiveDirectoryIterator( $sDirPath );
-			$_oIterator			= new RecursiveIteratorIterator( $_oDir );
-			$_oRegexIterator	= new RegexIterator( $_oIterator, $sFilePathRegexNeedle, RegexIterator::GET_MATCH );
+			$_oDir              = new RecursiveDirectoryIterator( $sDirPath );
+			$_oIterator         = new RecursiveIteratorIterator( $_oDir );
+			$_oRegexIterator    = new RegexIterator( $_oIterator, $sFilePathRegexNeedle, RegexIterator::GET_MATCH );
 			foreach( $_oRegexIterator as $_aFile ) {
 				$_aFileList = array_merge( $_aFileList, $_aFile );
 			}
@@ -76,8 +76,7 @@ abstract class PHP_Class_Files_Script_Creator_Base {
 		 */
 		protected function _getFileList( $sDirPath, array $aSearchOptions ) {
 			
-			$sDirPath	= rtrim( $sDirPath, '\\/' ) . DIRECTORY_SEPARATOR;	// ensures the trailing (back/)slash exists. 
-			
+			$sDirPath            = rtrim( $sDirPath, '\\/' ) . DIRECTORY_SEPARATOR;	// ensures the trailing (back/)slash exists. 		
 			$_aExcludingDirPaths = $this->_formatPaths( $aSearchOptions['exclude_dir_paths'] );
 			
 			if ( defined( 'GLOB_BRACE' ) ) {	// in some OSes this flag constant is not available.
@@ -119,16 +118,16 @@ abstract class PHP_Class_Files_Script_Creator_Base {
 			 */
 			private function doRecursiveGlob( $sPathPatten, $nFlags=0, array $aExcludeDirPaths=array(), array $aExcludeDirNames=array() ) {
 
-				$_aFiles	= glob( $sPathPatten, $nFlags );	
-				$_aFiles	= is_array( $_aFiles ) ? $_aFiles : array();	// glob() can return false.
-				$_aDirs		= glob( dirname( $sPathPatten ) . DIRECTORY_SEPARATOR . '*', GLOB_ONLYDIR|GLOB_NOSORT );
-				$_aDirs		= is_array( $_aDirs ) ? $_aDirs : array();
+				$_aFiles    = glob( $sPathPatten, $nFlags );	
+				$_aFiles    = is_array( $_aFiles ) ? $_aFiles : array();	// glob() can return false.
+				$_aDirs     = glob( dirname( $sPathPatten ) . DIRECTORY_SEPARATOR . '*', GLOB_ONLYDIR|GLOB_NOSORT );
+				$_aDirs     = is_array( $_aDirs ) ? $_aDirs : array();
 				foreach ( $_aDirs as $_sDirPath ) {
-					$_sDirPath	= str_replace( '\\', '/', $_sDirPath );
+					$_sDirPath  = str_replace( '\\', '/', $_sDirPath );
 					if ( in_array( $_sDirPath, $aExcludeDirPaths ) ) { continue; }
 					if ( in_array( pathinfo( $_sDirPath, PATHINFO_DIRNAME ), $aExcludeDirNames ) ) { continue; }
 					
-					$_aFiles	= array_merge( $_aFiles, $this->doRecursiveGlob( $_sDirPath . DIRECTORY_SEPARATOR . basename( $sPathPatten ), $nFlags, $aExcludeDirPaths ) );
+					$_aFiles    = array_merge( $_aFiles, $this->doRecursiveGlob( $_sDirPath . DIRECTORY_SEPARATOR . basename( $sPathPatten ), $nFlags, $aExcludeDirPaths ) );
 					
 				}
 				return $_aFiles;
@@ -163,10 +162,10 @@ abstract class PHP_Class_Files_Script_Creator_Base {
 			$_sClassName	= pathinfo( $_sFilePath, PATHINFO_FILENAME );
 			$_sPHPCode		= $this->getPHPCode( $_sFilePath );
 			$_aFiles[ $_sClassName ] = array(	// the file name without extension will be assigned to the key
-				'path'				=>	$_sFilePath,	
-				'code'				=>	$_sPHPCode ? trim( $_sPHPCode ) : '',
-				'dependency'		=>	$this->_getParentClass( $_sPHPCode ),
-				'defined_classes'	=>	$this->_getDefinedClasses( $_sPHPCode ),
+				'path'              =>	$_sFilePath,	
+				'code'              =>	$_sPHPCode ? trim( $_sPHPCode ) : '',
+				'dependency'        =>	$this->_getParentClass( $_sPHPCode ),
+				'defined_classes'   =>	$this->_getDefinedClasses( $_sPHPCode ),
 			); 
 
 		}
@@ -256,25 +255,25 @@ abstract class PHP_Class_Files_Script_Creator_Base {
 		 */
 		protected function _generateHeaderComment( $sClassName ) {
 			
-			$_oRC			= new ReflectionClass( $sClassName );
-			$_aConstants	= $_oRC->getConstants() + array(
-				'Name'			=>	'', 'Version'		=>	'',
-				'Description'	=>	'', 'URI'			=>	'',
-				'Author'		=>	'', 'AuthorURI'		=>	'',
-				'Copyright'		=>	'', 'License'		=>	'',
-				'Contributors'	=>	'',
+			$_oRC           = new ReflectionClass( $sClassName );
+			$_aConstants    = $_oRC->getConstants() + array(
+				'Name'          => '', 'Version'        =>	'',
+				'Description'   => '', 'URI'            =>	'',
+				'Author'        => '', 'AuthorURI'      =>	'',
+				'Copyright'     => '', 'License'        =>	'',
+				'Contributors'  => '',
 			);
-			$_aOutputs		= array();
-			$_aOutputs[]	= '/' . '**' . PHP_EOL;
-			$_aOutputs[]	= "\t" . $_aConstants['Name'] . ' '
+			$_aOutputs      = array();
+			$_aOutputs[]    = '/' . '**' . PHP_EOL;
+			$_aOutputs[]    = "\t" . $_aConstants['Name'] . ' '
 				. ( $_aConstants['Version']	? 'v' . $_aConstants['Version'] . ' '  : '' ) 
 				. ( $_aConstants['Author']	? 'by ' . $_aConstants['Author'] . ' ' : ''  )
 				. PHP_EOL;
-			$_aOutputs[]	= $_aConstants['Description']	? "\t". $_aConstants['Description'] . PHP_EOL : '';
-			$_aOutputs[]	= $_aConstants['URI'] 			? "\t". '<' . $_aConstants['URI'] . '>' . PHP_EOL : '';
-			$_aOutputs[]	= "\t" . $_aConstants['Copyright']
+			$_aOutputs[]    = $_aConstants['Description']	? "\t". $_aConstants['Description'] . PHP_EOL : '';
+			$_aOutputs[]    = $_aConstants['URI'] 			? "\t". '<' . $_aConstants['URI'] . '>' . PHP_EOL : '';
+			$_aOutputs[]    = "\t" . $_aConstants['Copyright']
 				. ( $_aConstants['License']	? '; Licensed under ' . $_aConstants['License'] : '' );
-			$_aOutputs[]	= ' */' . PHP_EOL;
+			$_aOutputs[]    = ' */' . PHP_EOL;
 			return implode( '', array_filter( $_aOutputs ) );
 		}	
 		/**
