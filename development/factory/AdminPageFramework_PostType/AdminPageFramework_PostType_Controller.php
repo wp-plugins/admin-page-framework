@@ -25,7 +25,11 @@ abstract class AdminPageFramework_PostType_Controller extends AdminPageFramework
         
         if ( $this->_isInThePage() ) :
         
-            add_action( 'wp_loaded', array( $this, 'setup_pre' ) );     
+            if ( did_action( 'wp_loaded' ) ) {  // For the activation hook.
+                $this->setup_pre();
+            } {
+                add_action( 'wp_loaded', array( $this, 'setup_pre' ) );     
+            }
             
         endif;
         
@@ -202,19 +206,29 @@ abstract class AdminPageFramework_PostType_Controller extends AdminPageFramework
         if ( isset( $aArgs['show_in_sidebar_menus'] ) && ! $aArgs['show_in_sidebar_menus'] ) {
             $this->oProp->aTaxonomyRemoveSubmenuPages[ "edit-tags.php?taxonomy={$sTaxonomySlug}&amp;post_type={$this->oProp->sPostType}" ] = "edit.php?post_type={$this->oProp->sPostType}";
         }
-        if ( count( $this->oProp->aTaxonomyTableFilters ) == 1 ) {
-            add_action( 'init', array( $this, '_replyToRegisterTaxonomies' ) ); // the hook should not be admin_init because taxonomies need to be accessed in regular pages.
-        }
-        if ( count( $this->oProp->aTaxonomyRemoveSubmenuPages ) == 1 ) {
-            add_action( 'admin_menu', array( $this, '_replyToRemoveTexonomySubmenuPages' ), 999 );     
-        }
         
         $_aExistingObjectTypes = isset( $this->oProp->aTaxonomyObjectTypes[ $sTaxonomySlug ] ) && is_array( $this->oProp->aTaxonomyObjectTypes[ $sTaxonomySlug ] )
             ? $this->oProp->aTaxonomyObjectTypes[ $sTaxonomySlug ] 
             : array();
         $aAdditionalObjectTypes = array_merge( $_aExistingObjectTypes, $aAdditionalObjectTypes );
         $this->oProp->aTaxonomyObjectTypes[ $sTaxonomySlug ] = array_unique( $aAdditionalObjectTypes );
-        
+
+        // Set up hooks.
+        if ( count( $this->oProp->aTaxonomyTableFilters ) == 1 ) {
+            if ( did_action( 'init' ) ) {
+                $this->_replyToRegisterTaxonomies();
+            } else {
+                add_action( 'init', array( $this, '_replyToRegisterTaxonomies' ) ); // the hook should not be admin_init because taxonomies need to be accessed in regular pages.
+            }
+        }
+        if ( count( $this->oProp->aTaxonomyRemoveSubmenuPages ) == 1 ) {
+            if ( did_action( 'admin_menu' ) ) {
+                $this->_replyToRemoveTexonomySubmenuPages();
+            } else {
+                add_action( 'admin_menu', array( $this, '_replyToRemoveTexonomySubmenuPages' ), 999 ); 
+            }
+        }
+    
     }    
 
     /**

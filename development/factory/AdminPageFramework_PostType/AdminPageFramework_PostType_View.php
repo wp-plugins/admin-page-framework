@@ -13,9 +13,9 @@ if ( ! class_exists( 'AdminPageFramework_PostType_View' ) ) :
  * Those methods are internal and deal with printing outputs.
  * 
  * @abstract
- * @since 3.0.4
- * @package AdminPageFramework
- * @subpackage PostType
+ * @since       3.0.4
+ * @package     AdminPageFramework
+ * @subpackage  PostType
  */
 abstract class AdminPageFramework_PostType_View extends AdminPageFramework_PostType_Model {    
 
@@ -34,7 +34,10 @@ abstract class AdminPageFramework_PostType_View extends AdminPageFramework_PostT
             add_action( 'admin_head', array( $this, '_replyToPrintStyle' ) );
             
         }     
-                
+        
+        // Front-end
+        add_action( 'the_content', array( $this, '_replyToFilterPostTypeContent' ) );
+        
     }
         
     /**
@@ -181,6 +184,42 @@ abstract class AdminPageFramework_PostType_View extends AdminPageFramework_PostT
             ";     
             
         }    
+    
+    /**
+     * Filters the post type post content.
+     * 
+     * This method is called in the same timing of the content_{instantiated class name.}. This is shorthand for it.
+     * 
+     * @remark  This class should be overridden in the extended class.
+     * @since   3.1.5
+     */
+    public function content( $sContent ) { return $sContent; }
+    
+    /**
+     * Filters the post type post content.
+     * 
+     * @since   3.1.5
+     */
+    public function _replyToFilterPostTypeContent( $sContent ) {
+        
+        if ( ! is_singular() ) {
+            return $sContent;
+        }
+        if ( ! is_main_query() ) {
+            return $sContent;
+        }
+        global $post;
+        if ( $this->oProp->sPostType !== $post->post_type ) {
+            return $sContent;
+        }
+    
+        return $this->oUtil->addAndApplyFilters(
+            $this, 
+            "content_{$this->oProp->sClassName}", 
+            $this->content( $sContent )
+        );    
+        
+    }
     
 }
 endif;
