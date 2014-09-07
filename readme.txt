@@ -3,7 +3,7 @@ Contributors: Michael Uno, miunosoft, pcraig3
 Donate link: http://michaeluno.jp/en/donate
 Tags: admin, administration, admin panel, option, options, setting, settings, Settings API, API, framework, library, class, classes, developers, developer tool, meta box, custom post type, utility, utilities, field, fields, custom field, custom fields, tool, tools
 Requires at least: 3.3
-Tested up to: 3.9.2
+Tested up to: 4.0
 Stable tag: 3.1.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -63,6 +63,8 @@ You can include your own custom field types when they are necessary. The reason 
 * `revealer` - a selector field that displays a hidden HTML element.
 * `grid` - a drag and drop grid composer.
 * `autocomplete` - a custom text field that shows a predefined pop-up autocomplete list.
+* `link` - it lets pick a post and set the url.
+* `system` - displays the site system information.
 
 = Necessary Files =
 * **`admin-page-framework.min.php`** is in the *library* folder. Alternatively you may use **`admin-page-framework.php`** located in the *development* folder. In that case, all the class files in the sub-folders need to be copied.
@@ -427,6 +429,15 @@ See examples, https://gist.github.com/michaeluno/c30713fcfe0d9d45d89f, https://g
 Check out [the issues](https://github.com/michaeluno/admin-page-framework/issues?labels=enhancement&page=1&state=open) on GitHub labeled *enhancement*.
 
 == Changelog ==
+
+= 3.1.6 - 2014/09/08 =
+- Added the `stopped_sorting_fields` JavaScript hook for field type that supports sortable fields.
+- Added support of repeatable and sortable rich text editor of the `textarea` field type except quick tags.
+- Added an example of a download button in the demo plugin.
+- Added the `system` custom field type.
+- Changed the timing of the `removed_repeatable_field` callback for sections from before removing the section to after removing it.
+- Tweaked the styling of switchable tabs of tabbed sections to remove dotted outlines when focused or activated which occur in FireFox.
+- Fixed a compatibility issue with WordPress 4.0 for the media modal frame.
 
 = 3.1.5 - 2014/08/31 =
 - Added the `content_{instantiated class name}` hook and the default `content()` callback method that filters the post type post content for the post type class.
