@@ -500,16 +500,20 @@ class APF_Demo extends AdminPageFramework {
                     . ' ' . __( 'So when you specify the default value with the <code>default</code> or <code>value</code> element, specify the KEY.', 'admin-page-framework-demo' ),
             ),    
             array( // Single Drop-down List with Multiple Options
-                'field_id' => 'select_multiple_options',
+                'field_id'      => 'select_multiple_options',
                 // 'section_id' => 'selectors', // <-- this can be omitted since it is set in the previous field array
-                'title' => __( 'Dropdown List with Multiple Options', 'admin-page-framework-demo' ),
-                'help' => __( 'This is the <em>select</em> field type with multiple elements.', 'admin-page-framework' ),
-                'type' => 'select',
-                'is_multiple' =>    true,
-                'default' => 3, // note that PHP array indices are zero-base, meaning the index count starts from 0 (not 1). 3 here means the fourth item of the array.
-                'size' => 10,    
-                'label' => array( 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'November', 'October', 'December' ),
-                'description' => __( 'Use <code>is_multiple</code> key to enable multiple selections.' ),
+                'title'         => __( 'Dropdown List with Multiple Options', 'admin-page-framework-demo' ),
+                'help'          => __( 'This is the <em>select</em> field type with multiple elements.', 'admin-page-framework' ),
+                'type'          => 'select',
+                'is_multiple'   =>    true,
+                'default'       => 3, // note that PHP array indices are zero-base, meaning the index count starts from 0 (not 1). 3 here means the fourth item of the array.  
+                'label'         => array( 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'November', 'October', 'December' ),
+                'description'   => __( 'Use <code>is_multiple</code> key to enable multiple selections.' ),
+                'attributes'    =>  array(
+                    'select'    =>  array(
+                        'size'  => 10,
+                    ),
+                ),
             ),    
             array( // Single Drop-down List with Multiple Options
                 'field_id' => 'select_multiple_groups',
@@ -658,7 +662,7 @@ class APF_Demo extends AdminPageFramework {
                     'label' => array( 
                         6 => 'six',
                         7 => 'seven',
-                        8     => 'eight',
+                        8 => 'eight',
                         9 => 'nine' 
                     ),
                 ),
@@ -679,8 +683,9 @@ class APF_Demo extends AdminPageFramework {
                 'title' => __( 'Sortable', 'admin-page-framework-demo' ),
                 'type' => 'radio',
                 'label' => array( 
-                    1 => 'On',
-                    0 => 'Off' 
+                    1   => __( 'One', 'admin-page-framework-demo' ),
+                    2   => __( 'Two', 'admin-page-framework-demo' ),
+                    3   => __( 'Three', 'admin-page-framework-demo' ),
                 ),
                 'default' => 1, // set the key of the label array
                 'sortable' =>    true,
@@ -1134,10 +1139,19 @@ class APF_Demo extends AdminPageFramework {
             ),     
             array( // Repeatable Color Pickers
                 'field_id' => 'color_picker_repeatable_field',
-                'title' => __( 'Repeatable Color Picker Fields', 'admin-page-framework-demo' ),
+                'title' => __( 'Repeatable', 'admin-page-framework-demo' ),
                 'type' => 'color',
                 'repeatable' =>    true,
-            )
+            ),
+            array( // Repeatable Color Pickers
+                'field_id'  => 'color_picker_sortable',
+                'title'     => __( 'Sortable', 'admin-page-framework-demo' ),
+                'type'      => 'color',
+                'sortable'  =>    true,
+                array(),    // the second item
+                array(),    // the third item
+                
+            )            
         );
         $this->addSettingFields(
             'hidden_field', // the target section ID.

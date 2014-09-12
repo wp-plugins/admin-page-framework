@@ -21,12 +21,22 @@ class LinkCustomFieldType extends AdminPageFramework_FieldType {
 		),
 
 	);
+    
+    /**
+     * Stores the flag indicating whether it is loaded or not.
+     */
+    static public $_bLoaded;
 
 	/**
 	 * Loads the field type necessary components.
 	 */ 
 	public function setUp() {
 		
+        if ( isset( self::$_bLoaded ) ) {
+            return;
+        }
+        self::$_bLoaded = true;
+        
 		wp_enqueue_script( 'wplink' );
 		if ( ! class_exists( '_WP_Editors' ) ) {			
 			require( ABSPATH . WPINC . '/class-wp-editor.php' );		
@@ -59,65 +69,81 @@ class LinkCustomFieldType extends AdminPageFramework_FieldType {
 		add_action( 'admin_footer', array( $this, '_replyToAddLinkModalQueryPlugin' ) );
 		$_aJSArray = json_encode( $this->aFieldTypeSlugs );
 		return "jQuery( document ).ready( function(){	
-				jQuery( '#wp-link-submit' ).on( 'click', function( event ) {
-					
-					if ( ! sInputID_LinkModal ) return;
-					var linkAtts = wpLink.getAttrs();
-					jQuery( '#' + sInputID_LinkModal ).val( linkAtts.href );
-					jQuery( '#' + sInputID_LinkModal + '_title' ).val( linkAtts.title );
-					jQuery( '#' + sInputID_LinkModal + '_target' ).val( linkAtts.target );
-					wpLink.textarea = jQuery( 'body' );
-					wpLink.close();
-					event.preventDefault ? event.preventDefault() : event.returnValue = false;
-					event.stopPropagation();
-					sInputID_LinkModal = '';
-					return false;
-					
-				});					
-				jQuery( '#wp-link-close' ).on( 'click', function( event ) {
-					wpLink.textarea = jQuery( 'body' );
-					wpLink.close();
-					event.preventDefault ? event.preventDefault() : event.returnValue = false;
-					event.stopPropagation();
-					return false;
-				});
+        
+            var stripHTML = function( sHTML ){
+               var _sTmp = document.createElement( 'DIV' );
+               _sTmp.innerHTML = sHTML;
+               return _sTmp.textContent || _sTmp.innerText || '';
+            }
 
-				jQuery().registerAPFCallback( {				
-				
-					/**
-					 * The repeatable field callback.
-					 * 
-					 * When a repeat event occurs and a field is copied, this method will be triggered.
-					 * 
-					 * @param	object	oCopied		the copied node object.
-					 * @param	string	sFieldType	the field type slug
-					 * @param	string	sFieldTagID	the field container tag ID
-					 * @param	integer	iCallType	the caller type. 1 : repeatable sections. 0 : repeatable fields.
-					 */
-					added_repeatable_field: function( oCopied, sFieldType, sFieldTagID, iCallType ) {		
-					
-						/* If it is not this field type, do nothing. */
-						if ( jQuery.inArray( sFieldType, {$_aJSArray} ) <= -1 ) {
-							return;
-						}
+            jQuery( '#wp-link-submit' ).on( 'click', function( event ) {
+                
+                if ( ! sInputID_LinkModal ) { return; }
+                var _oLinkAtts  = wpLink.getAttrs();
+                wpLink.textarea = jQuery( 'body' );
+                wpLink.close();
+                                
+                // IE does not set the values without delays.                
+                var _sInputID   = sInputID_LinkModal;
+                var _sValue     = stripHTML( _oLinkAtts.href );
+                var _sTitle     = _oLinkAtts.title;
+                var _sTarget    = _oLinkAtts.target;
+                setTimeout( function () {
+                    jQuery( '#' + _sInputID ).val( _sValue );                
+                    jQuery( '#' + _sInputID + '_title' ).val( _sTitle );
+                    jQuery( '#' + _sInputID + '_target' ).val( _sTarget );    
+                }, 1 );
+                
+                event.preventDefault ? event.preventDefault() : event.returnValue = false;
+                event.stopPropagation();
+                sInputID_LinkModal = '';
+                return false;
+                
+            });					
+            jQuery( '#wp-link-close' ).on( 'click', function( event ) {
+                wpLink.textarea = jQuery( 'body' );
+                wpLink.close();
+                event.preventDefault ? event.preventDefault() : event.returnValue = false;
+                event.stopPropagation();
+                return false;
+            });
 
-						/* If the input tag is not found, do nothing  */
-						var oLinkModalInput = oCopied.find( 'input.link_modal_dialog' );
-						if ( oLinkModalInput.length <= 0 ) {
-							return;
-						}
+            jQuery().registerAPFCallback( {				
+            
+                /**
+                 * The repeatable field callback.
+                 * 
+                 * When a repeat event occurs and a field is copied, this method will be triggered.
+                 * 
+                 * @param	object	oCopied		the copied node object.
+                 * @param	string	sFieldType	the field type slug
+                 * @param	string	sFieldTagID	the field container tag ID
+                 * @param	integer	iCallType	the caller type. 1 : repeatable sections. 0 : repeatable fields.
+                 */
+                added_repeatable_field: function( oCopied, sFieldType, sFieldTagID, iCallType ) {		
+                
+                    /* If it is not this field type, do nothing. */
+                    if ( jQuery.inArray( sFieldType, {$_aJSArray} ) <= -1 ) {
+                        return;
+                    }
 
-						// Find the 'Select Link' button and update its id (it is copied so the id is still the same as the original one of the clone.)
-						var oLinkModalSelectButton = oCopied.find( '.select_link' );
-						
-						// Now attach the event.
-						oLinkModalSelectButton.link_modal_dialog();
-						
-					},
-					
-				});		
-				
-			});";
+                    /* If the input tag is not found, do nothing  */
+                    var oLinkModalInput = oCopied.find( 'input.link_modal_dialog' );
+                    if ( oLinkModalInput.length <= 0 ) {
+                        return;
+                    }
+
+                    // Find the 'Select Link' button and update its id (it is copied so the id is still the same as the original one of the clone.)
+                    var oLinkModalSelectButton = oCopied.find( '.select_link' );
+                    
+                    // Now attach the event.
+                    oLinkModalSelectButton.link_modal_dialog();
+                    
+                }
+                
+            });		
+            
+        });";
 
 	}	
 	
@@ -166,16 +192,16 @@ class LinkCustomFieldType extends AdminPageFramework_FieldType {
 					. "<input " . $this->generateAttributes( $aInputAttributes ) . " />"    // this method is defined in the base class
 					. "<a href='#' id='select_{$aField['input_id']}' class='select_link button button-small' >" . __( 'Select Link', 'admin-page-framework' ) . "</a>"
 					. $aField['after_input']
-					. $this->getExtraInputs( $aField )				
+					. $this->_getExtraInputs( $aField )				
 				. "</label>"
 			. "</div>"
 			. $aField['after_label']            
-			. $this->getUploadButtonScript( $aField['input_id'] );
+			. $this->_getUploadButtonScript( $aField['input_id'] );
 
 	}
 
 
-	protected function getExtraInputs( $aField ) {
+	protected function _getExtraInputs( $aField ) {
 
 		return '<input ' . $this->generateAttributes(
 				array(
@@ -200,7 +226,7 @@ class LinkCustomFieldType extends AdminPageFramework_FieldType {
 	/**
 	 * Returns the field type specific JavaScript script.
 	 */ 
-	 protected function getUploadButtonScript( $sInputID ) { 
+	 protected function _getUploadButtonScript( $sInputID ) { 
 	 
 		return "<script type='text/javascript' class='admin-page-framework-link-modal-enabler-script'>" 
 				. "jQuery( document ).ready( function(){
@@ -218,23 +244,31 @@ class LinkCustomFieldType extends AdminPageFramework_FieldType {
 		
 		$_sScript = "
 		(function ( $ ) {
-		
+                        
 			$.fn.link_modal_dialog = function() {
 								
 				this.on( 'click', function( event ) {
 					
 					// Find the input id and set the global variable.
-					var oInput = $( this ).siblings( '.link_modal_dialog' );
-					sInputID_LinkModal = oInput.attr( 'id' );
-					
-					// Open the modal dialog.
-					wpActiveEditor = true;
-					wpLink.open();
+					var oInput          = $( this ).siblings( '.link_modal_dialog' );
+					sInputID_LinkModal  = oInput.attr( 'id' );
 
+                    // for WP v3.8x or below             
+					wpActiveEditor      = oInput.attr( 'id' );
+                    tinyMCEPopup        = 'undefined' !== typeof tinyMCEPopup ? tinyMCEPopup : null;    
+					
+                    // Open the modal dialog. Since v3.9, we can directly pass the element id to the parameter.
+					wpLink.open( oInput.attr( 'id' ) );                 
+                       
 					return false;
 					
-				});     				
-								
+				});     	
+			
+                this.on( 'wplink-close', function() {
+                    console.log( 'closed' );
+                    console.log( arguments );
+                });        
+            
 			};
 
 		}( jQuery ));";

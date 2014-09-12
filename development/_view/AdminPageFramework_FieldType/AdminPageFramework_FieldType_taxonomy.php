@@ -28,10 +28,10 @@ class AdminPageFramework_FieldType_taxonomy extends AdminPageFramework_FieldType
      * @remark $_aDefaultKeys holds shared default key-values defined in the base class.
      */
     protected $aDefaultKeys = array(
-        'taxonomy_slugs' => 'category', // ( array|string ) This is for the taxonomy field type.
-        'height' => '250px', // 
-        'max_width' => '100$', // for the taxonomy checklist field type, since 2.1.1.     
-        'attributes' => array(
+        'taxonomy_slugs'    => 'category', // ( array|string ) This is for the taxonomy field type.
+        'height'            => '250px', // 
+        'max_width'         => '100%', // for the taxonomy checklist field type, since 2.1.1.     
+        'attributes'        => array(
         ),    
     );
     
@@ -59,8 +59,9 @@ class AdminPageFramework_FieldType_taxonomy extends AdminPageFramework_FieldType
                     jQuery( nodeTabBoxContainer ).each( function() {
                         jQuery( this ).find( '.tab-box-tab' ).each( function( i ) {
                             
-                            if ( i == 0 )
+                            if ( 0 === i ) {
                                 jQuery( this ).addClass( 'active' );
+                            }
                                 
                             jQuery( this ).click( function( e ){
                                      
@@ -95,14 +96,12 @@ class AdminPageFramework_FieldType_taxonomy extends AdminPageFramework_FieldType
                     added_repeatable_field: function( oClonedField, sFieldType, sFieldTagID, iCallType ) {
             
                         /* If it is not the color field type, do nothing. */
-                        if ( jQuery.inArray( sFieldType, {$aJSArray} ) <= -1 ) return;
+                        if ( jQuery.inArray( sFieldType, {$aJSArray} ) <= -1 ) { return; }
 
                         oClonedField.nextAll().andSelf().each( function() {     
                             jQuery( this ).find( 'div' ).incrementIDAttribute( 'id' );
                             jQuery( this ).find( 'li.tab-box-tab a' ).incrementIDAttribute( 'href' );
                             jQuery( this ).find( 'li.category-list' ).incrementIDAttribute( 'id' );
-                            jQuery( this ).find( 'input' ).decrementNameAttribute( 'name' ); // the framework increments the last found digit by default so revert it
-                            jQuery( this ).find( 'input' ).incrementNameAttribute( 'name', -1 ); // now increment the second found digit from the end 
                             enableAPFTabbedBox( jQuery( this ).find( '.tab-box-container' ) );
                         });     
                         
@@ -118,18 +117,14 @@ class AdminPageFramework_FieldType_taxonomy extends AdminPageFramework_FieldType
                     removed_repeatable_field: function( oNextFieldConainer, sFieldType, sFieldTagID, iCallType ) {
             
                         /* If it is not the color field type, do nothing. */
-                        if ( jQuery.inArray( sFieldType, {$aJSArray} ) <= -1 ) return;
+                        if ( jQuery.inArray( sFieldType, {$aJSArray} ) <= -1 ) { return; }
     
                         oNextFieldConainer.nextAll().andSelf().each( function() {
                             jQuery( this ).find( 'div' ).decrementIDAttribute( 'id' );
                             jQuery( this ).find( 'li.tab-box-tab a' ).decrementIDAttribute( 'href' );
                             jQuery( this ).find( 'li.category-list' ).decrementIDAttribute( 'id' );
-                            jQuery( this ).find( 'input' ).incrementNameAttribute( 'name' ); // the framework decrements the last found digit by default so revert it
-                            jQuery( this ).find( 'input' ).decrementNameAttribute( 'name', -1 ); // now decrement the second found digit from the end 
                         });    
-                        
-                        // enableAPFTabbedBox( oNextFieldConainer.find( '.tab-box-container' ) );
-                        
+                                                
                     },     
                 });
             });     
@@ -172,7 +167,7 @@ class AdminPageFramework_FieldType_taxonomy extends AdminPageFramework_FieldType
                 margin-bottom: 0;
             }
             /* .admin-page-framework-field .tab-box-tab {     
-vertical-align: top;
+                vertical-align: top;
             } */
             .admin-page-framework-field .tab-box-tabs .tab-box-tab.active {
                 display: inline;
@@ -292,12 +287,10 @@ vertical-align: top;
             . "</div>";
             
         return ''
-            // ( is_array( $aField['before_label'] ) ? '' : ( string ) $aField['before_label'] )
             . "<div id='tabbox-{$aField['field_id']}' class='tab-box-container categorydiv' style='max-width:{$aField['max_width']};'>"
                 . $sTabs . PHP_EOL
                 . $sContents . PHP_EOL
             . "</div>"
-            // . ( is_array( $aField['after_label'] ) ? '' : ( string ) $aField['after_label'] )
             ;
                 
     }
@@ -316,8 +309,8 @@ vertical-align: top;
 
             $vValue = ( array ) $vValue; // cast array because the initial value (null) may not be an array.
             
-            if ( ! isset( $vValue[ $sTaxonomySlug ] ) ) return array();
-            if ( ! is_array( $vValue[ $sTaxonomySlug ] ) ) return array();
+            if ( ! isset( $vValue[ $sTaxonomySlug ] ) ) { return array(); }
+            if ( ! is_array( $vValue[ $sTaxonomySlug ] ) ) { return array(); }
             
             return array_keys( $vValue[ $sTaxonomySlug ], true );
         
