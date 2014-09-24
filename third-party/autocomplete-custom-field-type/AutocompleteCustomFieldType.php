@@ -49,7 +49,7 @@ class AutoCompleteCustomFieldType extends AdminPageFramework_FieldType {
 
 		$_aGet = $_GET;
 		unset( $_aGet['post_type'], $_aGet['request'], $_aGet['page'], $_aGet['tab'], $_aGet['settings-updated'] );
-		$this->aDefaultKeys['settings']		= $this->getQueryAdminURL( array( 'request' => 'autocomplete' ) + $_aGet );
+		$this->aDefaultKeys['settings']		= $this->getQueryAdminURL( array( 'request' => 'autocomplete', 'post_type' => 'post' ) + $_aGet );
 		$this->aDefaultKeys['settings2']	= array(
 			'hintText'	=>	__( 'Type the title of posts.', 'admin-page-framework-demo' ),
 		);
@@ -57,7 +57,7 @@ class AutoCompleteCustomFieldType extends AdminPageFramework_FieldType {
 		/*
 		 * If the request key is set in the url and it yields 'autocomplete', return a JSON output and exit.
 		 */		
-		if ( isset( $_GET['request'] ) && 'autocomplete' == $_GET['request'] ) {
+		if ( isset( $_GET['request'] ) && 'autocomplete' === $_GET['request'] ) {
 			if ( did_action( 'init' ) ) {
 				$this->_replyToReturnAutoCompleteRequest();
 			} else {			
@@ -77,7 +77,7 @@ class AutoCompleteCustomFieldType extends AdminPageFramework_FieldType {
 
 		$_aGet = $_GET;
 		unset( $_aGet['request'], $_aGet['page'], $_aGet['tab'], $_aGet['settings-updated'] );
-					
+
         $_aData = array();
         $_sType = isset( $_GET['type'] ) ? $_GET['type'] : '';
         switch ( $_sType ) {
@@ -89,6 +89,7 @@ class AutoCompleteCustomFieldType extends AdminPageFramework_FieldType {
                 $_aData = $this->_searchUsers( $_aGet );
                 break;
         }
+     
 		exit( json_encode( $_aData ) );
 		
 	}
@@ -394,28 +395,29 @@ class AutoCompleteCustomFieldType extends AdminPageFramework_FieldType {
 			$sParam1 = $this->_formatSettings( $asParam1, $sValue );
 			$sParam2 = $this->_formatSettings( $aParam2, $sValue );
 			return 
-				"<script type='text/javascript' class='autocomplete-enabler-script'>
-					jQuery( document ).ready( function() {
-                        var _sJSONValue     = jQuery( '#{$sInputID}' ).attr( 'value' );
-						var oSavedValues    = _sJSONValue ? jQuery.parseJSON( _sJSONValue ) : '';
-						jQuery( '#{$sInputID}' ).tokenInput( 
-							{$sParam1}, 
-							jQuery.extend( true, {$sParam2}, {
-								onAdd: function ( item ) {
-									jQuery( '#{$sInputID}' ).attr( 'value', JSON.stringify( jQuery( '#{$sInputID}' ).tokenInput( 'get' ) ) );
-								},
-								onDelete: function ( item ) {
-									jQuery( '#{$sInputID}' ).attr( 'value', JSON.stringify( jQuery( '#{$sInputID}' ).tokenInput( 'get' ) ) );
-								},
-							})
-						);
-						jQuery( oSavedValues ).each( function ( index, value) {
-							jQuery( '#{$sInputID}' ).tokenInput( 'add', value );
-						}); 
-						var sOptionID = jQuery( '#{$sInputID}' ).closest( '.admin-page-framework-sections' ).attr( 'id' ) + '_' + jQuery( '#{$sInputID}' ).closest( '.admin-page-framework-fields' ).attr( 'id' );
-						jQuery( '#{$sInputID}' ).storeTokenInputOptions( sOptionID, {$sParam1}, {$sParam2} );
-					});
-				</script>";		
+"<script type='text/javascript' class='autocomplete-enabler-script'>
+    jQuery( document ).ready( function() {
+        var _sJSONValue     = jQuery( '#{$sInputID}' ).attr( 'value' );
+        var _oSavedValues    = _sJSONValue ? jQuery.parseJSON( _sJSONValue ) : '';
+        jQuery( '#{$sInputID}' ).tokenInput( 
+            {$sParam1}, 
+            jQuery.extend( true, {$sParam2}, {
+                onAdd: function ( item ) {
+                    jQuery( '#{$sInputID}' ).attr( 'value', JSON.stringify( jQuery( '#{$sInputID}' ).tokenInput( 'get' ) ) );
+                },
+                onDelete: function ( item ) {
+                    jQuery( '#{$sInputID}' ).attr( 'value', JSON.stringify( jQuery( '#{$sInputID}' ).tokenInput( 'get' ) ) );
+                },
+            })
+        );
+        jQuery( _oSavedValues ).each( function ( iIndex, value ) {
+            jQuery( '#{$sInputID}' ).tokenInput( 'add', value );
+        }); 
+        var sOptionID = jQuery( '#{$sInputID}' ).closest( '.admin-page-framework-sections' ).attr( 'id' ) + '_' + jQuery( '#{$sInputID}' ).closest( '.admin-page-framework-fields' ).attr( 'id' );
+        jQuery( '#{$sInputID}' ).storeTokenInputOptions( sOptionID, {$sParam1}, {$sParam2} );
+
+    });
+</script>";		
 		}
 		
 		/**

@@ -13,8 +13,9 @@ if ( ! class_exists( 'AdminPageFramework_Factory' ) ) :
  * This class defines public methods that the user will interact with.
  * 
  * @abstract
- * @since 3.0.4
- * @subpackage Factory
+ * @since       3.0.4
+ * @package     AdminPageFramework
+ * @subpackage  Factory
  * @internal
  */
 abstract class AdminPageFramework_Factory extends AdminPageFramework_Factory_Controller {}

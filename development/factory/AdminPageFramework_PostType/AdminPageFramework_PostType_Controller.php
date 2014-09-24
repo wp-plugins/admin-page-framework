@@ -171,30 +171,30 @@ abstract class AdminPageFramework_PostType_Controller extends AdminPageFramework
     * Adds a custom taxonomy to the class post type.
     * <h4>Example</h4>
     * <code>$this->addTaxonomy( 
-    * 'sample_taxonomy', // taxonomy slug
-    * array( // argument
-    * 'labels' => array(
-    * 'name' => 'Genre',
-    * 'add_new_item' => 'Add New Genre',
-    * 'new_item_name' => "New Genre"
-    * ),
-    * 'show_ui' => true,
-    * 'show_tagcloud' => false,
-    * 'hierarchical' => true,
-    * 'show_admin_column' => true,
-    * 'show_in_nav_menus' => true,
-    * 'show_table_filter' => true, // framework specific key
-    * 'show_in_sidebar_menus' => false, // framework specific key
-    * )
+    *   'sample_taxonomy', // taxonomy slug
+    *   array( // argument
+    *       'labels'        => array(
+    *       'name'          => 'Genre',
+    *       'add_new_item'  => 'Add New Genre',
+    *       'new_item_name' => "New Genre"
+    *   ),
+    *   'show_ui'               => true,
+    *   'show_tagcloud'         => false,
+    *   'hierarchical'          => true,
+    *   'show_admin_column'     => true,
+    *   'show_in_nav_menus'     => true,
+    *   'show_table_filter'     => true,  // framework specific key
+    *   'show_in_sidebar_menus' => false, // framework specific key
+    *   )
     * );</code>
     * 
     * @see http://codex.wordpress.org/Function_Reference/register_taxonomy#Arguments
-    * @since 2.0.0
-    * @since 3.1.1 Added the third parameter.
-    * @param string $sTaxonomySlug The taxonomy slug.
-    * @param array $aArgs The taxonomy argument array passed to the second parameter of the <a href="http://codex.wordpress.org/Function_Reference/register_taxonomy#Arguments">register_taxonomy()</a> function.
-    * @param array $aAdditionalObjectTypes Additional object types(post types) besides the caller post type.
-    * @return void
+    * @since    2.0.0
+    * @since    3.1.1       Added the third parameter.
+    * @param    string      $sTaxonomySlug              The taxonomy slug.
+    * @param    array       $aArgs                      The taxonomy argument array passed to the second parameter of the <a href="http://codex.wordpress.org/Function_Reference/register_taxonomy#Arguments">register_taxonomy()</a> function.
+    * @param    array       $aAdditionalObjectTypes     Additional object types(post types) besides the caller post type.
+    * @return   void
     */ 
     protected function addTaxonomy( $sTaxonomySlug, array $aArgs, array $aAdditionalObjectTypes=array() ) {
         
@@ -213,18 +213,19 @@ abstract class AdminPageFramework_PostType_Controller extends AdminPageFramework
         $aAdditionalObjectTypes = array_merge( $_aExistingObjectTypes, $aAdditionalObjectTypes );
         $this->oProp->aTaxonomyObjectTypes[ $sTaxonomySlug ] = array_unique( $aAdditionalObjectTypes );
 
-        // Set up hooks.
-        if ( count( $this->oProp->aTaxonomyTableFilters ) == 1 ) {
-            if ( did_action( 'init' ) ) {
-                $this->_replyToRegisterTaxonomies();
-            } else {
+        // Set up hooks. If the 'init' hook is already done, register it now.
+        if ( did_action( 'init' ) ) {
+            $this->_registerTaxonomy( $sTaxonomySlug, $aAdditionalObjectTypes, $aArgs );
+        } else {
+            if ( 1 == count( $this->oProp->aTaxonomies ) ) {
                 add_action( 'init', array( $this, '_replyToRegisterTaxonomies' ) ); // the hook should not be admin_init because taxonomies need to be accessed in regular pages.
             }
         }
-        if ( count( $this->oProp->aTaxonomyRemoveSubmenuPages ) == 1 ) {
-            if ( did_action( 'admin_menu' ) ) {
-                $this->_replyToRemoveTexonomySubmenuPages();
-            } else {
+        
+        if ( did_action( 'admin_menu' ) ) {
+            $this->_replyToRemoveTexonomySubmenuPages();
+        } else {
+            if ( 1 == count( $this->oProp->aTaxonomyRemoveSubmenuPages ) ) {
                 add_action( 'admin_menu', array( $this, '_replyToRemoveTexonomySubmenuPages' ), 999 ); 
             }
         }
@@ -252,12 +253,23 @@ abstract class AdminPageFramework_PostType_Controller extends AdminPageFramework
      * This is only necessary if it is not set in the constructor.
      * 
      * @since 2.0.0
-     * @see http://codex.wordpress.org/Function_Reference/register_post_type#Arguments
-     * @param array The <a href="http://codex.wordpress.org/Function_Reference/register_post_type#Arguments">array of arguments</a> to be passed to the second parameter of the <em>register_post_type()</em> function.
+     * @deprecated      3.2.0   Use the setArguments() method instead.
      * @return void
      */ 
     protected function setPostTypeArgs( $aArgs ) {
-        $this->oProp->aPostTypeArgs = $aArgs;
+        $this->setArguments( ( array ) $aArgs );
+    }
+    
+    /**
+     * Sets the post type arguments.
+     * 
+     * @remark      The alias of setPostTypeArgs().
+     * @see http://codex.wordpress.org/Function_Reference/register_post_type#Arguments
+     * @param array The <a href="http://codex.wordpress.org/Function_Reference/register_post_type#Arguments">array of arguments</a> to be passed to the second parameter of the <em>register_post_type()</em> function.
+     * @since       3.2.0
+     */
+    protected function setArguments( array $aArguments=array() ) {
+        $this->oProp->aPostTypeArgs = $aArguments;
     }
     
     /**

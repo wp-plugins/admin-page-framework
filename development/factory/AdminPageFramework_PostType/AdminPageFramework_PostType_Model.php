@@ -33,12 +33,12 @@ abstract class AdminPageFramework_PostType_Model extends AdminPageFramework_Post
         // Properties
         $this->oProp->aColumnHeaders = array(
             'cb' => '<input type="checkbox" />', // Checkbox for bulk actions. 
-            'title' => $this->oMsg->__( 'title' ), // Post title. Includes "edit", "quick edit", "trash" and "view" links. If $mode (set from $_REQUEST['mode']) is 'excerpt', a post excerpt is included between the title and links.
-            'author' => $this->oMsg->__( 'author' ),     // Post author.
-            // 'categories' => $this->oMsg->__( 'categories' ), // Categories the post belongs to. 
-            // 'tags' => $this->oMsg->__( 'tags' ),         // Tags for the post. 
+            'title' => $this->oMsg->get( 'title' ), // Post title. Includes "edit", "quick edit", "trash" and "view" links. If $mode (set from $_REQUEST['mode']) is 'excerpt', a post excerpt is included between the title and links.
+            'author' => $this->oMsg->get( 'author' ),     // Post author.
+            // 'categories' => $this->oMsg->get( 'categories' ), // Categories the post belongs to. 
+            // 'tags' => $this->oMsg->get( 'tags' ),         // Tags for the post. 
             'comments'         => '<div class="comment-grey-bubble"></div>', // Number of pending comments. 
-            'date' => $this->oMsg->__( 'date' ),         // The date and publish status of the post. 
+            'date' => $this->oMsg->get( 'date' ),         // The date and publish status of the post. 
         );     
                             
         if ( $this->_isInThePage() ) :
@@ -58,9 +58,11 @@ abstract class AdminPageFramework_PostType_Model extends AdminPageFramework_Post
     /**
      * Determines whether the currently loaded page is of the post type page.
      * 
-     * @since 3.0.4
+     * @internal
+     * @since       3.0.4
+     * @since       3.2.0   Changed the scope to public from protected as the head tag object will access it.
      */
-    protected function _isInThePage() {
+    public function _isInThePage() {
         
         // If it's not in one of the post type's pages
         if ( ! $this->oProp->bIsAdmin ) {
@@ -152,15 +154,33 @@ abstract class AdminPageFramework_PostType_Model extends AdminPageFramework_Post
     public function _replyToRegisterTaxonomies() {
 
         foreach( $this->oProp->aTaxonomies as $_sTaxonomySlug => $_aArgs ) {
-            $_aObjectTypes = is_array( $this->oProp->aTaxonomyObjectTypes[ $_sTaxonomySlug ] ) ? $this->oProp->aTaxonomyObjectTypes[ $_sTaxonomySlug ] : array();
-            $_aObjectTypes[] = $this->oProp->sPostType;
-            register_taxonomy(
-                $_sTaxonomySlug,
-                array_unique( $_aObjectTypes ), // object types
+            $this->_registerTaxonomy( 
+                $_sTaxonomySlug,  
+                is_array( $this->oProp->aTaxonomyObjectTypes[ $_sTaxonomySlug ] ) 
+                    ? $this->oProp->aTaxonomyObjectTypes[ $_sTaxonomySlug ] 
+                    : array(), // object types
                 $_aArgs // for the argument array keys, refer to: http://codex.wordpress.org/Function_Reference/register_taxonomy#Arguments
-            );    
+            );
         }
 
+    }
+    
+    /**
+     * Registers a taxonomy.
+     * @since       3.2.0
+     * @internal    
+     */
+    public function _registerTaxonomy( $sTaxonomySlug, array $aObjectTypes, array $aArguments ) {
+        
+        if ( ! in_array( $this->oProp->sPostType, $aObjectTypes ) ) {
+            $aObjectTypes[] = $this->oProp->sPostType;
+        }
+        register_taxonomy(
+            $sTaxonomySlug,
+            array_unique( $aObjectTypes ), // object types
+            $aArguments // for the argument array keys, refer to: http://codex.wordpress.org/Function_Reference/register_taxonomy#Arguments
+        );            
+        
     }
 
     /**
@@ -171,7 +191,14 @@ abstract class AdminPageFramework_PostType_Model extends AdminPageFramework_Post
     public function _replyToRemoveTexonomySubmenuPages() {
     
         foreach( $this->oProp->aTaxonomyRemoveSubmenuPages as $sSubmenuPageSlug => $sTopLevelPageSlug ) {
+            
             remove_submenu_page( $sTopLevelPageSlug, $sSubmenuPageSlug );
+            
+            // This method is called directly without a hook if the admin_menu hook is already passed.
+            // In that case, when registering multiple taxonomies, this method can be called multiple times.
+            // For that, the removed item should be cleared to avoid multiple menu removals.
+            unset( $this->oProp->aTaxonomyRemoveSubmenuPages[ $sSubmenuPageSlug ] );
+            
         }
 
     }
