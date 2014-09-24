@@ -4,7 +4,7 @@ Donate link:        http://michaeluno.jp/en/donate
 Tags:               admin, administration, admin panel, admin page framework, option, options, option page, option pages, setting, settings, setting page, setting pages, Settings API, API, framework, library, class, classes, developers, developer tool, meta box, meta box field, meta box fields, custom post type, utility, utilities, field, fields, custom field, custom fields, tool, tools, widget, widgets, factory
 Requires at least:  3.3
 Tested up to:       4.0
-Stable tag:         3.1.7
+Stable tag:         3.2.0
 License:            GPLv2 or later
 License URI:        http://www.gnu.org/licenses/gpl-2.0.html
 
