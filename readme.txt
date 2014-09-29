@@ -1,10 +1,10 @@
 === Admin Page Framework ===
 Contributors:       Michael Uno, miunosoft, pcraig3
 Donate link:        http://michaeluno.jp/en/donate
-Tags:               admin, administration, admin panel, admin page framework, option, options, option page, option pages, setting, settings, setting page, setting pages, Settings API, API, framework, library, class, classes, developers, developer tool, meta box, meta box field, meta box fields, custom post type, utility, utilities, field, fields, custom field, custom fields, tool, tools, widget, widgets, factory
+Tags:               admin, administration, admin panel, admin page framework, option, options, setting, settings, Settings API, API, framework, library, class, classes, developers, developer tool, meta box, custom post type, custom post types, utility, utilities, field, fields, custom field, custom fields, tool, tools, widget, widgets, factory, form, forms
 Requires at least:  3.3
 Tested up to:       4.0
-Stable tag:         3.2.0
+Stable tag:         3.1.7
 License:            GPLv2 or later
 License URI:        http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -15,16 +15,22 @@ It provides plugin and theme developers with easier means of creating option pag
 
 **Notes:** this framework does not do anything by itself. If you are not a developer, you do not need this.
 
-= Features =
-- **Root Page, Sub Pages, and Tabs** - allows you to instantly create a top level page and the sub pages of it, plus tabs inside the sub pages.
-- **Custom Post Types** - helps to create custom post types and insert custom columns in the post listing table.
-- **Meta Boxes** - helps to create custom meta boxes with form fields, that means it enables to store additinal data associated with a post that your users create. 
-- **Widgets** - helps to create widgets with the form fields that the framework provides. 
-- **Network Admin Pages** - network admin pages for WordPress multi-sites can be created.
+= What you can do =
+
+with it, easily create:
+
+- **Root Page, Sub Pages, and Tabs** - where your users will access to operate your plugin or theme.
+- **Forms** - to let your users store their options.
+- **Custom Post Types** - and the custom columns in the post listing table.
+- **Meta Boxes and Fields** - which help to store meta data stored associated with posts of set post types. Also meta boxes can be added to the pages created with the framework.
+- **Widgets and Fields** - to display modular outputs based on the user's settings in the front end.
+- **Network Admin Pages and Forms** - for WordPress multi-sites.
+
+= What are useful about =
 - **Extensible** - the created admin pages will become highly extensible with the automatically created hooks. In other words, it empowers other developers to customize your plugin or theme. That will result on making your projects grow.
 - **Section Tabs** - form sections can be displayed in a tabbed box.
 - **Repeatability** - supports repeatable form sections and fields which means the user can dynamically add/remove form fields.
-- **Sotability** - supports sortable form fields which means the user can set the order of fields by moving the field with drag-and-drop.
+- **Sortability** - supports sortable form fields which means the user can set the order of fields by moving the field with drag-and-drop.
 - **Import and Export Options** - buttons that the user can import and export settings by uploading and downloading text files.
 - **Reset Button** - lets the user to initialize the saved options.
 - **Validation and Error Messages** - with the pre-defined validation callbacks, the user's submitting form data can be verified. Furthermore, by setting the error array, you can display the error message to the user.
@@ -52,8 +58,8 @@ It provides plugin and theme developers with easier means of creating option pag
 - `size` - a combination field of the text and the select fields that let the user set sizes with a selectable unit.
 - `section_title` - a text field type that will be placed in the section title so that it lets the user set the section title.
 
-= Custom Field Types = 
-You can include your own custom field types when they are necessary. The reason that they are not built-in is to keep the library size as small as possible. The example custom field types are included in the demo plugin.
+= Bundled Custom Field Types = 
+You can include your own custom field types when they are necessary. The reason that they are not built-in is to keep the library size as small as possible. The followings are example custom field types.
 
 - `geometry` - a location selector with the Google map.
 - `date`, `time`, `date_time`, `date_range`, `time_range`, `date_time_range` - date and time fields with the date picker.
@@ -65,6 +71,7 @@ You can include your own custom field types when they are necessary. The reason 
 - `link` - it lets pick a post and set the url.
 - `system` - displays the site system information.
 - `github` - displays GitHub buttons.
+- `image_checkbox`, `image_radio` - displays images instead of text labels to be selected.
 
 = Necessary Files =
 - **`admin-page-framework.min.php`** is in the *library* folder. Alternatively you may use **`admin-page-framework.php`** located in the *development* folder. In that case, all the class files in the sub-folders need to be copied.
@@ -437,7 +444,18 @@ Check out [the issues](https://github.com/michaeluno/admin-page-framework/issues
 
 == Changelog ==
 
-= 3.2.0 =
+= 3.2.1 - 2014/09/29 =
+- Added an example of using the `content_top_{...}` and the `style_common_admin_page_framework` filters.
+- Added the `style_common_admin_page_framework` hook.
+- Added support for a file path to be passed for image submit buttons.
+- Added support for custom queries for the `posttype` field type.
+- Added the `radio_checkbox` custom field type.
+- Added the `image_checkbox` custom field type.
+- Tweaked the styling of field error messages.
+- Fixed an issue that sortable fields could not be rendered properly when being dragged in browser screen widths of less than 782px in Chrome in WordPress above v3.8.
+- Fixed the `content_top_{...}` hooks and the methods were not available.
+
+= 3.2.0 - 2014/09/25 =
 - Added an example of using an image for a submit button.
 - Added the option to set custom button labels via the `data-label` attribute for the `image`, `media`, and `font` field types.
 - Added the remove button for the `image`, `media`, and `font` field types.
@@ -448,7 +466,7 @@ Check out [the issues](https://github.com/michaeluno/admin-page-framework/issues
 - Fixed a bug that a last item did not set when selecting multiple items in the fields of the `image`, `media`, `font` field types.
 - Fixed a bug in the `autocomplete` custom field type that the default post type slug was not set properly when the page that the field is displayed contains the `post_type` query key in the url.
 
-= 3.1.7 - 2014/0912 =
+= 3.1.7 - 2014/09/12 =
 - Added the `github` custom field type that displays GitHub buttons.
 - Fixed an incompatibility issue of the `grid` custom field type with Internet Explorer.
 - Fixed an incompatibility issue of the `link` custom field type with WordPress 3.8.x or below and Internet Explorer.
@@ -548,4 +566,4 @@ Check out [the issues](https://github.com/michaeluno/admin-page-framework/issues
 - Fixed a bug that the `autocomplete` custom field type's JavaScript script could not run when the prePopulate option is set and the value is saved without changing.
 - Fixed an issue in the class autoloader that caused a PHP fatal error in some non GNU OSes such as Solaris in the development version.
 
-= [Old Change Log Items](https://raw.githubusercontent.com/michaeluno/admin-page-framework/master/changelog.md) =
+<h4>[Old Change Log Items](https://raw.githubusercontent.com/michaeluno/admin-page-framework/master/changelog.md)</h4>

@@ -85,7 +85,7 @@ $this->addSettingFields(
             'min' => 3,
         ),
         'description'       => __( 'Press + / - to add / remove the fields. To enable the repeatable fields functionality, set the <code>repeatable</code> argument to <code>true</code>.', 'admin-page-framework-demo' )
-            . __( 'To set maximum and minimum numbers of fields, set the <code>max</code> and <code>min</code> arguments in the <code>repeatable<code> argument array in the field deifnition array.' ),
+            . __( 'To set maximum and minimum numbers of fields, set the <code>max</code> and <code>min</code> arguments in the <code>repeatable</code> argument array in the field definition array.' ),
     ),     
     array( // Sortable text fields
         'field_id'          => 'text_sortable',
@@ -799,12 +799,27 @@ $this->addSettingFields(
  * Check lists
  */
 $this->addSettingFields(     
+    'checklists',
     array(
         'field_id'              => 'post_type_checklist',
-        'section_id'            => 'checklists',
         'title'                 => __( 'Post Types', 'admin-page-framework-demo' ),
         'type'                  => 'posttype',
-    ),     
+    ),
+    array(
+        'field_id'              => 'post_type_checklist_custom_query',
+        'title'                 => __( 'Custom Query', 'admin-page-framework-demo' ),
+        'type'                  => 'posttype',
+        // Accepts query arguments. For the specification, see the arg parameter of get_post_types() function.
+        // See:  http://codex.wordpress.org/Function_Reference/get_post_types#Parameters
+        'query'                 => array(
+            'public'   => true,
+            '_builtin' => false,
+        ),
+        'operator'              => 'and',   // can be 'or'
+        'slugs_to_remove'       => array(), // if not set, the following slugs will be automatically removed. 'revision',  'attachment',  'nav_menu_item'.
+        'description'           => __( 'With the <code>query</code> argument, you can query post types to retrieve.', 'admin-page-framework-demo' )
+            . ' ' . sprintf( __( 'For the specification, see the <a href="%1$s">Parameter</a> section of codex for the <code>get_post_types()</code> function.', 'admin-page-framework-demo' ), 'http://codex.wordpress.org/Function_Reference/get_post_types#Parameters' ) ,
+    ),    
     array(
         'field_id'              => 'post_type_multiple_checklists',
         'title'                 => __( 'Multiple', 'admin-page-framework-demo' ),
@@ -1019,11 +1034,11 @@ $this->addSettingFields(
         'type'              => 'submit',
         'href'              => 'http://en.michaeluno.jp/donate',
         'attributes'        =>  array(
-           'src'    => 'https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif',
+           'src'    => APFDEMO_DIRNAME . '/asset/image/donation.gif',
            'alt'    => __( 'Submit', 'admin-page-framework-demo' ),
            'class'  => '',
         ),
-        'description'   => __( 'For a custom image to the button, set the image url in the <code>src</code> attribute with the <code>attributes</code> argument.', 'admin-page-framework-demo' )
+        'description'   => __( 'For a custom image submit button, set the image url in the <code>src</code> attribute with the <code>attributes</code> argument.', 'admin-page-framework-demo' )
             . ' ' . __( 'This button will take you to the donation page for the developer of this framework. If you like to donate, please do so to help the development!', 'admin-page-framework-demo' ),
     ),    
     array()
@@ -1033,7 +1048,7 @@ $this->addSettingFields(
  * Verification Example
  * */
 $this->addSettingFields(     
-    'verification', // the target sectin ID
+    'verification', // the target section ID
     array(
         'field_id' => 'verify_text_field',
         'title' => __( 'Verify Text Input', 'admin-page-framework-demo' ),
@@ -1101,28 +1116,28 @@ $this->addSettingFields(
 $this->addSettingFields(    
     'repeatable_sections', // the target section ID
     array(
-        'field_id' => 'text_field_in_repeatable_sections',
-        'title' => __( 'Text', 'admin-page-framework-demo' ),
-        'type' => 'text',
-        'default' => 'xyz',
+        'field_id'      => 'text_field_in_repeatable_sections',
+        'title'         => __( 'Text', 'admin-page-framework-demo' ),
+        'type'          => 'text',
+        'default'       => 'xyz',
     ),
     array(
-        'field_id' => 'repeatable_field_in_repeatable_sections',
-        'title' => __( 'Repeatable', 'admin-page-framework-demo' ),
-        'type' => 'text',
-        'repeatable' =>    true,
+        'field_id'      => 'repeatable_field_in_repeatable_sections',
+        'title'         => __( 'Repeatable', 'admin-page-framework-demo' ),
+        'type'          => 'text',
+        'repeatable'    =>    true,
     ),     
     array(
-        'field_id' => 'color_in_repeatable_sections',
-        'title' => __( 'Color', 'admin-page-framework-demo' ),
-        'type' => 'color',
+        'field_id'      => 'color_in_repeatable_sections',
+        'title'         => __( 'Color', 'admin-page-framework-demo' ),
+        'type'          => 'color',
     ),
     array(
-        'field_id' => 'radio_in_repeatable_sections',
-        'title' => __( 'Radio', 'admin-page-framework-demo' ),
-        'type' => 'radio',
-        'default' => 'b',
-        'label' => array(
+        'field_id'      => 'radio_in_repeatable_sections',
+        'title'         => __( 'Radio', 'admin-page-framework-demo' ),
+        'type'          => 'radio',
+        'default'       => 'b',
+        'label'         => array(
             'a' => 'A',
             'b' => 'B',
             'c' => 'c',     

@@ -30,6 +30,8 @@ class APF_Demo_CustomFieldTypes extends AdminPageFramework {
             $_sPluginDirName . '/third-party/link-custom-field-type/LinkCustomFieldType.php',     
             $_sPluginDirName . '/third-party/system-custom-field-type/SystemCustomFieldType.php',
             $_sPluginDirName . '/third-party/github-custom-field-type/GitHubCustomFieldType.php',
+            $_sPluginDirName . '/third-party/image_checkbox-custom-field-type/ImageCheckboxCustomFieldType.php',
+            $_sPluginDirName . '/third-party/image_radio-custom-field-type/ImageRadioCustomFieldType.php',
         );
         foreach( $_aFiles as $_sFilePath ) {
             if ( file_exists( $_sFilePath ) ) {     
@@ -54,6 +56,8 @@ class APF_Demo_CustomFieldTypes extends AdminPageFramework {
         new LinkCustomFieldType( $_sClassName );     
         new SystemCustomFieldType( $_sClassName );     
         new GitHubCustomFieldType( $_sClassName );     
+        new ImageCheckboxCustomFieldType( $_sClassName );     
+        new ImageRadioCustomFieldType( $_sClassName );     
         
     }    
 
@@ -71,9 +75,9 @@ class APF_Demo_CustomFieldTypes extends AdminPageFramework {
         /* ( required ) Add sub-menu items (pages or links) */
         $this->addSubMenuItems(    
             array(
-                'title' => __( 'Custom Field Types', 'admin-page-framework-demo' ),
-                'page_slug' => 'apf_custom_field_types',
-                'screen_icon' => 'options-general',
+                'title'         => __( 'Custom Field Types', 'admin-page-framework-demo' ),
+                'page_slug'     => 'apf_custom_field_types',
+                'screen_icon'   => 'options-general',
             )
         );
         
@@ -152,7 +156,11 @@ class APF_Demo_CustomFieldTypes extends AdminPageFramework {
             array(
                 'tab_slug'  => 'github',
                 'title'     => __( 'GitHub', 'admin-page-framework-demo' ),    
-            ),                             
+            ),
+            array(
+                'tab_slug'  => 'image_selectors',
+                'title'     => __( 'Image Selectors', 'admin-page-framework-demo' ),    
+            ),            
             array()     
         );    
                 
@@ -226,6 +234,11 @@ class APF_Demo_CustomFieldTypes extends AdminPageFramework {
                 'section_id'    => 'github',
                 'tab_slug'      => 'github',
                 'title'         => __( 'GitHub Buttons', 'admin-page-framework-demo' ),
+            ),     
+            array(
+                'section_id'    => 'image_selectors',
+                'tab_slug'      => 'image_selectors',
+                'title'         => __( 'Image Selectors', 'admin-page-framework-demo' ),
             ),                 
             array()
         );
@@ -851,7 +864,7 @@ class APF_Demo_CustomFieldTypes extends AdminPageFramework {
                 'title'         => __( 'Saved Options', 'admin-page-framework-demo' ),
                 'data'          => array(
                     // Removes the default data by passing an empty value below.
-                    'AdminPage Framework'   => '', 
+                    'Admin Page Framework'   => '', 
                     'WordPress'             => '', 
                     'PHP'                   => '', 
                     'MySQL'                 => '', 
@@ -1030,6 +1043,49 @@ class APF_Demo_CustomFieldTypes extends AdminPageFramework {
                 'value'         => 'The Meaning of Gist', 
             )              
         );
+        
+        // Image Checkbox
+        $this->addSettingFields(
+            'image_selectors', // the target section id
+            array(
+                'field_id'      => 'image_checkbox',
+                'type'          => 'image_checkbox',     
+                'title'         => __( 'Image Checkbox', 'admin-page-framework-demo' ),
+                'width'         => 96,
+                'height'        => 64,  
+                'label_min_width'   => 200,
+                'label'         => array(
+                    'a' => APFDEMO_DIRNAME . '/asset/image/a.jpg',
+                    'b' => APFDEMO_DIRNAME . '/asset/image/b.jpg',
+                    'c' => APFDEMO_DIRNAME . '/asset/image/c.jpg',
+                ),
+                'after_input'   => array(
+                    'a' => "<br /><span>" . __( 'First Image' ) . "</span>",
+                    'b' => "<br /><span>" . __( 'Second Image' ) . "</span>",
+                    'c' => "<br /><span>" . __( 'Third Image' ) . "</span>",
+                ),                
+            ),
+            array(
+                'field_id'      => 'image_radio',
+                'type'          => 'image_radio',     
+                'title'         => __( 'Image Radio', 'admin-page-framework-demo' ),
+                'width'         => 96,
+                'height'        => 64,  
+                'label_min_width'   => 200,
+                'label'         => array(
+                    'a' => APFDEMO_DIRNAME . '/asset/image/a.jpg',
+                    'b' => APFDEMO_DIRNAME . '/asset/image/b.jpg',
+                    'c' => APFDEMO_DIRNAME . '/asset/image/c.jpg',
+                ),
+                'after_input'   => array(
+                    'a' => "<br /><span>" . __( 'First Image' ) . "</span>",
+                    'b' => "<br /><span>" . __( 'Second Image' ) . "</span>",
+                    'c' => "<br /><span>" . __( 'Third Image' ) . "</span>",
+                ),   
+                'default'   => 'b',
+            ),            
+            array()
+        );     
         
     }
     
