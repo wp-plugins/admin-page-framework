@@ -12,14 +12,15 @@ if ( ! class_exists( 'AdminPageFramework_FormTable_Base' ) ) :
  * 
  * This base class mainly deals with setting properties in the constructor and internal methods. 
  * 
- * @package AdminPageFramework
- * @subpackage Form
- * @since 3.0.0
+ * @package     AdminPageFramework
+ * @subpackage  Form
+ * @since       3.0.0
  * @internal
  */
 class AdminPageFramework_FormTable_Base extends AdminPageFramework_WPUtility {
     
     /**
+     * Sets up properties and hooks.
      * 
      * @since 3.0.0
      * @since 3.0.4 The $aFieldErrors parameter was added.
@@ -42,29 +43,31 @@ class AdminPageFramework_FormTable_Base extends AdminPageFramework_WPUtility {
         /**
          * Inserts necessary JavaScript scripts for fields.
          * 
-         * @since 3.0.0
+         * @since       3.0.0
+         * @internal
          */ 
         private function _loadScripts() {
             
             if ( self::$_bIsLoadedTabPlugin ) { return; }
-            
-            self::$_bIsLoadedTabPlugin = add_action( 'admin_footer', array( $this, '_replyToAddTabPlugin' ) );
+            self::$_bIsLoadedTabPlugin = true;
+            new AdminPageFramework_Script_Tab;
             
         }
         
     /**
      * Generates attributes of the field container tag.
      * 
-     * @since 3.0.0
+     * @since       3.0.0
      * @internal
      */
     protected function _getAttributes( $aField, $aAttributes=array() ) {
 
         $_aAttributes = $aAttributes + ( isset( $aField['attributes']['fieldrow'] ) ? $aField['attributes']['fieldrow'] : array() );
         
-        if ( $aField['hidden'] ) // Prepend the visibility CSS property.
+        // Prepend the visibility CSS property.
+        if ( $aField['hidden'] ) { 
             $_aAttributes['style'] = 'display:none;' . ( isset( $_aAttributes['style'] ) ? $_aAttributes['style'] : '' );
-        
+        }
         return $this->generateAttributes( $_aAttributes );
         
     }
@@ -72,15 +75,30 @@ class AdminPageFramework_FormTable_Base extends AdminPageFramework_WPUtility {
     /**
      * Returns the title part of the field output.
      * 
-     * @since 3.0.0
+     * @since       3.0.0
      * @internal
      */
     protected function _getFieldTitle( $aField ) {
         
         return "<label for='{$aField['field_id']}'>"
             . "<a id='{$aField['field_id']}'></a>"
-                . "<span title='" . ( strip_tags( isset( $aField['tip'] ) ? $aField['tip'] : $aField['description'] ) ) . "'>"
+                . "<span title='" 
+                        . esc_attr( strip_tags( 
+                            isset( $aField['tip'] ) 
+                                ? $aField['tip'] 
+                                : ( 
+                                    is_array( $aField['description'] 
+                                        ? implode( '&#10;', $aField['description'] )
+                                        : $aField['description'] 
+                                    ) 
+                                ) 
+                        ) ) 
+                    . "'>"
                     . $aField['title'] 
+                    . ( in_array( $aField[ '_fields_type' ], array( 'widget', 'post_meta_box', 'page_meta_box' ) )  
+                        ? "<span class='title-colon'>:</span>"
+                        : ''
+                    )
                 . "</span>"
             . "</label>";
         
@@ -93,8 +111,8 @@ class AdminPageFramework_FormTable_Base extends AdminPageFramework_WPUtility {
      * which affects the way of rendering the row that contains the field output (by the field output callback).
      * 
      * @internal
-     * @since 3.0.0
-     * @remark The returning merged field definition array does not respect sub-fields so when passing the field definition to the callback,
+     * @since       3.0.0
+     * @remark      The returning merged field definition array does not respect sub-fields so when passing the field definition to the callback,
      * do not use the array returned from this method but the raw (non-merged) array.
      */
     protected function _mergeDefault( $aField ) {
@@ -106,38 +124,6 @@ class AdminPageFramework_FormTable_Base extends AdminPageFramework_WPUtility {
                 : array()
         );
         
-    }
-
-    
-    /**
-     * Returns the framework's repeatable field jQuery plugin.
-     * 
-     * @since 3.0.0
-     * @internal
-     */
-    public function _replyToAddRepeatableSectionjQueryPlugin() {
-        
-        static $bIsCalled = false; // the static variable value will take effect even in other instances of the same class.
-        
-        if ( $bIsCalled ) return;
-        $bIsCalled = true;
-        echo "<script type='text/javascript' class='admin-page-framework-repeatable-sections-plugin'>"
-                . AdminPageFramework_Script_RepeatableSection::getjQueryPlugin( $this->oMsg->get( 'allowed_maximum_number_of_sections' ), $this->oMsg->get( 'allowed_minimum_number_of_sections' ) )
-            . "</script>";
-    
-    }     
-
-    /**
-     * Returns the tab JavaScript script.
-     * 
-     * @since 3.0.0
-     */
-    public function _replyToAddTabPlugin() {
-        
-        echo "<script type='text/javascript' class='admin-page-framework-tab-plugin'>"
-                . AdminPageFramework_Script_Tab::getjQueryPlugin()
-            . "</script>";
-            
     }
     
 }

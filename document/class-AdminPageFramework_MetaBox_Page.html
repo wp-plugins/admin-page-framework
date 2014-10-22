@@ -2,14 +2,13 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<meta name="generator" content="ApiGen 2.8.0">
 
 	<title>Class AdminPageFramework_MetaBox_Page | Admin Page Framework Documentation</title>
 
-	<script type="text/javascript" src="resources/combined.js?1723033208"></script>
-	<script type="text/javascript" src="elementlist.js?3059767791"></script>
+	<script type="text/javascript" src="resources/combined.js?361344329"></script>
+	<script type="text/javascript" src="elementlist.js?3454352893"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/bootstrap.min.css?2514636104">
-	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?2754522461">
+	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?2195379744">
 
 </head>
 
@@ -53,18 +52,15 @@
 			<ul>
 				<li class="active main"><a href="package-AdminPageFramework.html">AdminPageFramework<span></span></a>
 						<ul>
+				<li class="main"><a href="package-AdminPageFramework.AdminPage.html">AdminPage</a>
+						</li>
 				<li class="main"><a href="package-AdminPageFramework.Factory.html">Factory</a>
 						</li>
 				<li class="main"><a href="package-AdminPageFramework.FieldType.html">FieldType</a>
 						</li>
 				<li class="main"><a href="package-AdminPageFramework.MetaBox.html">MetaBox</a>
 						</li>
-				<li class="main"><a href="package-AdminPageFramework.NetworkAdmin.html">NetworkAdmin<span></span></a>
-						<ul>
-				<li class="main"><a href="package-AdminPageFramework.NetworkAdmin.Page.html">Page</a>
-						</li>
-							</ul></li>
-				<li class="main"><a href="package-AdminPageFramework.Page.html">Page</a>
+				<li class="main"><a href="package-AdminPageFramework.NetworkAdmin.html">NetworkAdmin</a>
 						</li>
 				<li class="active main"><a href="package-AdminPageFramework.PageMetaBox.html">PageMetaBox</a>
 						</li>
@@ -82,11 +78,22 @@
 		<div id="elements">
 			<h3>Classes</h3>
 			<ul>
-				<li class="active"><a href="class-AdminPageFramework_MetaBox_Page.html">AdminPageFramework_MetaBox_Page</a></li>
-				<li><a href="class-AdminPageFramework_MetaBox_Page_Controller.html">AdminPageFramework_MetaBox_Page_Controller</a></li>
-				<li><a href="class-AdminPageFramework_MetaBox_Page_Model.html">AdminPageFramework_MetaBox_Page_Model</a></li>
-				<li><a href="class-AdminPageFramework_MetaBox_Page_Router.html">AdminPageFramework_MetaBox_Page_Router</a></li>
-				<li><a href="class-AdminPageFramework_MetaBox_Page_View.html">AdminPageFramework_MetaBox_Page_View</a></li>
+				<li class="active">
+                    
+                    
+                    <a href="class-AdminPageFramework_MetaBox_Page.html">
+                        AdminPageFramework_MetaBox_Page
+                    </a>
+                </li>
+				<li>
+                    
+                    
+                    <a href="class-AdminPageFramework_MetaBox_Page_Controller.html">
+                        AdminPageFramework_MetaBox_Page_Controller
+                    </a>
+                </li>
+				<li>
+                    
 			</ul>
 
 
@@ -109,71 +116,6 @@
 	
 <p>Provides methods for creating meta boxes in pages added by the framework.</p>
 
-<h2>Hooks</h2>
-
-<p>The class automatically creates WordPress action and filter hooks associated
-with the class methods. The class methods corresponding to the name of the below
-actions and filters can be extended to modify the page output. Those methods are
-the callbacks of the filters and actions.</p>
-
-<h3>Methods and Action Hooks</h3>
-
-<ul>
-	<li><strong>start_{instantiated class name}</strong> – triggered at the end of
-	the class constructor. This receives the class object in the first
-	parameter.</li>
-
-	<li><strong>set_up{instantiated class name}</strong> – triggered afther the
-	setUp() method is called. This receives the class object in the first
-	parameter.</li>
-
-	<li><strong>do_{instantiated class name}</strong> – triggered when the meta
-	box gets rendered. The first parameter: the class object [3.1.3+].</li>
-</ul>
-
-<h3>Methods and Filter Hooks</h3>
-
-<ul>
-	<li><strong>field_types_{instantiated class name}</strong> – receives the
-	field type definition array. The first parameter: the field type definition
-	array.</li>
-
-	<li><strong>field_{instantiated class name}_{field ID}</strong> – receives the
-	form input field output of the given input field ID. The first parameter: output
-	string. The second parameter: the array of option.</li>
-
-	<li><strong>content_{instantiated class name}</strong> – receives the entire
-	output of the meta box. The first parameter: the output HTML string.</li>
-
-	<li><strong>style_common_{instantiated class name}</strong> – receives the
-	output of the base CSS rules applied to the pages of the associated post types
-	with the meta box.</li>
-
-	<li><strong>style_ie_common_{instantiated class name}</strong> – receives the
-	output of the base CSS rules for Internet Explorer applied to the pages of the
-	associated post types with the meta box.</li>
-
-	<li><strong>style_{instantiated class name}</strong> – receives the output of
-	the CSS rules applied to the pages of the associated post types with the meta
-	box.</li>
-
-	<li><strong>style_ie_{instantiated class name}</strong> – receives the output
-	of the CSS rules for Internet Explorer applied to the pages of the associated
-	post types with the meta box.</li>
-
-	<li><strong>script_common_{instantiated class name}</strong> – receives the
-	output of the base JavaScript scripts applied to the pages of the associated
-	post types with the meta box.</li>
-
-	<li><strong>script_{instantiated class name}</strong> – receives the output of
-	the JavaScript scripts applied to the pages of the associated post types with
-	the meta box.</li>
-
-	<li><strong>validation_{instantiated class name}</strong> – receives the form
-	submission values as array. The first parameter: submitted input array. The
-	second parameter: the original array stored in the database.</li>
-</ul>
-
 	</div>
 
 	<dl class="tree well">
@@ -184,8 +126,7 @@ AdminPageFramework_Factory_Router
 		</dd>
 		<dd style="padding-left:30px">
 			<img src="resources/inherit.png" alt="Extended by">
-			<a href="class-AdminPageFramework_Factory_Model.html"><span>AdminPageFramework_Factory_Model</span></a>
-			
+AdminPageFramework_Factory_Model
 			
 			
 		</dd>
@@ -210,39 +151,51 @@ AdminPageFramework_Factory
 		</dd>
 		<dd style="padding-left:150px">
 			<img src="resources/inherit.png" alt="Extended by">
-AdminPageFramework_MetaBox_Base
+			<a href="class-AdminPageFramework_MetaBox_Router.html"><span>AdminPageFramework_MetaBox_Router</span></a>
+			
 			
 			
 		</dd>
 		<dd style="padding-left:180px">
 			<img src="resources/inherit.png" alt="Extended by">
-			<a href="class-AdminPageFramework_MetaBox_Page_Router.html"><span>AdminPageFramework_MetaBox_Page_Router</span></a>
+			<a href="class-AdminPageFramework_MetaBox_Model.html"><span>AdminPageFramework_MetaBox_Model</span></a>
 			
 			
 			
 		</dd>
 		<dd style="padding-left:210px">
 			<img src="resources/inherit.png" alt="Extended by">
-			<a href="class-AdminPageFramework_MetaBox_Page_Model.html"><span>AdminPageFramework_MetaBox_Page_Model</span></a>
+			<a href="class-AdminPageFramework_MetaBox_View.html"><span>AdminPageFramework_MetaBox_View</span></a>
 			
 			
 			
 		</dd>
 		<dd style="padding-left:240px">
 			<img src="resources/inherit.png" alt="Extended by">
-			<a href="class-AdminPageFramework_MetaBox_Page_View.html"><span>AdminPageFramework_MetaBox_Page_View</span></a>
-			
+AdminPageFramework_MetaBox_Page_Router
 			
 			
 		</dd>
 		<dd style="padding-left:270px">
+			<img src="resources/inherit.png" alt="Extended by">
+AdminPageFramework_MetaBox_Page_Model
+			
+			
+		</dd>
+		<dd style="padding-left:300px">
+			<img src="resources/inherit.png" alt="Extended by">
+AdminPageFramework_MetaBox_Page_View
+			
+			
+		</dd>
+		<dd style="padding-left:330px">
 			<img src="resources/inherit.png" alt="Extended by">
 			<a href="class-AdminPageFramework_MetaBox_Page_Controller.html"><span>AdminPageFramework_MetaBox_Page_Controller</span></a>
 			
 			
 			
 		</dd>
-		<dd style="padding-left:300px">
+		<dd style="padding-left:360px">
 			<img src="resources/inherit.png" alt="Extended by">
 <b><span>AdminPageFramework_MetaBox_Page</span></b>			
 			
@@ -265,14 +218,6 @@ AdminPageFramework_MetaBox_Base
 
 				<b>Since:</b>
 				3.0.0<br>
-				<b>Use:</b>
-				AdminPageFramework_Utility<br>
-				<b>Use:</b>
-				AdminPageFramework_Message<br>
-				<b>Use:</b>
-				AdminPageFramework_Debug<br>
-				<b>Use:</b>
-				AdminPageFramework_Property_Page<br>
 		<b>Located at</b> factory/AdminPageFramework_MetaBox_Page/AdminPageFramework_MetaBox_Page.php<br>
 	</div>
 
@@ -293,13 +238,8 @@ AdminPageFramework_MetaBox_Base
 			<a class="anchor" href="#___construct">#</a>
 			<code>__construct( <span>string <var>$sMetaBoxID</var></span>, <span>string <var>$sTitle</var></span>, <span>array|string <var>$asPageSlugs</var> = <span class="php-keyword1">array</span>()</span>, <span>string <var>$sContext</var> = <span class="php-quote">'normal'</span></span>, <span>string <var>$sPriority</var> = <span class="php-quote">'default'</span></span>, <span>string <var>$sCapability</var> = <span class="php-quote">'manage_options'</span></span>, <span>string <var>$sTextDomain</var> = <span class="php-quote">'admin-page-framework'</span> </span> )</code>
 
-			<div class="description short" style="display:none;">
-				
-<p>Registers necessary hooks and internal properties.</p>
 
-			</div>
-
-			<div class="description detailed hidden">
+			<div class="description detailed">
 				
 <p>Registers necessary hooks and internal properties.</p>
 
@@ -390,16 +330,18 @@ belongs to the page whose slug is 'settings' ), 'manage', // if the numeric key
 with a string value is given, the condition applies to the page slug of this
 string value. ); </code></dd>
 						<dt><var>$sContext</var></dt>
-						<dd><code>string</code><br>$sContext The context, either 'normal', 'advanced', or 'side'.</dd>
+						<dd><code>string</code><br>$sContext The context, either <code>normal</code>, <code>advanced</code>, or
+<code>side</code>.</dd>
 						<dt><var>$sPriority</var></dt>
-						<dd><code>string</code><br>$sPriority The priority, either 'high', 'core', 'default' or 'low'.</dd>
+						<dd><code>string</code><br>$sPriority The priority, either <code>high</code>, <code>core</code>,
+<code>default</code> or <code>low</code>.</dd>
 						<dt><var>$sCapability</var></dt>
 						<dd><code>string</code><br>$sCapability The capability. See <a
 href="https://codex.wordpress.org/Roles_and_Capabilities" target="_blank">Roles
 and Capabilities</a>.</dd>
 						<dt><var>$sTextDomain</var></dt>
-						<dd><code>string</code><br>$sTextDomain ( optional ) The text domain applied to the displayed text
-messages. Default: admin-page-framework.</dd>
+						<dd><code>string</code><br>$sTextDomain (optional) The text domain applied to the displayed text messages.
+Default: <code>admin-page-framework</code>.</dd>
 					</dl></div>
 
 
@@ -410,7 +352,7 @@ messages. Default: admin-page-framework.</dd>
 					</div>
 
 					<h4>Overrides</h4>
-					<div class="list"><code><a href="class-AdminPageFramework_MetaBox_Page_Model.html#___construct">AdminPageFramework_MetaBox_Page_Model::__construct</a></code></div>
+					<div class="list"><code>AdminPageFramework_MetaBox_Page_Model::__construct</code></div>
 
 			</div>
 			</div></td>
@@ -424,25 +366,24 @@ messages. Default: admin-page-framework.</dd>
 			<code><a href="class-AdminPageFramework_MetaBox_Page_Controller.html#_enqueueStyle">enqueueStyle()</a></code>, 
 			<code><a href="class-AdminPageFramework_MetaBox_Page_Controller.html#_enqueueStyles">enqueueStyles()</a></code>
 		</p>
-		<h3>Methods inherited from <a href="class-AdminPageFramework_MetaBox_Page_Model.html#methods">AdminPageFramework_MetaBox_Page_Model</a></h3>
+		<h3>Methods inherited from AdminPageFramework_MetaBox_Page_Model</h3>
 		<p class="elementList">
-			<code><a href="class-AdminPageFramework_MetaBox_Page_Model.html#__replyToFilterPageOptions">_replyToFilterPageOptions()</a></code>
-		</p>
-		<h3>Methods inherited from <a href="class-AdminPageFramework_MetaBox_Page_Router.html#methods">AdminPageFramework_MetaBox_Page_Router</a></h3>
-		<p class="elementList">
-			<code><a href="class-AdminPageFramework_MetaBox_Page_Router.html#__isInstantiatable">_isInstantiatable()</a></code>
-		</p>
-		<h3>Methods inherited from AdminPageFramework_MetaBox_Base</h3>
-		<p class="elementList">
-			<code>_getInputArray()</code>, 
-			<code><span class="deprecated">_getSavedMetaArray()</span></code>, 
+			<code>_registerFormElements()</code>, 
 			<code>_replyToAddMetaBox()</code>, 
-			<code>_replyToDetermineToLoad()</code>, 
-			<code>_replyToGetSectionHeaderOutput()</code>, 
-			<code>_replyToPrintMetaBoxContents()</code>, 
-			<code>_replyToRegisterFormElements()</code>, 
-			<code>_replyToSaveMetaBoxFields()</code>, 
-			<code>_setOptionArray()</code>
+			<code>_replyToFilterPageOptions()</code>, 
+			<code>_replyToValidateOptions()</code>, 
+			<code>_setUpValidationHooks()</code>, 
+			<code>getFieldOutput()</code>
+		</p>
+		<h3>Methods inherited from AdminPageFramework_MetaBox_Page_Router</h3>
+		<p class="elementList">
+			<code>_isInThePage()</code>, 
+			<code>_isInstantiatable()</code>
+		</p>
+		<h3>Methods inherited from <a href="class-AdminPageFramework_MetaBox_Model.html#methods">AdminPageFramework_MetaBox_Model</a></h3>
+		<p class="elementList">
+			<code><a href="class-AdminPageFramework_MetaBox_Model.html#__replyToFilterSavingData">_replyToFilterSavingData()</a></code>, 
+			<code><a href="class-AdminPageFramework_MetaBox_Model.html#__replyToModifyRedirectPostLocation">_replyToModifyRedirectPostLocation()</a></code>
 		</p>
 		<h3>Methods inherited from <a href="class-AdminPageFramework_Factory_Controller.html#methods">AdminPageFramework_Factory_Controller</a></h3>
 		<p class="elementList">
@@ -451,6 +392,7 @@ messages. Default: admin-page-framework.</dd>
 			<code><a href="class-AdminPageFramework_Factory_Controller.html#_addSettingFields">addSettingFields()</a></code>, 
 			<code><a href="class-AdminPageFramework_Factory_Controller.html#_addSettingSection">addSettingSection()</a></code>, 
 			<code><a href="class-AdminPageFramework_Factory_Controller.html#_addSettingSections">addSettingSections()</a></code>, 
+			<code><a href="class-AdminPageFramework_Factory_Controller.html#_hasFieldError">hasFieldError()</a></code>, 
 			<code><a href="class-AdminPageFramework_Factory_Controller.html#_hasSettingNotice">hasSettingNotice()</a></code>, 
 			<code><a href="class-AdminPageFramework_Factory_Controller.html#_setFieldErrors">setFieldErrors()</a></code>, 
 			<code><a href="class-AdminPageFramework_Factory_Controller.html#_setSettingNotice">setSettingNotice()</a></code>, 
@@ -461,20 +403,26 @@ messages. Default: admin-page-framework.</dd>
 			<code>_replyToGetFieldOutput()</code>, 
 			<code>_replyToPrintSettingNotice()</code>
 		</p>
-		<h3>Methods inherited from <a href="class-AdminPageFramework_Factory_Model.html#methods">AdminPageFramework_Factory_Model</a></h3>
+		<h3>Methods inherited from AdminPageFramework_Factory_Model</h3>
 		<p class="elementList">
-			<code><a href="class-AdminPageFramework_Factory_Model.html#__setUp">_setUp()</a></code>
+			<code>_getFieldErrors()</code>, 
+			<code>_isValidationErrors()</code>, 
+			<code>_loadDefaultFieldTypeDefinitions()</code>, 
+			<code>_registerFields()</code>, 
+			<code>_replyToDeleteFieldErrors()</code>, 
+			<code>_replyToSaveFieldErrors()</code>, 
+			<code>_replyToSaveNotices()</code>, 
+			<code>_setUp()</code>
 		</p>
 		<h3>Methods inherited from AdminPageFramework_Factory_Router</h3>
 		<p class="elementList">
 			<code>__call()</code>, 
 			<code>__get()</code>, 
 			<code>_getFormInstance()</code>, 
-			<code>_getHeadTagInstance()</code>, 
 			<code>_getHelpPaneInstance()</code>, 
 			<code>_getLinkInstancce()</code>, 
 			<code>_getPageLoadInfoInstance()</code>, 
-			<code>_isInThePage()</code>, 
+			<code>_getResourceInstance()</code>, 
 			<code>_replyToLoadComponents()</code>
 		</p>
 
@@ -490,10 +438,9 @@ messages. Default: admin-page-framework.</dd>
 
 		<h2>Properties summary</h2>
 
-		<h3>Properties inherited from AdminPageFramework_MetaBox_Base</h3>
+		<h3>Properties inherited from AdminPageFramework_MetaBox_Page_Model</h3>
 		<p class="elementList">
-			<code><var>$_sFieldsType</var></code>, 
-			<code><var>$_sTargetSectionTabSlug</var></code>
+			<code><var>$_sFieldsType</var></code>
 		</p>
 		<h3>Properties inherited from AdminPageFramework_Factory_Router</h3>
 		<p class="elementList">
@@ -508,7 +455,7 @@ messages. Default: admin-page-framework.</dd>
 	</div>
 
 	<div id="footer">
-		Admin Page Framework Documentation API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>
+		<a href="http://en.michaeluno.jp/admin-page-framework">Admin Page Framework Documentation</a> generated by <a href="http://apigen.org">ApiGen 2.8.0</a>
 	</div>
 </div>
 </body>

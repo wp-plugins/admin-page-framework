@@ -2,14 +2,13 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<meta name="generator" content="ApiGen 2.8.0">
 
 	<title>Class AdminPageFramework_MetaBox | Admin Page Framework Documentation</title>
 
-	<script type="text/javascript" src="resources/combined.js?1723033208"></script>
-	<script type="text/javascript" src="elementlist.js?3059767791"></script>
+	<script type="text/javascript" src="resources/combined.js?361344329"></script>
+	<script type="text/javascript" src="elementlist.js?3454352893"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/bootstrap.min.css?2514636104">
-	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?2754522461">
+	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?2195379744">
 
 </head>
 
@@ -53,18 +52,15 @@
 			<ul>
 				<li class="active main"><a href="package-AdminPageFramework.html">AdminPageFramework<span></span></a>
 						<ul>
+				<li class="main"><a href="package-AdminPageFramework.AdminPage.html">AdminPage</a>
+						</li>
 				<li class="main"><a href="package-AdminPageFramework.Factory.html">Factory</a>
 						</li>
 				<li class="main"><a href="package-AdminPageFramework.FieldType.html">FieldType</a>
 						</li>
 				<li class="active main"><a href="package-AdminPageFramework.MetaBox.html">MetaBox</a>
 						</li>
-				<li class="main"><a href="package-AdminPageFramework.NetworkAdmin.html">NetworkAdmin<span></span></a>
-						<ul>
-				<li class="main"><a href="package-AdminPageFramework.NetworkAdmin.Page.html">Page</a>
-						</li>
-							</ul></li>
-				<li class="main"><a href="package-AdminPageFramework.Page.html">Page</a>
+				<li class="main"><a href="package-AdminPageFramework.NetworkAdmin.html">NetworkAdmin</a>
 						</li>
 				<li class="main"><a href="package-AdminPageFramework.PageMetaBox.html">PageMetaBox</a>
 						</li>
@@ -82,7 +78,43 @@
 		<div id="elements">
 			<h3>Classes</h3>
 			<ul>
-				<li class="active"><a href="class-AdminPageFramework_MetaBox.html">AdminPageFramework_MetaBox</a></li>
+				<li class="active">
+                    
+                    
+                    <a href="class-AdminPageFramework_MetaBox.html">
+                        AdminPageFramework_MetaBox
+                    </a>
+                </li>
+				<li>
+                    
+                    
+                    <a href="class-AdminPageFramework_MetaBox_Controller.html">
+                        AdminPageFramework_MetaBox_Controller
+                    </a>
+                </li>
+				<li>
+                    
+				<li>
+                    
+                    
+                    <a href="class-AdminPageFramework_MetaBox_Model.html">
+                        AdminPageFramework_MetaBox_Model
+                    </a>
+                </li>
+				<li>
+                    
+                    
+                    <a href="class-AdminPageFramework_MetaBox_Router.html">
+                        AdminPageFramework_MetaBox_Router
+                    </a>
+                </li>
+				<li>
+                    
+                    
+                    <a href="class-AdminPageFramework_MetaBox_View.html">
+                        AdminPageFramework_MetaBox_View
+                    </a>
+                </li>
 			</ul>
 
 
@@ -105,76 +137,6 @@
 	
 <p>Provides methods for creating meta boxes for post types.</p>
 
-<h2>Hooks</h2>
-
-<p>The class automatically creates WordPress action and filter hooks associated
-with the class methods. The class methods corresponding to the name of the below
-actions and filters can be extended to modify the page output. Those methods are
-the callbacks of the filters and actions.</p>
-
-<h3>Methods and Action Hooks</h3>
-
-<ul>
-	<li><strong>start_{instantiated class name}</strong> – triggered at the end of
-	the class constructor. This receives the class object in the first
-	parameter.</li>
-
-	<li><strong>set_up_{instantiated class name}</strong> – triggered after the
-	setUp() method is called. This receives the class object in the first
-	parameter.</li>
-
-	<li><strong>do_{instantiated class name}</strong> – triggered when the meta
-	box gets rendered. The first parameter: the calss object[3.1.3+].</li>
-</ul>
-
-<h3>Methods and Filter Hooks</h3>
-
-<ul>
-	<li><strong>field_types_{instantiated class name}</strong> – receives the
-	field type definition array. The first parameter: the field type definition
-	array.</li>
-
-	<li><strong>field_{instantiated class name}_{field ID}</strong> – receives the
-	form input field output of the given input field ID. The first parameter: output
-	string. The second parameter: the array of option.</li>
-
-	<li><strong>content_{instantiated class name}</strong> – receives the entire
-	output of the meta box. The first parameter: the output HTML string.</li>
-
-	<li><strong>style_common_{instantiated class name}</strong> – receives the
-	output of the base CSS rules applied to the pages of the associated post types
-	with the meta box.</li>
-
-	<li><strong>style_ie_common_{instantiated class name}</strong> – receives the
-	output of the base CSS rules for Internet Explorer applied to the pages of the
-	associated post types with the meta box.</li>
-
-	<li><strong>style_{instantiated class name}</strong> – receives the output of
-	the CSS rules applied to the pages of the associated post types with the meta
-	box.</li>
-
-	<li><strong>style_ie_{instantiated class name}</strong> – receives the output
-	of the CSS rules for Internet Explorer applied to the pages of the associated
-	post types with the meta box.</li>
-
-	<li><strong>script_common_{instantiated class name}</strong> – receives the
-	output of the base JavaScript scripts applied to the pages of the associated
-	post types with the meta box.</li>
-
-	<li><strong>script_{instantiated class name}</strong> – receives the output of
-	the JavaScript scripts applied to the pages of the associated post types with
-	the meta box.</li>
-
-	<li><strong>validation_{instantiated class name}</strong> – receives the form
-	submission values as array. The first parameter: submitted input array. The
-	second parameter: the original array stored in the database.</li>
-</ul>
-
-<h3>Remarks</h3>
-
-<p>The slugs must not contain a dot(.) or a hyphen(-) since it is used in the
-callback method name.</p>
-
 	</div>
 
 	<dl class="tree well">
@@ -185,8 +147,7 @@ AdminPageFramework_Factory_Router
 		</dd>
 		<dd style="padding-left:30px">
 			<img src="resources/inherit.png" alt="Extended by">
-			<a href="class-AdminPageFramework_Factory_Model.html"><span>AdminPageFramework_Factory_Model</span></a>
-			
+AdminPageFramework_Factory_Model
 			
 			
 		</dd>
@@ -211,11 +172,33 @@ AdminPageFramework_Factory
 		</dd>
 		<dd style="padding-left:150px">
 			<img src="resources/inherit.png" alt="Extended by">
-AdminPageFramework_MetaBox_Base
+			<a href="class-AdminPageFramework_MetaBox_Router.html"><span>AdminPageFramework_MetaBox_Router</span></a>
+			
 			
 			
 		</dd>
 		<dd style="padding-left:180px">
+			<img src="resources/inherit.png" alt="Extended by">
+			<a href="class-AdminPageFramework_MetaBox_Model.html"><span>AdminPageFramework_MetaBox_Model</span></a>
+			
+			
+			
+		</dd>
+		<dd style="padding-left:210px">
+			<img src="resources/inherit.png" alt="Extended by">
+			<a href="class-AdminPageFramework_MetaBox_View.html"><span>AdminPageFramework_MetaBox_View</span></a>
+			
+			
+			
+		</dd>
+		<dd style="padding-left:240px">
+			<img src="resources/inherit.png" alt="Extended by">
+			<a href="class-AdminPageFramework_MetaBox_Controller.html"><span>AdminPageFramework_MetaBox_Controller</span></a>
+			
+			
+			
+		</dd>
+		<dd style="padding-left:270px">
 			<img src="resources/inherit.png" alt="Extended by">
 <b><span>AdminPageFramework_MetaBox</span></b>			
 			
@@ -238,14 +221,6 @@ AdminPageFramework_MetaBox_Base
 
 				<b>Since:</b>
 				2.0.0<br>
-				<b>Use:</b>
-				AdminPageFramework_Utility<br>
-				<b>Use:</b>
-				AdminPageFramework_Message<br>
-				<b>Use:</b>
-				AdminPageFramework_Debug<br>
-				<b>Use:</b>
-				AdminPageFramework_Property_MetaBox<br>
 		<b>Located at</b> factory/AdminPageFramework_MetaBox/AdminPageFramework_MetaBox.php<br>
 	</div>
 
@@ -266,13 +241,8 @@ AdminPageFramework_MetaBox_Base
 			<a class="anchor" href="#___construct">#</a>
 			<code>__construct( <span>string <var>$sMetaBoxID</var></span>, <span>string <var>$sTitle</var></span>, <span>string|array <var>$asPostTypeOrScreenID</var> = <span class="php-keyword1">array</span>( <span class="php-quote">'post'</span> )</span>, <span>string <var>$sContext</var> = <span class="php-quote">'normal'</span></span>, <span>string <var>$sPriority</var> = <span class="php-quote">'default'</span></span>, <span>string <var>$sCapability</var> = <span class="php-quote">'edit_posts'</span></span>, <span>string <var>$sTextDomain</var> = <span class="php-quote">'admin-page-framework'</span> </span> )</code>
 
-			<div class="description short" style="display:none;">
-				
-<p>Constructs the class object instance of AdminPageFramework_MetaBox.</p>
 
-			</div>
-
-			<div class="description detailed hidden">
+			<div class="description detailed">
 				
 <p>Constructs the class object instance of AdminPageFramework_MetaBox.</p>
 
@@ -308,24 +278,26 @@ class="php-comment">// priority</span>
 					<h4>Parameters</h4>
 					<div class="list"><dl>
 						<dt><var>$sMetaBoxID</var></dt>
-						<dd><code>string</code><br>The meta box ID.</dd>
+						<dd><code>string</code><br>$sMetaBoxID The meta box ID. [3.3.0+] If an empty value is passed, the ID will
+be automatically generated and the lower-cased class name will be used.</dd>
 						<dt><var>$sTitle</var></dt>
-						<dd><code>string</code><br>The meta box title.</dd>
+						<dd><code>string</code><br>$sTitle The meta box title.</dd>
 						<dt><var>$asPostTypeOrScreenID</var></dt>
-						<dd><code>string|array</code><br>( optional ) The post type(s) or screen ID that the meta box is associated with.</dd>
+						<dd><code>string|array</code><br>$asPostTypeOrScreenID (optional) The post type(s) or screen ID that the meta box
+is associated with.</dd>
 						<dt><var>$sContext</var></dt>
-						<dd><code>string</code><br>( optional ) The part of the page where the edit screen section should be shown
-('normal', 'advanced', or 'side') Default: normal.</dd>
+						<dd><code>string</code><br>$sContext (optional) The part of the page where the edit screen section should
+be shown ('normal', 'advanced', or 'side') Default: <code>normal</code>.</dd>
 						<dt><var>$sPriority</var></dt>
-						<dd><code>string</code><br>( optional ) The priority within the context where the boxes should show
-('high', 'core', 'default' or 'low') Default: default.</dd>
+						<dd><code>string</code><br>$sPriority (optional) The priority within the context where the boxes should
+show ('high', 'core', 'default' or 'low') Default: <code>default</code>.</dd>
 						<dt><var>$sCapability</var></dt>
-						<dd><code>string</code><br>( optional ) The <a
+						<dd><code>string</code><br>$sPriority (optional) The <a
 href="http://codex.wordpress.org/Roles_and_Capabilities">access level</a> to the
-meta box. Default: edit_posts.</dd>
+meta box. Default: <code>edit_posts</code>.</dd>
 						<dt><var>$sTextDomain</var></dt>
-						<dd><code>string</code><br>( optional ) The text domain applied to the displayed text messages. Default:
-admin-page-framework.</dd>
+						<dd><code>string</code><br>$sTextDomain (optional) The text domain applied to the displayed text messages.
+Default: <code>admin-page-framework</code>.</dd>
 					</dl></div>
 
 
@@ -341,376 +313,26 @@ href="http://codex.wordpress.org/Function_Reference/add_meta_box#Parameters">htt
 					</div>
 
 					<h4>Overrides</h4>
-					<div class="list"><code>AdminPageFramework_MetaBox_Base::__construct</code></div>
-
-			</div>
-			</div></td>
-		</tr>
-		<tr data-order="setUp" id="_setUp">
-
-			<td class="attributes"><code>
-				 public 
-				
-				
-				</code>
-			</td>
-
-			<td class="name"><div>
-			<a class="anchor" href="#_setUp">#</a>
-			<code>setUp( )</code>
-
-			<div class="description short" style="display:none;">
-				
-<p>The method for all necessary set-ups.</p>
-
-			</div>
-
-			<div class="description detailed hidden">
-				
-<p>The method for all necessary set-ups.</p>
-
-<h4>Example</h4>
-
-<pre> <span class="php-keyword1">public</span> <span
-class="php-keyword1">function</span> setUp() {
-    <span
-class="php-var">$this</span>-&gt;addSettingFields(
-        <span
-class="php-keyword1">array</span>(
-            <span
-class="php-quote">'field_id'</span> =&gt; <span
-class="php-quote">'sample_metabox_text_field'</span>,
-            <span
-class="php-quote">'title'</span> =&gt; <span
-class="php-quote">'Text Input'</span>,
-            <span
-class="php-quote">'description'</span> =&gt; <span
-class="php-quote">'The description for the field.'</span>,
-            <span
-class="php-quote">'type'</span> =&gt; <span
-class="php-quote">'text'</span>,
-        ),
-        <span
-class="php-keyword1">array</span>(
-            <span
-class="php-quote">'field_id'</span> =&gt; <span
-class="php-quote">'sample_metabox_textarea_field'</span>,
-            <span
-class="php-quote">'title'</span> =&gt; <span
-class="php-quote">'Textarea'</span>,
-            <span
-class="php-quote">'description'</span> =&gt; <span
-class="php-quote">'The description for the field.'</span>,
-            <span
-class="php-quote">'type'</span> =&gt; <span
-class="php-quote">'textarea'</span>,
-            <span
-class="php-quote">'default'</span> =&gt; <span
-class="php-quote">'This is a default text value.'</span>,
-        )
-    );
-}</pre>
-
-
-
-
-
-
-					<h4>Since</h4>
-					<div class="list">
-							2.0.0<br>
-					</div>
-					<h4>Remark</h4>
-					<div class="list">
-							The user should override this method.<br>
-					</div>
-
-					<h4>Overrides</h4>
-					<div class="list"><code><a href="class-AdminPageFramework_Factory_Controller.html#_setUp">AdminPageFramework_Factory_Controller::setUp</a></code></div>
-
-			</div>
-			</div></td>
-		</tr>
-		<tr data-order="enqueueStyles" id="_enqueueStyles">
-
-			<td class="attributes"><code>
-				 public 
-				
-				
-				</code>
-			</td>
-
-			<td class="name"><div>
-			<a class="anchor" href="#_enqueueStyles">#</a>
-			<code>enqueueStyles( <span>mixed <var>$aSRCs</var></span>, <span>mixed <var>$aPostTypes</var> = <span class="php-keyword1">array</span>()</span>, <span>mixed <var>$aCustomArgs</var> = <span class="php-keyword1">array</span>() </span> )</code>
-
-			<div class="description short" style="display:none;">
-				
-<p>Enqueues styles by page slug and tab slug.</p>
-
-			</div>
-
-			<div class="description detailed hidden">
-				
-<p>Enqueues styles by page slug and tab slug.</p>
-
-
-
-
-
-
-					<h4>Since</h4>
-					<div class="list">
-							3.0.0<br>
-					</div>
-
-					<h4>Overrides</h4>
-					<div class="list"><code><a href="class-AdminPageFramework_Factory_Controller.html#_enqueueStyles">AdminPageFramework_Factory_Controller::enqueueStyles</a></code></div>
-
-			</div>
-			</div></td>
-		</tr>
-		<tr data-order="enqueueStyle" id="_enqueueStyle">
-
-			<td class="attributes"><code>
-				 public 
-				string
-				
-				</code>
-			</td>
-
-			<td class="name"><div>
-			<a class="anchor" href="#_enqueueStyle">#</a>
-			<code>enqueueStyle( <span>string <var>$sSRC</var></span>, <span>array <var>$aPostTypes</var> = <span class="php-keyword1">array</span>()</span>, <span>array <var>$aCustomArgs</var> = <span class="php-keyword1">array</span>() </span> )</code>
-
-			<div class="description short" style="display:none;">
-				
-<p>Enqueues a style by page slug and tab slug.</p>
-
-			</div>
-
-			<div class="description detailed hidden">
-				
-<p>Enqueues a style by page slug and tab slug.</p>
-
-
-
-					<h4>Parameters</h4>
-					<div class="list"><dl>
-						<dt><var>$sSRC</var></dt>
-						<dd><code>string</code><br>The source of the stylesheet to enqueue: the URL, the absolute file path, or the
-relative path to the root directory of WordPress. Example: '/css/mystyle.css'.
-<h4>Custom Argument Array</h4>
-
-<ul>
-	<li><strong>handle_id</strong> - ( optional, string ) The handle ID of the
-	stylesheet.</li>
-
-	<li><strong>dependencies</strong> - ( optional, array ) The dependency array.
-	For more information, see <a
-	href="http://codex.wordpress.org/Function_Reference/wp_enqueue_style">codex</a>.</li>
-
-	<li><strong>version</strong> - ( optional, string ) The stylesheet version
-	number.</li>
-
-	<li><strong>media</strong> - ( optional, string ) the description of the field
-	which is inserted into after the input field tag.</li>
-</ul>
-</dd>
-						<dt><var>$aPostTypes</var></dt>
-						<dd><code>array</code><br>(optional) The post type slugs that the stylesheet should be added to. If not
-set, it applies to all the pages of the post types.</dd>
-						<dt><var>$aCustomArgs</var></dt>
-						<dd><code>array</code><br>(optional) The argument array for more advanced parameters.</dd>
-					</dl></div>
-
-					<h4>Returns</h4>
-					<div class="list">
-						<code>string</code><br>The script handle ID. If the passed url is not a valid url string, an empty
-string will be returned.<br>
-					</div>
-
-
-					<h4>Since</h4>
-					<div class="list">
-							3.0.0<br>
-					</div>
-					<h4>See</h4>
-					<div class="list">
-							<a
-href="http://codex.wordpress.org/Function_Reference/wp_enqueue_style">http://codex.wordpress.org/Function_Reference/wp_enqueue_style</a><br>
-					</div>
-
-					<h4>Overrides</h4>
-					<div class="list"><code><a href="class-AdminPageFramework_Factory_Controller.html#_enqueueStyle">AdminPageFramework_Factory_Controller::enqueueStyle</a></code></div>
-
-			</div>
-			</div></td>
-		</tr>
-		<tr data-order="enqueueScripts" id="_enqueueScripts">
-
-			<td class="attributes"><code>
-				 public 
-				
-				
-				</code>
-			</td>
-
-			<td class="name"><div>
-			<a class="anchor" href="#_enqueueScripts">#</a>
-			<code>enqueueScripts( <span>mixed <var>$aSRCs</var></span>, <span>mixed <var>$aPostTypes</var> = <span class="php-keyword1">array</span>()</span>, <span>mixed <var>$aCustomArgs</var> = <span class="php-keyword1">array</span>() </span> )</code>
-
-			<div class="description short" style="display:none;">
-				
-<p>Enqueues scripts by page slug and tab slug.</p>
-
-			</div>
-
-			<div class="description detailed hidden">
-				
-<p>Enqueues scripts by page slug and tab slug.</p>
-
-
-
-
-
-
-					<h4>Since</h4>
-					<div class="list">
-							3.0.0<br>
-					</div>
-
-					<h4>Overrides</h4>
-					<div class="list"><code><a href="class-AdminPageFramework_Factory_Controller.html#_enqueueScripts">AdminPageFramework_Factory_Controller::enqueueScripts</a></code></div>
-
-			</div>
-			</div></td>
-		</tr>
-		<tr data-order="enqueueScript" id="_enqueueScript">
-
-			<td class="attributes"><code>
-				 public 
-				string
-				
-				</code>
-			</td>
-
-			<td class="name"><div>
-			<a class="anchor" href="#_enqueueScript">#</a>
-			<code>enqueueScript( <span>string <var>$sSRC</var></span>, <span>string <var>$aPostTypes</var> = <span class="php-keyword1">array</span>()</span>, <span>string <var>$aCustomArgs</var> = <span class="php-keyword1">array</span>() </span> )</code>
-
-			<div class="description short" style="display:none;">
-				
-<p>Enqueues a script by page slug and tab slug.</p>
-
-			</div>
-
-			<div class="description detailed hidden">
-				
-<p>Enqueues a script by page slug and tab slug.</p>
-
-<h4>Example</h4>
-
-<pre><span class="php-var">$this</span>-&gt;enqueueScript(
-plugins_url( <span
-class="php-quote">'asset/js/test.js'</span> , __FILE__ ), <span
-class="php-comment">// source url or path</span>
-<span
-class="php-keyword1">array</span>( <span
-class="php-quote">'my_post_type_slug'</span> ),
-<span
-class="php-keyword1">array</span>(
-<span
-class="php-quote">'handle_id'</span> =&gt; <span
-class="php-quote">'my_script'</span>, <span
-class="php-comment">// this handle ID also is used as the object name for the translation array below.</span>
-<span
-class="php-quote">'translation'</span> =&gt; <span
-class="php-keyword1">array</span>(
-<span
-class="php-quote">'a'</span> =&gt; <span
-class="php-quote">'hello world!'</span>,
-<span
-class="php-quote">'style_handle_id'</span> =&gt; <span
-class="php-var">$sStyleHandle</span>, <span
-class="php-comment">// check the enqueued style handle ID here.</span>
-),
-)
-);</pre>
-
-
-
-					<h4>Parameters</h4>
-					<div class="list"><dl>
-						<dt><var>$sSRC</var></dt>
-						<dd><code>string</code><br>The source of the stylesheet to enqueue: the URL, the absolute file path, or the
-relative path to the root directory of WordPress. Example: '/js/myscript.js'.
-<h4>Custom Argument Array</h4>
-
-<ul>
-	<li><strong>handle_id</strong> - ( optional, string ) The handle ID of the
-	script.</li>
-
-	<li><strong>dependencies</strong> - ( optional, array ) The dependency array.
-	For more information, see <a
-	href="http://codex.wordpress.org/Function_Reference/wp_enqueue_script">codex</a>.</li>
-
-	<li><strong>version/strong&gt; - ( optional, string ) The stylesheet version
-	number.</strong></li>
-
-	<li><strong>translation</strong> - ( optional, array ) The translation array.
-	The handle ID will be used for the object name.</li>
-
-	<li><strong>in_footer</strong> - ( optional, boolean ) Whether to enqueue the
-	script before &lt;/head &gt; or before &lt;/body&gt; Default:
-	<em>false</em>.</li>
-</ul>
-</dd>
-						<dt><var>$aPostTypes</var></dt>
-						<dd><code>string</code><br>(optional) The page slug that the script should be added to. If not set, it
-applies to all the pages created by the framework.</dd>
-						<dt><var>$aCustomArgs</var></dt>
-						<dd><code>string</code><br>(optional) The tab slug that the script should be added to. If not set, it
-applies to all the in-page tabs in the page.</dd>
-					</dl></div>
-
-					<h4>Returns</h4>
-					<div class="list">
-						<code>string</code><br>The script handle ID. If the passed url is not a valid url string, an empty
-string will be returned.<br>
-					</div>
-
-
-					<h4>Since</h4>
-					<div class="list">
-							2.1.2<br>
-					</div>
-					<h4>See</h4>
-					<div class="list">
-							<a
-href="http://codex.wordpress.org/Function_Reference/wp_enqueue_script">http://codex.wordpress.org/Function_Reference/wp_enqueue_script</a><br>
-					</div>
-
-					<h4>Overrides</h4>
-					<div class="list"><code><a href="class-AdminPageFramework_Factory_Controller.html#_enqueueScript">AdminPageFramework_Factory_Controller::enqueueScript</a></code></div>
+					<div class="list"><code><a href="class-AdminPageFramework_MetaBox_Router.html#___construct">AdminPageFramework_MetaBox_Router::__construct</a></code></div>
 
 			</div>
 			</div></td>
 		</tr>
 		</table>
 
-		<h3>Methods inherited from AdminPageFramework_MetaBox_Base</h3>
+		<h3>Methods inherited from <a href="class-AdminPageFramework_MetaBox_Controller.html#methods">AdminPageFramework_MetaBox_Controller</a></h3>
 		<p class="elementList">
-			<code>_getInputArray()</code>, 
-			<code><span class="deprecated">_getSavedMetaArray()</span></code>, 
-			<code>_isInstantiatable()</code>, 
-			<code>_replyToAddMetaBox()</code>, 
-			<code>_replyToDetermineToLoad()</code>, 
-			<code>_replyToGetSectionHeaderOutput()</code>, 
-			<code>_replyToPrintMetaBoxContents()</code>, 
-			<code>_replyToRegisterFormElements()</code>, 
-			<code>_replyToSaveMetaBoxFields()</code>, 
-			<code>_setOptionArray()</code>
+			<code><a href="class-AdminPageFramework_MetaBox_Controller.html#_enqueueScript">enqueueScript()</a></code>, 
+			<code><a href="class-AdminPageFramework_MetaBox_Controller.html#_enqueueScripts">enqueueScripts()</a></code>, 
+			<code><a href="class-AdminPageFramework_MetaBox_Controller.html#_enqueueStyle">enqueueStyle()</a></code>, 
+			<code><a href="class-AdminPageFramework_MetaBox_Controller.html#_enqueueStyles">enqueueStyles()</a></code>, 
+			<code><a href="class-AdminPageFramework_MetaBox_Controller.html#_setUp">setUp()</a></code>
+		</p>
+		<h3>Methods inherited from <a href="class-AdminPageFramework_MetaBox_Model.html#methods">AdminPageFramework_MetaBox_Model</a></h3>
+		<p class="elementList">
+			<code><a href="class-AdminPageFramework_MetaBox_Model.html#__replyToFilterSavingData">_replyToFilterSavingData()</a></code>, 
+			<code><a href="class-AdminPageFramework_MetaBox_Model.html#__replyToModifyRedirectPostLocation">_replyToModifyRedirectPostLocation()</a></code>, 
+			<code><a href="class-AdminPageFramework_MetaBox_Model.html#__setUpValidationHooks">_setUpValidationHooks()</a></code>
 		</p>
 		<h3>Methods inherited from <a href="class-AdminPageFramework_Factory_Controller.html#methods">AdminPageFramework_Factory_Controller</a></h3>
 		<p class="elementList">
@@ -719,6 +341,7 @@ href="http://codex.wordpress.org/Function_Reference/wp_enqueue_script">http://co
 			<code><a href="class-AdminPageFramework_Factory_Controller.html#_addSettingFields">addSettingFields()</a></code>, 
 			<code><a href="class-AdminPageFramework_Factory_Controller.html#_addSettingSection">addSettingSection()</a></code>, 
 			<code><a href="class-AdminPageFramework_Factory_Controller.html#_addSettingSections">addSettingSections()</a></code>, 
+			<code><a href="class-AdminPageFramework_Factory_Controller.html#_hasFieldError">hasFieldError()</a></code>, 
 			<code><a href="class-AdminPageFramework_Factory_Controller.html#_hasSettingNotice">hasSettingNotice()</a></code>, 
 			<code><a href="class-AdminPageFramework_Factory_Controller.html#_setFieldErrors">setFieldErrors()</a></code>, 
 			<code><a href="class-AdminPageFramework_Factory_Controller.html#_setSettingNotice">setSettingNotice()</a></code>
@@ -728,20 +351,28 @@ href="http://codex.wordpress.org/Function_Reference/wp_enqueue_script">http://co
 			<code>_replyToGetFieldOutput()</code>, 
 			<code>_replyToPrintSettingNotice()</code>
 		</p>
-		<h3>Methods inherited from <a href="class-AdminPageFramework_Factory_Model.html#methods">AdminPageFramework_Factory_Model</a></h3>
+		<h3>Methods inherited from AdminPageFramework_Factory_Model</h3>
 		<p class="elementList">
-			<code><a href="class-AdminPageFramework_Factory_Model.html#__setUp">_setUp()</a></code>
+			<code>_getFieldErrors()</code>, 
+			<code>_isValidationErrors()</code>, 
+			<code>_loadDefaultFieldTypeDefinitions()</code>, 
+			<code>_registerFields()</code>, 
+			<code>_replyToDeleteFieldErrors()</code>, 
+			<code>_replyToSaveFieldErrors()</code>, 
+			<code>_replyToSaveNotices()</code>, 
+			<code>_setUp()</code>
 		</p>
 		<h3>Methods inherited from AdminPageFramework_Factory_Router</h3>
 		<p class="elementList">
 			<code>__call()</code>, 
 			<code>__get()</code>, 
 			<code>_getFormInstance()</code>, 
-			<code>_getHeadTagInstance()</code>, 
 			<code>_getHelpPaneInstance()</code>, 
 			<code>_getLinkInstancce()</code>, 
 			<code>_getPageLoadInfoInstance()</code>, 
+			<code>_getResourceInstance()</code>, 
 			<code>_isInThePage()</code>, 
+			<code>_isInstantiatable()</code>, 
 			<code>_replyToLoadComponents()</code>
 		</p>
 
@@ -757,11 +388,6 @@ href="http://codex.wordpress.org/Function_Reference/wp_enqueue_script">http://co
 
 		<h2>Properties summary</h2>
 
-		<h3>Properties inherited from AdminPageFramework_MetaBox_Base</h3>
-		<p class="elementList">
-			<code><var>$_sFieldsType</var></code>, 
-			<code><var>$_sTargetSectionTabSlug</var></code>
-		</p>
 		<h3>Properties inherited from AdminPageFramework_Factory_Router</h3>
 		<p class="elementList">
 			<code><var>$oProp</var></code>
@@ -775,7 +401,7 @@ href="http://codex.wordpress.org/Function_Reference/wp_enqueue_script">http://co
 	</div>
 
 	<div id="footer">
-		Admin Page Framework Documentation API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>
+		<a href="http://en.michaeluno.jp/admin-page-framework">Admin Page Framework Documentation</a> generated by <a href="http://apigen.org">ApiGen 2.8.0</a>
 	</div>
 </div>
 </body>

@@ -12,10 +12,11 @@ if ( ! class_exists( 'AdminPageFramework_Utility_Array' ) ) :
  *
  * @since       2.0.0
  * @package     AdminPageFramework
+ * @extends     AdminPageFramework_Utility_String
  * @subpackage  Utility
  * @internal
  */
-abstract class AdminPageFramework_Utility_Array {
+abstract class AdminPageFramework_Utility_Array extends AdminPageFramework_Utility_String {
     
     /**
      * Retrieves a corresponding array value from the given array.
@@ -23,11 +24,11 @@ abstract class AdminPageFramework_Utility_Array {
      * When there are multiple arrays and they have similar index structures but it's not certain if one has the key and the others,
      * use this method to retrieve the corresponding key value. 
      * 
-     * @remark This is mainly used by the field array to insert user-defined key values.
-     * @return string|array If the key does not exist in the passed array, it will return the default. If the subject value is not an array, it will return the subject value itself.
-     * @since 2.0.0
-     * @since 2.1.3 Added the $bBlankToDefault parameter that sets the default value if the subject value is empty.
-     * @since 2.1.5 Changed the scope to public static from protected as converting all the utility methods to all public static.
+     * @remark      This is mainly used by the field array to insert user-defined key values.
+     * @return      string|array    If the key does not exist in the passed array, it will return the default. If the subject value is not an array, it will return the subject value itself.
+     * @since       2.0.0
+     * @since       2.1.3           Added the $bBlankToDefault parameter that sets the default value if the subject value is empty.
+     * @since       2.1.5           Changed the scope to public static from protected as converting all the utility methods to all public static.
      */
     public static function getCorrespondingArrayValue( $vSubject, $sKey, $sDefault='', $bBlankToDefault=false ) {    
                 
@@ -103,7 +104,7 @@ abstract class AdminPageFramework_Utility_Array {
     /**
      * Merges multiple multi-dimensional arrays recursively.
      * 
-     * The advantage of using this method over the array unite operator or array_merge() is that it merges recursively and the null values of the preceding array will be overridden.
+     * The advantage of using this method over the array unite operator or `array_merge() is that it merges recursively and the null values of the preceding array will be overridden.
      * 
      * @since       2.1.2
      * @static
@@ -126,7 +127,7 @@ abstract class AdminPageFramework_Utility_Array {
      * Merges two multi-dimensional arrays recursively.
      * 
      * The first parameter array takes its precedence. This is useful to merge default option values. 
-     * An alternative to <em>array_replace_recursive()</em>; it is not supported PHP 5.2.x or below.
+     * An alternative to `array_replace_recursive()` which is not available PHP 5.2.x or below.
      * 
      * @since       2.0.0
      * @since       2.1.5       Changed the scope to static. 
@@ -291,24 +292,24 @@ abstract class AdminPageFramework_Utility_Array {
     }
     
     /**
-     * Retrieves an array element by given array representing the dimensional key structure.
+     * Retrieves an array element by the given array representing the dimensional key structure.
      * 
      * e.g. The following code will yield eee.
      * <code>
      * $a = array(
-        'a' => array(
-            'b' => array(
-                'c' => array(
-                    'd' => array(
-                        'e' => 'eee',
-                    ),
-                ),
-            ),
-        ),
-        );
-        $aKeys = array( 'a', 'b', 'c', 'd', 'e' );
-        $v = getArrayValueByArrayKeys( $a, $aKeys, 'default value' );
-        var_dump( $v );
+     *  'a' => array(
+     *      'b' => array(
+     *          'c' => array(
+     *              'd' => array(
+     *                  'e' => 'eee',
+     *              ),
+     *          ),
+     *      ),
+     *  ),
+     *  );
+     *  $aKeys = array( 'a', 'b', 'c', 'd', 'e' );
+     *  $v = getArrayValueByArrayKeys( $a, $aKeys, 'default value' );
+     *  var_dump( $v );
      * </code>
      * 
      * 
@@ -346,5 +347,105 @@ abstract class AdminPageFramework_Utility_Array {
         return ( array ) $asValue; // finally
         
     }
+    
+    /**
+     * Returns the readable list of the given array contents.
+     * 
+     * @remark      If the second dimension element is an array it will be enclosed in parenthesis.
+     * @since       3.3.0
+     */
+    static public function getReadableListOfArray( array $aArray ) {
+        
+        $_aOutput   = array();
+        foreach( $aArray as $_sKey => $_vValue ) {        
+            $_aOutput[] = self::getReadableArrayContents( $_sKey, $_vValue, 32 ) . PHP_EOL;
+        }
+        return implode( PHP_EOL, $_aOutput );
+        
+    }
+    /**
+     * Returns the readable array contents.
+     * 
+     * @since   3.3.0
+     */
+    static public function getReadableArrayContents( $sKey, $vValue, $sLabelCharLengths=16, $iOffset=0 ) {
+        
+        $_aOutput   = array();
+        $_aOutput[] = ( $iOffset ? str_pad( ' ', $iOffset  ) : '' ) 
+            . ( $sKey ? '[' . $sKey . ']' : '' );
+        
+        if ( ! is_array( $vValue ) && ! is_object( $vValue ) ) {
+            $_aOutput[] = $vValue;
+            return implode( PHP_EOL, $_aOutput );    
+        }
+        
+        foreach ( $vValue as $_sTitle => $_asDescription ) {
+            if ( ! is_array( $_asDescription ) && ! is_object( $_asDescription ) ) {
+                $_aOutput[] = str_pad( ' ', $iOffset )
+                    . $_sTitle 
+                    . str_pad( ':', $sLabelCharLengths - self::getStringLength( $_sTitle ) )
+                    . $_asDescription;
+                continue;
+            }
+            $_aOutput[] = str_pad( ' ', $iOffset )
+                . $_sTitle 
+                . ": {" 
+                . self::getReadableArrayContents( '', $_asDescription, 16, $iOffset + 4 )
+                . PHP_EOL
+                . str_pad( ' ', $iOffset ) . "}";
+        }
+        return implode( PHP_EOL, $_aOutput );    
+        
+    }        
+    /**
+     * Returns the readable list of the given array contents as HTML.
+     * 
+     * @since       3.3.0
+     */
+    static public function getReadableListOfArrayAsHTML( array $aArray ) {
+
+        $_aOutput   = array();
+        foreach( $aArray as $_sKey => $_vValue ) {        
+            $_aOutput[] = "<ul class='array-contents'>" 
+                    .  self::getReadableArrayContentsHTML( $_sKey, $_vValue )
+                . "</ul>". PHP_EOL;
+        }
+        return implode( PHP_EOL, $_aOutput );    
+        
+    } 
+    /**
+     * Returns the readable array contents.
+     * 
+     * @since   3.3.0
+     */    
+    static public function getReadableArrayContentsHTML( $sKey, $vValue ) {
+        
+        // Output container.
+        $_aOutput   = array();
+        
+        // Title - array key
+        $_aOutput[] = $sKey 
+            ? "<h3 class='array-key'>" . $sKey . "</h3>"
+            : "";
+            
+        // If it does not have a nested array or object, 
+        if ( ! is_array( $vValue ) && ! is_object( $vValue ) ) {
+            $_aOutput[] = "<div class='array-value'>" 
+                    . html_entity_decode( nl2br( str_replace( ' ', '&nbsp;', $vValue ) ), ENT_QUOTES )
+                . "</div>";
+            return "<li>" . implode( PHP_EOL, $_aOutput ) . "</li>";    
+        }
+        
+        // Now it is a nested item.
+        foreach ( $vValue as $_sKey => $_vValue ) {   
+            $_aOutput[] =  "<ul class='array-contents'>" 
+                    . self::getReadableArrayContentsHTML( $_sKey, $_vValue ) 
+                . "</ul>";
+        }
+        return implode( PHP_EOL, $_aOutput ) ;
+        
+    }
+    
+    
 }
 endif;

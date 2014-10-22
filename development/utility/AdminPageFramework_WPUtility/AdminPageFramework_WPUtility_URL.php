@@ -10,10 +10,10 @@ if ( ! class_exists( 'AdminPageFramework_WPUtility_URL' ) ) :
 /**
  * Provides utility methods handing urls which use WordPress functions and classes.
  *
- * @since 2.0.0
- * @extends AdminPageFramework_Utility
- * @package AdminPageFramework
- * @subpackage Utility
+ * @since       2.0.0
+ * @extends     AdminPageFramework_Utility
+ * @package     AdminPageFramework
+ * @subpackage  Utility
  * @internal
  */
 class AdminPageFramework_WPUtility_URL extends AdminPageFramework_Utility {
@@ -25,14 +25,14 @@ class AdminPageFramework_WPUtility_URL extends AdminPageFramework_Utility {
      */
     static public function getCurrentAdminURL() {
         
-        $sRequestURI = $GLOBALS['is_IIS'] ? $_SERVER['PATH_INFO'] : $_SERVER["REQUEST_URI"];
-        $sPageURL = ( @$_SERVER["HTTPS"] == "on" ) ? "https://" : "http://";
+        $sRequestURI    = $GLOBALS['is_IIS'] ? $_SERVER['PATH_INFO'] : $_SERVER["REQUEST_URI"];
+        $sPageURL       = 'on' == @$_SERVER["HTTPS"] ? "https://" : "http://";
         
-        if ( $_SERVER["SERVER_PORT"] != "80" ) 
+        if ( "80" != $_SERVER["SERVER_PORT"] ) {
             $sPageURL .= $_SERVER["SERVER_NAME"] . ":" . $_SERVER["SERVER_PORT"] . $sRequestURI;
-        else 
+        } else {
             $sPageURL .= $_SERVER["SERVER_NAME"] . $sRequestURI;
-        
+        }
         return $sPageURL;
         
     }
@@ -84,29 +84,29 @@ class AdminPageFramework_WPUtility_URL extends AdminPageFramework_Utility {
     /**
      * Calculates the URL from the given path.
      * 
-     * @since 2.1.5
+     * @since   2.1.5
      * @static
-     * @access public
-     * @return string The source url
+     * @access  public
+     * @return  string The source url
      */
     static public function getSRCFromPath( $sFilePath ) {
                         
-        $oWPStyles = new WP_Styles(); // It doesn't matter whether the file is a style or not. Just use the built-in WordPress class to calculate the SRC URL.
-        $sRelativePath = AdminPageFramework_Utility::getRelativePath( ABSPATH, $sFilePath );     
-        $sRelativePath = preg_replace( "/^\.[\/\\\]/", '', $sRelativePath, 1 ); // removes the heading ./ or .\ 
-        $sHref = trailingslashit( $oWPStyles->base_url ) . $sRelativePath;
+        $oWPStyles      = new WP_Styles(); // It doesn't matter whether the file is a style or not. Just use the built-in WordPress class to calculate the SRC URL.
+        $sRelativePath  = AdminPageFramework_Utility::getRelativePath( ABSPATH, $sFilePath );     
+        $sRelativePath  = preg_replace( "/^\.[\/\\\]/", '', $sRelativePath, 1 ); // removes the heading ./ or .\ 
+        $sHref          = trailingslashit( $oWPStyles->base_url ) . $sRelativePath;
         unset( $oWPStyles ); // for PHP 5.2.x or below
         return esc_url( $sHref );     
         
     }    
 
     /**
-     * Resolves the given src.
+     * Resolves the given src and returns the url.
      * 
      * Checks if the given string is a url, a relative path, or an absolute path and returns the url if it's not a relative path.
      * 
      * @since       2.1.5
-     * @since       2.1.6       Moved from the AdminPageFramework_HeadTag_Base class. Added the $bReturnNullIfNotExist parameter.
+     * @since       2.1.6       Moved from the AdminPageFramework_Resource_Base class. Added the $bReturnNullIfNotExist parameter.
      */
     static public function resolveSRC( $sSRC, $bReturnNullIfNotExist=false ) {    
 
@@ -116,12 +116,12 @@ class AdminPageFramework_WPUtility_URL extends AdminPageFramework_Utility {
             
         // It is a url
         if ( filter_var( $sSRC, FILTER_VALIDATE_URL ) ) {
-            return $sSRC;
+            return esc_url( $sSRC );
         }
 
         // If the file exists, it means it is an absolute path. If so, calculate the URL from the path.
         if ( file_exists( realpath( $sSRC ) ) ) {
-            return self::getSRCFromPath( $sSRC );
+            return self::getSRCFromPath( $sSRC );   // url escaping is done in the method
         }
         
         if ( $bReturnNullIfNotExist ) {

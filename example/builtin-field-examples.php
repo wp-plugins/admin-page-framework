@@ -8,7 +8,10 @@ $this->addSettingFields(
         'field_id'          => 'text',
         // 'section_id'     => 'text_fields', // can be omitted as it is set previously
         'title'             => __( 'Text', 'admin-page-framework-demo' ),
-        'description'       => __( 'Type something here. This text is inserted with the <code>description</code> argument in the field definition array.', 'admin-page-framework-demo' ),
+        'description'       => array(
+            __( 'Type something here. This text is inserted with the <code>description</code> argument in the field definition array.', 'admin-page-framework-demo' ),
+            __( 'The argument accepts as an array and each element will be treated as one paragraph.', 'admin-page-framework-demo' ),
+        ),
         'help'              => __( 'This is a text field and typed text will be saved.', 'admin-page-framework-demo' )
             . ' ' . __( 'This text is inserted with the <code>help</code> argument in the field definition array.', 'admin-page-framework-demo' ),
         'type'              => 'text',
@@ -35,8 +38,8 @@ $this->addSettingFields(
         'type'              => 'text',
         'attributes'        => array(
             'size'          => 20,
-            'readonly'      => 'ReadOnly',
-            // 'disabled' => 'Disabled', // disabled can be specified like so
+            'readonly'      => 'readonly',
+            // 'disabled' => 'disabled', // disabled can be specified like so
         ),
         'value'             => __( 'This is a read-only value.', 'admin-page-framework-demo' ),
         'description'       => __( 'The attribute can be set with the <code>attributes</code> argument.', 'admin-page-framework-demo' ),
@@ -45,7 +48,7 @@ $this->addSettingFields(
         'field_id'          => 'number',
         'title'             => __( 'Number', 'admin-page-framework-demo' ),
         'type'              => 'number',
-    ),     
+    ),         
     array( // Multiple text fields
         'field_id'          => 'text_multiple',
         'title'             => __( 'Multiple', 'admin-page-framework-demo' ),
@@ -84,8 +87,10 @@ $this->addSettingFields(
             'max' => 10,
             'min' => 3,
         ),
-        'description'       => __( 'Press + / - to add / remove the fields. To enable the repeatable fields functionality, set the <code>repeatable</code> argument to <code>true</code>.', 'admin-page-framework-demo' )
-            . __( 'To set maximum and minimum numbers of fields, set the <code>max</code> and <code>min</code> arguments in the <code>repeatable</code> argument array in the field definition array.' ),
+        'description'       => array( 
+            __( 'Press + / - to add / remove the fields. To enable the repeatable fields functionality, set the <code>repeatable</code> argument to <code>true</code>.', 'admin-page-framework-demo' ),
+            __( 'To set maximum and minimum numbers of fields, set the <code>max</code> and <code>min</code> arguments in the <code>repeatable</code> argument array in the field definition array.' ),
+        ),
     ),     
     array( // Sortable text fields
         'field_id'          => 'text_sortable',
@@ -105,7 +110,7 @@ $this->addSettingFields(
             'label'         => __( 'Disabled Item', 'admin-page-framework-demo' ),
             'default'       => 'd',
             'attributes'    => array(
-                'disabled' => 'Disabled',
+                'disabled' => 'disabled',
             ),
         ),     
         'delimiter'     => '<br />',
@@ -207,8 +212,9 @@ $this->addSettingFields(
         'type'          => 'textarea',
         'rich'          => true,
         'repeatable'    => true,
-        'description'   => __( 'As of v3.1.6, repeatable TinyMCE editor fields are supported. However, Quick Tags are not supported.', 'admin-page-framework-demo' ),
-    )
+        'description'   => __( 'As of v3.1.6, repeatable TinyMCE editor fields are supported.', 'admin-page-framework-demo' ),
+    ),
+    array()
 );
 
 /*
@@ -270,7 +276,7 @@ $this->addSettingFields(
             ),
             'option' => array(
                 1 => array(
-                    'disabled' => 'Disabled',
+                    'disabled' => 'disabled',
                     'style' => 'background-color: #ECECEC; color: #888;',
                 ),
             ),
@@ -358,7 +364,7 @@ $this->addSettingFields(
         'after_label'   => '<br />',
         'attributes'    => array(
             'b' => array(
-                'disabled' => 'Disabled',
+                'disabled' => 'disabled',
             ),
         ),
         'description'   => __( 'Use the <code>after_input</code> argument to insert <code>&lt;br /&gt;</code> after each sub-field.', 'admin-page-framework-demo' )
@@ -452,28 +458,30 @@ $this->addSettingFields(
         ),
         'attributes'    => array(
             'earth' => array(
-                'disabled' => 'Disabled',
+                'disabled' => 'disabled',
             ),
         ),
         'description'   => __( 'It is possible to disable checkbox items on an individual basis.', 'admin-page-framework-demo' ),
         'after_label'   => '<br />',
     ),
     array( // Multiple sets of checkbox fields
-        'field_id'      => 'checkbox_multiple_fields',
-        'title'         => __( 'Multiple Sets', 'admin-page-framework-demo' ),
-        'type'          => 'checkbox',
-        'label'         => array( 
+        'field_id'              => 'checkbox_multiple_fields',
+        'title'                 => __( 'Multiple Sets', 'admin-page-framework-demo' ),
+        'type'                  => 'checkbox',
+        'select_all_button'     => true,        // 3.3.0+   to change the label, set the label here
+        'select_none_button'    => true,        // 3.3.0+   to change the label, set the label here                
+        'label'                 => array( 
             'a' => 'A',
             'b' => 'B',
             'c' => 'C' 
         ),
-        'default'       => array( 
+        'default'               => array( 
             'a' => false,
             'b' => true,
             'c' => false 
         ),
-        'delimiter'     => '<hr />',
-        'attributes'    => array(
+        'delimiter'             => '<hr />',
+        'attributes'            => array(
             'field' => array(
                 'style' => 'width: 100%;',
             ),
@@ -510,13 +518,15 @@ $this->addSettingFields(
         'type'          => 'checkbox',
         'label'         => array( 'x', 'y', 'z' ),
         'repeatable'    =>    true,
+        'select_all_button'     => __( 'Check All', 'admin-page-framework-demo' ),        // 3.3.0+   to change the label, set the label here
+        'select_none_button'    => __( 'Uncheck All', 'admin=page-framework-demo' ),      // 3.3.0+   to change the label, set the label here                        
     ),
     array( // sortable check boxes
         'field_id'      => 'checkbox_sortable_fields',
         'title'         => __( 'Sortable', 'admin-page-framework-demo' ),
         'type'          => 'checkbox',
         'label'         => array( 'x', 'y', 'z' ),
-        'sortable'      =>    true,
+        'sortable'      => true,
         array(), // the second item
         array(), // the third item
         array(), // the fourth item
@@ -588,7 +598,7 @@ $this->addSettingFields(
             ),
             'option'    => array(
                 'cm' => array( // applies only to the 'cm' element of the option elements
-                    'disabled'  => 'Disabled',
+                    'disabled'  => 'disabled',
                     'class'     => 'disabled',
                 ),
                 'style' => 'background-color: #F7EFFF', // applies to all the option elements
@@ -596,7 +606,7 @@ $this->addSettingFields(
             'optgroup'  => array(
                 'style' => 'background-color: #EFEFEF',
                 __( 'Astronomical Units', 'admin-page-framework' ) => array(
-                    'disabled' => 'Disabled',
+                    'disabled' => 'disabled',
                 ),
             ),
         ),
@@ -815,28 +825,13 @@ $this->addSettingFields(
             'public'   => true,
             '_builtin' => false,
         ),
+        'select_all_button'     => false,        // 3.3.0+   to change the label, set the label here
+        'select_none_button'    => false,        // 3.3.0+   to change the label, set the label here        
         'operator'              => 'and',   // can be 'or'
         'slugs_to_remove'       => array(), // if not set, the following slugs will be automatically removed. 'revision',  'attachment',  'nav_menu_item'.
         'description'           => __( 'With the <code>query</code> argument, you can query post types to retrieve.', 'admin-page-framework-demo' )
             . ' ' . sprintf( __( 'For the specification, see the <a href="%1$s">Parameter</a> section of codex for the <code>get_post_types()</code> function.', 'admin-page-framework-demo' ), 'http://codex.wordpress.org/Function_Reference/get_post_types#Parameters' ) ,
     ),    
-    array(
-        'field_id'              => 'post_type_multiple_checklists',
-        'title'                 => __( 'Multiple', 'admin-page-framework-demo' ),
-        'type'                  => 'posttype',
-        'before_field'          => '<p style="clear: both; font-weight: bold;">' . __( 'For A', 'admin-page-framework-demo' ) . '</p>',
-        array(
-            'before_field' => '<p style="clear: both; font-weight: bold;">' . __( 'For B', 'admin-page-framework-demo' ) . '</p>',
-        ),
-        array(
-            'before_field' => '<p style="clear: both; font-weight: bold;">' . __( 'For C', 'admin-page-framework-demo' ) . '</p>',
-        ),
-        'attributes'            => array(
-            'field' => array(
-                'style' => 'margin-bottom: 1em;',
-            )
-        ),
-    ),     
     array(
         'field_id'              => 'post_type_checklist_repeatable',
         'title'                 => __( 'Repeatable', 'admin-page-framework-demo' ),
@@ -851,6 +846,8 @@ $this->addSettingFields(
         'height'                => '200px', // (optional)
         'show_post_count'       => true,    // (optional) whether to show the post count. Default: false.
         'taxonomy_slugs'        => array( 'category', 'post_tag' ),
+        'select_all_button'     => false,        // 3.3.0+   to change the label, set the label here
+        'select_none_button'    => false,        // 3.3.0+   to change the label, set the label here        
     ),      
     array(  
         'field_id'              => 'taxonomy_checklist_all',
@@ -942,14 +939,14 @@ $this->addSettingFields(
         'field_id'      => 'hidden_miltiple',
         'title'         => __( 'Multiple', 'admin-page-framework-demo' ),
         'type'          => 'hidden',
-        'label'         => __( 'First', 'admin-page-framework-demo' ),
+        'label'         => __( 'First Item', 'admin-page-framework-demo' ),
         'default'       => 'a',
         array(
-            'label'     => __( 'Second', 'admin-page-framework-demo' ),
+            'label'     => __( 'Second Item', 'admin-page-framework-demo' ),
             'default'   => 'b',
         ),
         array(
-            'label'     => __( 'Third', 'admin-page-framework-demo' ),
+            'label'     => __( 'Third Item', 'admin-page-framework-demo' ),
             'default'   => 'c',
         ),
         'sortable'      => true,
@@ -1050,15 +1047,21 @@ $this->addSettingFields(
 $this->addSettingFields(     
     'verification', // the target section ID
     array(
-        'field_id' => 'verify_text_field',
-        'title' => __( 'Verify Text Input', 'admin-page-framework-demo' ),
-        'type' => 'text',
-        'description' => __( 'Enter a non numeric value here.', 'admin-page-framework-demo' ),
+        'field_id'      => 'verify_text_field',
+        'title'         => __( 'Verify Text Input', 'admin-page-framework-demo' ),
+        'type'          => 'text',
+        'description'   => __( 'Try setting a non numeric value here.', 'admin-page-framework-demo' ),
     ),
     array(
-        'field_id' => 'verify_text_field_submit', // this submit field ID can be used in a validation callback method
-        'type' => 'submit',     
-        'label' => __( 'Verify', 'admin-page-framework-demo' ),
+        'field_id'      => 'other_text_field',
+        'title'         => __( 'Other Field', 'admin-page-framework-demo' ),
+        'type'          => 'text',
+        'description'   => __( 'This field will not be validated.', 'admin-page-framework-demo' ),
+    ),    
+    array(
+        'field_id'      => 'verify_text_field_submit', // this submit field ID can be used in a validation callback method
+        'type'          => 'submit',     
+        'label'         => __( 'Verify', 'admin-page-framework-demo' ),
     )
 );    
 $this->addSettingFields(     
@@ -1266,5 +1269,43 @@ $this->addSettingFields(
         'type' => 'checkbox',
         'label_min_width' => '100%',
     ),     
+    array()
+);     
+
+/**
+ * The 'system' field type examples.
+ */
+$this->addSettingFields(
+    'system', // the target section id
+    array(
+        'field_id'      => 'system_information',
+        'type'          => 'system',     
+        'title'         => __( 'System Information', 'admin-page-framework-demo' ),
+        'data'          => array(
+            __( 'Custom Data', 'admin-page-framework-demo' )    => __( 'Her you can can isert own custom data with the data argument.', 'admin-page-framework-demo' ),
+            __( 'Current Time', 'admin-page-framework' )        => '', // Removes the Current Time Section.
+        ),
+        'attributes'    => array(
+            'name'  => '',
+        ),
+    ),
+    array(
+        'field_id'      => 'saved_options',
+        'type'          => 'system',     
+        'title'         => __( 'Saved Options', 'admin-page-framework-demo' ),
+        'data'          => array(
+            // Removes the default data by passing an empty value below.
+            'Admin Page Framework'  => '', 
+            'WordPress'             => '', 
+            'PHP'                   => '', 
+            'MySQL'                 => '', 
+            'Server'                => '',
+        ) 
+        + $this->oProp->aOptions,
+        'attributes'    => array(
+            'name'  => '',
+            'rows'   => 20,
+        ),        
+    ),            
     array()
 );     

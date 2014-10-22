@@ -2,14 +2,13 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<meta name="generator" content="ApiGen 2.8.0">
 
 	<title>Class AdminPageFramework_PostType_Controller | Admin Page Framework Documentation</title>
 
-	<script type="text/javascript" src="resources/combined.js?1723033208"></script>
-	<script type="text/javascript" src="elementlist.js?3059767791"></script>
+	<script type="text/javascript" src="resources/combined.js?361344329"></script>
+	<script type="text/javascript" src="elementlist.js?3454352893"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/bootstrap.min.css?2514636104">
-	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?2754522461">
+	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?2195379744">
 
 </head>
 
@@ -53,18 +52,15 @@
 			<ul>
 				<li class="active main"><a href="package-AdminPageFramework.html">AdminPageFramework<span></span></a>
 						<ul>
+				<li class="main"><a href="package-AdminPageFramework.AdminPage.html">AdminPage</a>
+						</li>
 				<li class="main"><a href="package-AdminPageFramework.Factory.html">Factory</a>
 						</li>
 				<li class="main"><a href="package-AdminPageFramework.FieldType.html">FieldType</a>
 						</li>
 				<li class="main"><a href="package-AdminPageFramework.MetaBox.html">MetaBox</a>
 						</li>
-				<li class="main"><a href="package-AdminPageFramework.NetworkAdmin.html">NetworkAdmin<span></span></a>
-						<ul>
-				<li class="main"><a href="package-AdminPageFramework.NetworkAdmin.Page.html">Page</a>
-						</li>
-							</ul></li>
-				<li class="main"><a href="package-AdminPageFramework.Page.html">Page</a>
+				<li class="main"><a href="package-AdminPageFramework.NetworkAdmin.html">NetworkAdmin</a>
 						</li>
 				<li class="main"><a href="package-AdminPageFramework.PageMetaBox.html">PageMetaBox</a>
 						</li>
@@ -82,11 +78,29 @@
 		<div id="elements">
 			<h3>Classes</h3>
 			<ul>
-				<li><a href="class-AdminPageFramework_PostType.html">AdminPageFramework_PostType</a></li>
-				<li class="active"><a href="class-AdminPageFramework_PostType_Controller.html">AdminPageFramework_PostType_Controller</a></li>
-				<li><a href="class-AdminPageFramework_PostType_Model.html">AdminPageFramework_PostType_Model</a></li>
-				<li><a href="class-AdminPageFramework_PostType_Router.html">AdminPageFramework_PostType_Router</a></li>
-				<li><a href="class-AdminPageFramework_PostType_View.html">AdminPageFramework_PostType_View</a></li>
+				<li>
+                    
+                    
+                    <a href="class-AdminPageFramework_PostType.html">
+                        AdminPageFramework_PostType
+                    </a>
+                </li>
+				<li class="active">
+                    
+                    
+                    <a href="class-AdminPageFramework_PostType_Controller.html">
+                        AdminPageFramework_PostType_Controller
+                    </a>
+                </li>
+				<li>
+                    
+				<li>
+                    
+                    
+                    <a href="class-AdminPageFramework_PostType_View.html">
+                        AdminPageFramework_PostType_View
+                    </a>
+                </li>
 			</ul>
 
 
@@ -122,8 +136,7 @@ AdminPageFramework_Factory_Router
 		</dd>
 		<dd style="padding-left:30px">
 			<img src="resources/inherit.png" alt="Extended by">
-			<a href="class-AdminPageFramework_Factory_Model.html"><span>AdminPageFramework_Factory_Model</span></a>
-			
+AdminPageFramework_Factory_Model
 			
 			
 		</dd>
@@ -148,15 +161,13 @@ AdminPageFramework_Factory
 		</dd>
 		<dd style="padding-left:150px">
 			<img src="resources/inherit.png" alt="Extended by">
-			<a href="class-AdminPageFramework_PostType_Router.html"><span>AdminPageFramework_PostType_Router</span></a>
-			
+AdminPageFramework_PostType_Router
 			
 			
 		</dd>
 		<dd style="padding-left:180px">
 			<img src="resources/inherit.png" alt="Extended by">
-			<a href="class-AdminPageFramework_PostType_Model.html"><span>AdminPageFramework_PostType_Model</span></a>
-			
+AdminPageFramework_PostType_Model
 			
 			
 		</dd>
@@ -216,15 +227,10 @@ AdminPageFramework_Factory
 			<a class="anchor" href="#_setUp">#</a>
 			<code>setUp( )</code>
 
-			<div class="description short" style="display:none;">
-				
-<p>The method for all necessary set-ups.</p>
 
-			</div>
-
-			<div class="description detailed hidden">
+			<div class="description detailed">
 				
-<p>The method for all necessary set-ups.</p>
+<p>The method for necessary set-ups.</p>
 
 <h4>Example</h4>
 
@@ -245,39 +251,39 @@ class="php-comment">// taxonomy slug</span>
 class="php-keyword1">array</span>( <span
 class="php-comment">// argument - for the argument array keys, refer to : http://codex.wordpress.org/Function_Reference/register_taxonomy#Arguments</span>
                 <span
-class="php-quote">'labels'</span> =&gt; <span
+class="php-quote">'labels'</span>              =&gt; <span
 class="php-keyword1">array</span>(
                     <span
-class="php-quote">'name'</span> =&gt; <span
+class="php-quote">'name'</span>            =&gt; <span
 class="php-quote">'Genre'</span>,
                     <span
-class="php-quote">'add_new_item'</span> =&gt; <span
+class="php-quote">'add_new_item'</span>    =&gt; <span
 class="php-quote">'Add New Genre'</span>,
                     <span
-class="php-quote">'new_item_name'</span> =&gt; <span
+class="php-quote">'new_item_name'</span>   =&gt; <span
 class="php-quote">&quot;New Genre&quot;</span>
                 ),
                 <span
-class="php-quote">'show_ui'</span> =&gt; <span
+class="php-quote">'show_ui'</span>                 =&gt; <span
 class="php-keyword1">true</span>,
                 <span
-class="php-quote">'show_tagcloud'</span> =&gt; <span
+class="php-quote">'show_tagcloud'</span>           =&gt; <span
 class="php-keyword1">false</span>,
                 <span
-class="php-quote">'hierarchical'</span> =&gt; <span
+class="php-quote">'hierarchical'</span>            =&gt; <span
 class="php-keyword1">true</span>,
                 <span
-class="php-quote">'show_admin_column'</span> =&gt; <span
+class="php-quote">'show_admin_column'</span>       =&gt; <span
 class="php-keyword1">true</span>,
                 <span
-class="php-quote">'show_in_nav_menus'</span> =&gt; <span
+class="php-quote">'show_in_nav_menus'</span>       =&gt; <span
 class="php-keyword1">true</span>,
                 <span
-class="php-quote">'show_table_filter'</span> =&gt; <span
+class="php-quote">'show_table_filter'</span>       =&gt; <span
 class="php-keyword1">true</span>, <span
 class="php-comment">// framework specific key</span>
                 <span
-class="php-quote">'show_in_sidebar_menus'</span> =&gt; <span
+class="php-quote">'show_in_sidebar_menus'</span>   =&gt; <span
 class="php-keyword1">false</span>, <span
 class="php-comment">// framework specific key</span>
             )
@@ -296,7 +302,7 @@ class="php-comment">// framework specific key</span>
 					<h4>Remark</h4>
 					<div class="list">
 							The user should override this method in their class definition.<br>
-							A callback for the <em>wp_loaded</em> hook.<br>
+							A callback for the <code>wp_loaded</code> hook.<br>
 					</div>
 
 					<h4>Overrides</h4>
@@ -316,20 +322,24 @@ class="php-comment">// framework specific key</span>
 
 			<td class="name"><div>
 			<a class="anchor" href="#_enqueueStyles">#</a>
-			<code>enqueueStyles( <span>mixed <var>$aSRCs</var></span>, <span>mixed <var>$aCustomArgs</var> = <span class="php-keyword1">array</span>() </span> )</code>
+			<code>enqueueStyles( <span>array <var>$aSRCs</var></span>, <span>array <var>$aCustomArgs</var> = <span class="php-keyword1">array</span>() </span> )</code>
 
-			<div class="description short" style="display:none;">
+
+			<div class="description detailed">
 				
-<p>Enqueues styles by page slug and tab slug.</p>
-
-			</div>
-
-			<div class="description detailed hidden">
-				
-<p>Enqueues styles by page slug and tab slug.</p>
+<p>Enqueues styles of the given sources.</p>
 
 
 
+					<h4>Parameters</h4>
+					<div class="list"><dl>
+						<dt><var>$aSRCs</var></dt>
+						<dd><code>array</code><br>The sources of the stylesheet to enqueue: the url, the absolute file path, or
+the relative path to the root directory of WordPress. Example: <code>array(
+'/css/mystyle.css', '/css/mystyle2.css' )</code></dd>
+						<dt><var>$aCustomArgs</var></dt>
+						<dd><code>array</code><br>(optional) The another source argument array.</dd>
+					</dl></div>
 
 					<h4>Returns</h4>
 					<div class="list">
@@ -359,63 +369,50 @@ class="php-comment">// framework specific key</span>
 			<a class="anchor" href="#_enqueueStyle">#</a>
 			<code>enqueueStyle( <span>string <var>$sSRC</var></span>, <span>array <var>$aCustomArgs</var> = <span class="php-keyword1">array</span>() </span> )</code>
 
-			<div class="description short" style="display:none;">
-				
-<p>Enqueues a style by page slug and tab slug.</p>
 
-			</div>
-
-			<div class="description detailed hidden">
+			<div class="description detailed">
 				
-<p>Enqueues a style by page slug and tab slug.</p>
+<p>Enqueues a style of the given source.</p>
 
 
 
 					<h4>Parameters</h4>
 					<div class="list"><dl>
 						<dt><var>$sSRC</var></dt>
-						<dd><code>string</code><br>The URL of the stylesheet to enqueue, the absolute file path, or the relative
-path to the root directory of WordPress. Example: '/css/mystyle.css'.</dd>
+						<dd><code>string</code><br>The source of the stylesheet to enqueue: the url, the absolute file path, or the
+relative path to the root directory of WordPress. Example: '/css/mystyle.css'.</dd>
 						<dt><var>$aCustomArgs</var></dt>
 						<dd><code>array</code><br>(optional) The argument array for more advanced parameters.
-<h4>Custom Argument Array</h4>
+<h4>Argument Array</h4>
 
 <ul>
-	<li><strong>handle_id</strong> - ( optional, string ) The handle ID of the
+	<li><strong>handle_id</strong> - (optional, string) The handle ID of the
 	stylesheet.</li>
 
-	<li><strong>dependencies</strong> - ( optional, array ) The dependency array.
-	For more information, see <a
+	<li><strong>dependencies</strong> - (optional, array) The dependency array. For
+	more information, see <a
 	href="http://codex.wordpress.org/Function_Reference/wp_enqueue_style">codex</a>.</li>
 
-	<li><strong>version</strong> - ( optional, string ) The stylesheet version
+	<li><strong>version</strong> - (optional, string) The stylesheet version
 	number.</li>
 
-	<li><strong>media</strong> - ( optional, string ) the description of the field
-	which is inserted into after the input field tag.</li>
+	<li><strong>media</strong> - (optional, string) the description of the field
+	which is inserted into the after the input field tag.</li>
+
+	<li><strong>attributes</strong> - (optional, array) [3.3.0+] attributes array.
+	<code>array( 'data-id' =&gt; '...' )</code></li>
 </ul>
 </dd>
 					</dl></div>
 
 					<h4>Returns</h4>
 					<div class="list">
-						<code>string</code><br>The script handle ID. If the passed url is not a valid url string, an empty
+						<code>string</code><br>The style handle ID. If the passed url is not a valid url string, an empty
 string will be returned.<br>
 					</div>
 
 
-					<h4>Since</h4>
-					<div class="list">
-							3.0.0<br>
-					</div>
-					<h4>See</h4>
-					<div class="list">
-							<a
-href="http://codex.wordpress.org/Function_Reference/wp_enqueue_style">http://codex.wordpress.org/Function_Reference/wp_enqueue_style</a><br>
-					</div>
 
-					<h4>Overrides</h4>
-					<div class="list"><code><a href="class-AdminPageFramework_Factory_Controller.html#_enqueueStyle">AdminPageFramework_Factory_Controller::enqueueStyle</a></code></div>
 
 			</div>
 			</div></td>
@@ -431,20 +428,39 @@ href="http://codex.wordpress.org/Function_Reference/wp_enqueue_style">http://cod
 
 			<td class="name"><div>
 			<a class="anchor" href="#_enqueueScripts">#</a>
-			<code>enqueueScripts( <span>mixed <var>$aSRCs</var></span>, <span>mixed <var>$aCustomArgs</var> = <span class="php-keyword1">array</span>() </span> )</code>
+			<code>enqueueScripts( <span>array <var>$aSRCs</var></span>, <span>array <var>$aCustomArgs</var> = <span class="php-keyword1">array</span>() </span> )</code>
 
-			<div class="description short" style="display:none;">
+
+			<div class="description detailed">
 				
-<p>Enqueues scripts by page slug and tab slug.</p>
+<p>Enqueues scripts by the given sources.</p>
 
-			</div>
+<h4>Example</h4>
 
-			<div class="description detailed hidden">
-				
-<p>Enqueues scripts by page slug and tab slug.</p>
+<pre>
+<span class="php-var">$this</span>-&gt;enqueueScripts(
+    <span
+class="php-keyword1">array</span>(
+         plugins_url( <span
+class="php-quote">'asset/js/test.js'</span> , __FILE__ ), <span
+class="php-comment">// source url or path</span>
+         plugins_url( <span
+class="php-quote">'asset/js/test2.js'</span> , __FILE__ ),
+    )
+);
+</pre>
 
 
 
+					<h4>Parameters</h4>
+					<div class="list"><dl>
+						<dt><var>$aSRCs</var></dt>
+						<dd><code>array</code><br>The sources of the stylesheets to enqueue: the URL, the absolute file path, or
+the relative path to the root directory of WordPress. Example:
+'/js/myscript.js'.</dd>
+						<dt><var>$aCustomArgs</var></dt>
+						<dd><code>array</code><br>(optional) Ad additional source list array.</dd>
+					</dl></div>
 
 					<h4>Returns</h4>
 					<div class="list">
@@ -452,13 +468,7 @@ href="http://codex.wordpress.org/Function_Reference/wp_enqueue_style">http://cod
 					</div>
 
 
-					<h4>Since</h4>
-					<div class="list">
-							3.0.0<br>
-					</div>
 
-					<h4>Overrides</h4>
-					<div class="list"><code><a href="class-AdminPageFramework_Factory_Controller.html#_enqueueScripts">AdminPageFramework_Factory_Controller::enqueueScripts</a></code></div>
 
 			</div>
 			</div></td>
@@ -476,40 +486,36 @@ href="http://codex.wordpress.org/Function_Reference/wp_enqueue_style">http://cod
 			<a class="anchor" href="#_enqueueScript">#</a>
 			<code>enqueueScript( <span>string <var>$sSRC</var></span>, <span>array <var>$aCustomArgs</var> = <span class="php-keyword1">array</span>() </span> )</code>
 
-			<div class="description short" style="display:none;">
-				
-<p>Enqueues a script by page slug and tab slug.</p>
 
-			</div>
-
-			<div class="description detailed hidden">
+			<div class="description detailed">
 				
-<p>Enqueues a script by page slug and tab slug.</p>
+<p>Enqueues a script by the given source.</p>
 
 <h4>Example</h4>
 
-<pre><span class="php-var">$this</span>-&gt;enqueueScript(
-plugins_url( <span
+<pre><span
+class="php-var">$this</span>-&gt;enqueueScript(
+     plugins_url( <span
 class="php-quote">'asset/js/test.js'</span> , __FILE__ ), <span
 class="php-comment">// source url or path</span>
-<span
+     <span
 class="php-keyword1">array</span>(
-<span
-class="php-quote">'handle_id'</span> =&gt; <span
+         <span
+class="php-quote">'handle_id'</span>     =&gt; <span
 class="php-quote">'my_script'</span>, <span
 class="php-comment">// this handle ID also is used as the object name for the translation array below.</span>
-<span
-class="php-quote">'translation'</span> =&gt; <span
+         <span
+class="php-quote">'translation'</span>   =&gt; <span
 class="php-keyword1">array</span>(
-<span
-class="php-quote">'a'</span> =&gt; <span
+             <span
+class="php-quote">'a'</span>                 =&gt; <span
 class="php-quote">'hello world!'</span>,
-<span
-class="php-quote">'style_handle_id'</span> =&gt; <span
+             <span
+class="php-quote">'style_handle_id'</span>   =&gt; <span
 class="php-var">$sStyleHandle</span>, <span
 class="php-comment">// check the enqueued style handle ID here.</span>
-),
-)
+         ),
+     )
 );</pre>
 
 
@@ -521,25 +527,28 @@ class="php-comment">// check the enqueued style handle ID here.</span>
 path to the root directory of WordPress. Example: '/js/myscript.js'.</dd>
 						<dt><var>$aCustomArgs</var></dt>
 						<dd><code>array</code><br>(optional) The argument array for more advanced parameters.
-<h4>Custom Argument Array</h4>
+<h4>Argument Array</h4>
 
 <ul>
-	<li><strong>handle_id</strong> - ( optional, string ) The handle ID of the
+	<li><strong>handle_id</strong> - (optional, string) The handle ID of the
 	script.</li>
 
-	<li><strong>dependencies</strong> - ( optional, array ) The dependency array.
-	For more information, see <a
+	<li><strong>dependencies</strong> - (optional, array) The dependency array. For
+	more information, see <a
 	href="http://codex.wordpress.org/Function_Reference/wp_enqueue_script">codex</a>.</li>
 
-	<li><strong>version</strong> - ( optional, string ) The stylesheet version
+	<li><strong>version</strong> - (optional, string) The stylesheet version
 	number.</li>
 
-	<li><strong>translation</strong> - ( optional, array ) The translation array.
-	The handle ID will be used for the object name.</li>
+	<li><strong>translation</strong> - (optional, array) The translation array. The
+	handle ID will be used for the object name.</li>
 
-	<li><strong>in_footer</strong> - ( optional, boolean ) Whether to enqueue the
-	script before <code>&lt;/head &gt;</code> or before <code>&lt;/body&gt;</code>
-	Default: <em>false</em>.</li>
+	<li><strong>in_footer</strong> - (optional, boolean) Whether to enqueue the
+	script before <code>&lt;/head&gt;</code> or before<code>&lt;/body&gt;</code>
+	Default: <code>false</code>.</li>
+
+	<li><strong>attributes</strong> - (optional, array) [3.3.0+] attributes array.
+	<code>array( 'data-id' =&gt; '...' )</code></li>
 </ul>
 </dd>
 					</dl></div>
@@ -555,14 +564,7 @@ string will be returned.<br>
 					<div class="list">
 							3.0.0<br>
 					</div>
-					<h4>See</h4>
-					<div class="list">
-							<a
-href="http://codex.wordpress.org/Function_Reference/wp_enqueue_script">http://codex.wordpress.org/Function_Reference/wp_enqueue_script</a><br>
-					</div>
 
-					<h4>Overrides</h4>
-					<div class="list"><code><a href="class-AdminPageFramework_Factory_Controller.html#_enqueueScript">AdminPageFramework_Factory_Controller::enqueueScript</a></code></div>
 
 			</div>
 			</div></td>
@@ -580,14 +582,8 @@ href="http://codex.wordpress.org/Function_Reference/wp_enqueue_script">http://co
 			<a class="anchor" href="#_setAutoSave">#</a>
 			<code>setAutoSave( <span>boolean <var>$bEnableAutoSave</var> = <span class="php-keyword1">True</span> </span> )</code>
 
-			<div class="description short" style="display:none;">
-				
-<p>Enables or disables the auto-save feature in the custom post type's post
-submission page.</p>
 
-			</div>
-
-			<div class="description detailed hidden">
+			<div class="description detailed">
 				
 <p>Enables or disables the auto-save feature in the custom post type's post
 submission page.</p>
@@ -630,59 +626,8 @@ class="php-keyword1">false</span> );
 			<a class="anchor" href="#_addTaxonomy">#</a>
 			<code>addTaxonomy( <span>string <var>$sTaxonomySlug</var></span>, <span>array <var>$aArgs</var></span>, <span>array <var>$aAdditionalObjectTypes</var> = <span class="php-keyword1">array</span>() </span> )</code>
 
-			<div class="description short" style="display:none;">
-				Adds a custom taxonomy to the class post type.
-<h4>Example</h4>
 
-<pre><span class="php-var">$this</span>-&gt;addTaxonomy(
-  <span
-class="php-quote">'sample_taxonomy'</span>, <span
-class="php-comment">// taxonomy slug</span>
-  <span
-class="php-keyword1">array</span>( <span
-class="php-comment">// argument</span>
-      <span
-class="php-quote">'labels'</span>        =&gt; <span
-class="php-keyword1">array</span>(
-      <span
-class="php-quote">'name'</span>          =&gt; <span
-class="php-quote">'Genre'</span>,
-      <span
-class="php-quote">'add_new_item'</span>  =&gt; <span
-class="php-quote">'Add New Genre'</span>,
-      <span
-class="php-quote">'new_item_name'</span> =&gt; <span
-class="php-quote">&quot;New Genre&quot;</span>
-  ),
-  <span
-class="php-quote">'show_ui'</span>               =&gt; <span
-class="php-keyword1">true</span>,
-  <span
-class="php-quote">'show_tagcloud'</span>         =&gt; <span
-class="php-keyword1">false</span>,
-  <span
-class="php-quote">'hierarchical'</span>          =&gt; <span
-class="php-keyword1">true</span>,
-  <span
-class="php-quote">'show_admin_column'</span>     =&gt; <span
-class="php-keyword1">true</span>,
-  <span
-class="php-quote">'show_in_nav_menus'</span>     =&gt; <span
-class="php-keyword1">true</span>,
-  <span
-class="php-quote">'show_table_filter'</span>     =&gt; <span
-class="php-keyword1">true</span>,  <span
-class="php-comment">// framework specific key</span>
-  <span
-class="php-quote">'show_in_sidebar_menus'</span> =&gt; <span
-class="php-keyword1">false</span>, <span
-class="php-comment">// framework specific key</span>
-  )
-);</pre>
-
-			</div>
-
-			<div class="description detailed hidden">
+			<div class="description detailed">
 				Adds a custom taxonomy to the class post type.
 <h4>Example</h4>
 
@@ -743,7 +688,7 @@ class="php-comment">// framework specific key</span>
 href="http://codex.wordpress.org/Function_Reference/register_taxonomy#Arguments">register_taxonomy()</a>
 function.</dd>
 						<dt><var>$aAdditionalObjectTypes</var></dt>
-						<dd><code>array</code><br>$aAdditionalObjectTypes Additional object types(post types) besides the caller
+						<dd><code>array</code><br>$aAdditionalObjectTypes Additional object types (post types) besides the caller
 post type.</dd>
 					</dl></div>
 
@@ -777,14 +722,8 @@ href="http://codex.wordpress.org/Function_Reference/register_taxonomy#Arguments"
 			<a class="anchor" href="#_setAuthorTableFilter">#</a>
 			<code>setAuthorTableFilter( <span>boolean <var>$bEnableAuthorTableFileter</var> = <span class="php-keyword1">false</span> </span> )</code>
 
-			<div class="description short" style="display:none;">
-				
-<p>Sets whether the author drop-down filter is enabled/disabled in the post type
-post list table.</p>
 
-			</div>
-
-			<div class="description detailed hidden">
+			<div class="description detailed">
 				
 <p>Sets whether the author drop-down filter is enabled/disabled in the post type
 post list table.</p>
@@ -800,7 +739,8 @@ class="php-keyword1">true</span> );
 					<h4>Parameters</h4>
 					<div class="list"><dl>
 						<dt><var>$bEnableAuthorTableFileter</var></dt>
-						<dd><code>boolean</code><br>If true, it enables the author filter; otherwise, it disables it.</dd>
+						<dd><code>boolean</code><br>$bEnableAuthorTableFileter If true, it enables the author filter; otherwise, it
+disables it.</dd>
 					</dl></div>
 
 
@@ -827,13 +767,8 @@ class="php-keyword1">true</span> );
 			<a class="anchor" href="#_setArguments">#</a>
 			<code>setArguments( <span>array <var>$aArguments</var> = <span class="php-keyword1">array</span>() </span> )</code>
 
-			<div class="description short" style="display:none;">
-				
-<p>Sets the post type arguments.</p>
 
-			</div>
-
-			<div class="description detailed hidden">
+			<div class="description detailed">
 				
 <p>Sets the post type arguments.</p>
 
@@ -842,10 +777,10 @@ class="php-keyword1">true</span> );
 					<h4>Parameters</h4>
 					<div class="list"><dl>
 						<dt><var>$aArguments</var></dt>
-						<dd><code>array</code><br>The <a
+						<dd><code>array</code><br>$aArguments The <a
 href="http://codex.wordpress.org/Function_Reference/register_post_type#Arguments">array
 of arguments</a> to be passed to the second parameter of the
-<em>register_post_type()</em> function.</dd>
+<code>register_post_type()</code> function.</dd>
 					</dl></div>
 
 
@@ -861,7 +796,7 @@ href="http://codex.wordpress.org/Function_Reference/register_post_type#Arguments
 					</div>
 					<h4>Remark</h4>
 					<div class="list">
-							The alias of setPostTypeArgs().<br>
+							The alias of <code>setPostTypeArgs()</code>.<br>
 					</div>
 
 
@@ -881,13 +816,8 @@ href="http://codex.wordpress.org/Function_Reference/register_post_type#Arguments
 			<a class="anchor" href="#_setFooterInfoLeft">#</a>
 			<code>setFooterInfoLeft( <span>string <var>$sHTML</var></span>, <span>boolean <var>$bAppend</var> = <span class="php-keyword1">true</span> </span> )</code>
 
-			<div class="description short" style="display:none;">
-				
-<p>Sets the given HTML text into the footer on the left hand side.</p>
 
-			</div>
-
-			<div class="description detailed hidden">
+			<div class="description detailed">
 				
 <p>Sets the given HTML text into the footer on the left hand side.</p>
 
@@ -902,9 +832,10 @@ class="php-quote">'&lt;br /&gt;Custom Text on the left hand side.'</span> );
 					<h4>Parameters</h4>
 					<div class="list"><dl>
 						<dt><var>$sHTML</var></dt>
-						<dd><code>string</code><br>The HTML code to insert.</dd>
+						<dd><code>string</code><br>$sHTML The HTML code to insert.</dd>
 						<dt><var>$bAppend</var></dt>
-						<dd><code>boolean</code><br>If true, the text will be appended; otherwise, it will replace the default text.</dd>
+						<dd><code>boolean</code><br>$bAppend If true, the text will be appended; otherwise, it will replace the
+default text.</dd>
 					</dl></div>
 
 
@@ -931,13 +862,8 @@ class="php-quote">'&lt;br /&gt;Custom Text on the left hand side.'</span> );
 			<a class="anchor" href="#_setFooterInfoRight">#</a>
 			<code>setFooterInfoRight( <span>string <var>$sHTML</var></span>, <span>boolean <var>$bAppend</var> = <span class="php-keyword1">true</span> </span> )</code>
 
-			<div class="description short" style="display:none;">
-				
-<p>Sets the given HTML text into the footer on the right hand side.</p>
 
-			</div>
-
-			<div class="description detailed hidden">
+			<div class="description detailed">
 				
 <p>Sets the given HTML text into the footer on the right hand side.</p>
 
@@ -952,9 +878,10 @@ class="php-quote">'&lt;br /&gt;Custom Text on the right hand side.'</span> );
 					<h4>Parameters</h4>
 					<div class="list"><dl>
 						<dt><var>$sHTML</var></dt>
-						<dd><code>string</code><br>The HTML code to insert.</dd>
+						<dd><code>string</code><br>$sHTML The HTML code to insert.</dd>
 						<dt><var>$bAppend</var></dt>
-						<dd><code>boolean</code><br>If true, the text will be appended; otherwise, it will replace the default text.</dd>
+						<dd><code>boolean</code><br>$bAppend If true, the text will be appended; otherwise, it will replace the
+default text.</dd>
 					</dl></div>
 
 
@@ -975,6 +902,23 @@ class="php-quote">'&lt;br /&gt;Custom Text on the right hand side.'</span> );
 			<code><a href="class-AdminPageFramework_PostType_View.html#__replyToFilterPostTypeContent">_replyToFilterPostTypeContent()</a></code>, 
 			<code><a href="class-AdminPageFramework_PostType_View.html#_content">content()</a></code>
 		</p>
+		<h3>Methods inherited from AdminPageFramework_PostType_Model</h3>
+		<p class="elementList">
+			<code>__construct()</code>, 
+			<code>_registerTaxonomy()</code>, 
+			<code>_replyToDisableAutoSave()</code>, 
+			<code>_replyToRegisterPostType()</code>, 
+			<code>_replyToRegisterTaxonomies()</code>, 
+			<code>_replyToRemoveTexonomySubmenuPages()</code>, 
+			<code>_replyToSetColumnCell()</code>, 
+			<code>_replyToSetColumnHeader()</code>, 
+			<code>_replyToSetSortableColumns()</code>
+		</p>
+		<h3>Methods inherited from AdminPageFramework_PostType_Router</h3>
+		<p class="elementList">
+			<code>__call()</code>, 
+			<code>_isInThePage()</code>
+		</p>
 		<h3>Methods inherited from <a href="class-AdminPageFramework_Factory_Controller.html#methods">AdminPageFramework_Factory_Controller</a></h3>
 		<p class="elementList">
 			<code><a href="class-AdminPageFramework_Factory_Controller.html#_addHelpText">addHelpText()</a></code>, 
@@ -982,30 +926,35 @@ class="php-quote">'&lt;br /&gt;Custom Text on the right hand side.'</span> );
 			<code><a href="class-AdminPageFramework_Factory_Controller.html#_addSettingFields">addSettingFields()</a></code>, 
 			<code><a href="class-AdminPageFramework_Factory_Controller.html#_addSettingSection">addSettingSection()</a></code>, 
 			<code><a href="class-AdminPageFramework_Factory_Controller.html#_addSettingSections">addSettingSections()</a></code>, 
+			<code><a href="class-AdminPageFramework_Factory_Controller.html#_hasFieldError">hasFieldError()</a></code>, 
 			<code><a href="class-AdminPageFramework_Factory_Controller.html#_hasSettingNotice">hasSettingNotice()</a></code>, 
 			<code><a href="class-AdminPageFramework_Factory_Controller.html#_setFieldErrors">setFieldErrors()</a></code>, 
 			<code><a href="class-AdminPageFramework_Factory_Controller.html#_setSettingNotice">setSettingNotice()</a></code>
 		</p>
 		<h3>Methods inherited from AdminPageFramework_Factory_View</h3>
 		<p class="elementList">
-			<code>__construct()</code>, 
 			<code>_replyToGetFieldOutput()</code>, 
 			<code>_replyToPrintSettingNotice()</code>
 		</p>
-		<h3>Methods inherited from <a href="class-AdminPageFramework_Factory_Model.html#methods">AdminPageFramework_Factory_Model</a></h3>
+		<h3>Methods inherited from AdminPageFramework_Factory_Model</h3>
 		<p class="elementList">
-			<code><a href="class-AdminPageFramework_Factory_Model.html#__setUp">_setUp()</a></code>
+			<code>_getFieldErrors()</code>, 
+			<code>_isValidationErrors()</code>, 
+			<code>_loadDefaultFieldTypeDefinitions()</code>, 
+			<code>_registerFields()</code>, 
+			<code>_replyToDeleteFieldErrors()</code>, 
+			<code>_replyToSaveFieldErrors()</code>, 
+			<code>_replyToSaveNotices()</code>, 
+			<code>_setUp()</code>
 		</p>
 		<h3>Methods inherited from AdminPageFramework_Factory_Router</h3>
 		<p class="elementList">
-			<code>__call()</code>, 
 			<code>__get()</code>, 
 			<code>_getFormInstance()</code>, 
-			<code>_getHeadTagInstance()</code>, 
 			<code>_getHelpPaneInstance()</code>, 
 			<code>_getLinkInstancce()</code>, 
 			<code>_getPageLoadInfoInstance()</code>, 
-			<code>_isInThePage()</code>, 
+			<code>_getResourceInstance()</code>, 
 			<code>_isInstantiatable()</code>, 
 			<code>_replyToLoadComponents()</code>
 		</p>
@@ -1035,7 +984,7 @@ class="php-quote">'&lt;br /&gt;Custom Text on the right hand side.'</span> );
 	</div>
 
 	<div id="footer">
-		Admin Page Framework Documentation API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>
+		<a href="http://en.michaeluno.jp/admin-page-framework">Admin Page Framework Documentation</a> generated by <a href="http://apigen.org">ApiGen 2.8.0</a>
 	</div>
 </div>
 </body>

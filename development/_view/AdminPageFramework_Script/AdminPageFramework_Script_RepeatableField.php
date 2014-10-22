@@ -10,21 +10,33 @@ if ( ! class_exists( 'AdminPageFramework_Script_RepeatableField' ) ) :
 /**
  * Provides JavaScript scripts for repeatable fields.
  * 
- * @since 3.0.0     
- * @package AdminPageFramework
- * @subpackage JavaScript
+ * @since       3.0.0     
+ * @since       3.3.0       Extends `AdminPageFramework_Script_Base`.
+ * @package     AdminPageFramework
+ * @subpackage  JavaScript
  * @internal
  */
-class AdminPageFramework_Script_RepeatableField {
+class AdminPageFramework_Script_RepeatableField extends AdminPageFramework_Script_Base {
 
-    static public function getjQueryPlugin( $sCannotAddMore, $sCannotRemoveMore ) {
-        
+    /**
+     * Returns the script.
+     * 
+     * @since       3.0.0
+     * @since       3.3.0       Changed the name from `getjQueryPlugin()`.
+     */
+    static public function getScript() {
+
+        $_aParams           = func_get_args() + array( null );
+        $_oMsg              = $_aParams[ 0 ];            
+        $sCannotAddMore     = $_oMsg->get( 'allowed_maximum_number_of_fields' );
+        $sCannotRemoveMore  = $_oMsg->get( 'allowed_minimum_number_of_fields' );
         return "(function ( $ ) {
         
             $.fn.updateAPFRepeatableFields = function( aSettings ) {
                 
-                var nodeThis = this; // it can be from a fields container or a cloned field container.
-                var sFieldsContainerID = nodeThis.find( '.repeatable-field-add' ).first().data( 'id' );
+                var nodeThis            = this; // it can be from a fields container or a cloned field container.
+                var sFieldsContainerID  = nodeThis.find( '.repeatable-field-add' ).first().data( 'id' );
+                
                 /* Store the fields specific options in an array  */
                 if ( ! $.fn.aAPFRepeatableFieldsOptions ) $.fn.aAPFRepeatableFieldsOptions = [];
                 if ( ! $.fn.aAPFRepeatableFieldsOptions.hasOwnProperty( sFieldsContainerID ) ) {     
@@ -73,10 +85,10 @@ class AdminPageFramework_Script_RepeatableField {
                     var sFieldContainerID = $( this ).closest( '.admin-page-framework-field' ).attr( 'id' );    
                 }
 
-                var nodeFieldContainer = $( '#' + sFieldContainerID );
-                var nodeNewField = nodeFieldContainer.clone(); // clone without bind events.
+                var nodeFieldContainer  = $( '#' + sFieldContainerID );
+                var nodeNewField        = nodeFieldContainer.clone(); // clone without bind events.
                 var nodeFieldsContainer = nodeFieldContainer.closest( '.admin-page-framework-fields' );
-                var sFieldsContainerID = nodeFieldsContainer.attr( 'id' );
+                var sFieldsContainerID  = nodeFieldsContainer.attr( 'id' );
 
                 /* If the set maximum number of fields already exists, do not add */
                  if ( ! $.fn.aAPFRepeatableFieldsOptions.hasOwnProperty( sFieldsContainerID ) ) {     
@@ -89,12 +101,13 @@ class AdminPageFramework_Script_RepeatableField {
                 var sMaxNumberOfFields = $.fn.aAPFRepeatableFieldsOptions[ sFieldsContainerID ]['max'];
                 if ( sMaxNumberOfFields != 0 && nodeFieldsContainer.find( '.admin-page-framework-field' ).length >= sMaxNumberOfFields ) {
                     var nodeLastRepeaterButtons = nodeFieldContainer.find( '.admin-page-framework-repeatable-field-buttons' ).last();
-                    var sMessage = $( this ).formatPrintText( '{$sCannotAddMore}', sMaxNumberOfFields );
-                    var nodeMessage = $( '<span class=\"repeatable-error repeatable-field-error\" id=\"repeatable-error-' + sFieldsContainerID + '\" >' + sMessage + '</span>' );
-                    if ( nodeFieldsContainer.find( '#repeatable-error-' + sFieldsContainerID ).length > 0 )
+                    var sMessage                = $( this ).formatPrintText( '{$sCannotAddMore}', sMaxNumberOfFields );
+                    var nodeMessage             = $( '<span class=\"repeatable-error repeatable-field-error\" id=\"repeatable-error-' + sFieldsContainerID + '\" >' + sMessage + '</span>' );
+                    if ( nodeFieldsContainer.find( '#repeatable-error-' + sFieldsContainerID ).length > 0 ) {
                         nodeFieldsContainer.find( '#repeatable-error-' + sFieldsContainerID ).replaceWith( nodeMessage );
-                    else
+                    } else {
                         nodeLastRepeaterButtons.before( nodeMessage );
+                    }
                     nodeMessage.delay( 2000 ).fadeOut( 1000 );
                     return;     
                 }
@@ -120,14 +133,14 @@ class AdminPageFramework_Script_RepeatableField {
                 nodeNewField.updateAPFRepeatableFields();
                 
                 /* It seems radio buttons of the original field need to be reassigned. Otherwise, the checked items will be gone. */
-                nodeFieldContainer.find( 'input[type=radio][checked=checked]' ).attr( 'checked', 'Checked' );    
+                nodeFieldContainer.find( 'input[type=radio][checked=checked]' ).attr( 'checked', 'checked' );    
                 
                 /* Call the registered callback functions */
                 nodeNewField.callBackAddRepeatableField( nodeNewField.data( 'type' ), nodeNewField.attr( 'id' ), 0, 0, 0 );     
                 
                 /* If more than one fields are created, show the Remove button */
                 var nodeRemoveButtons =  nodeFieldsContainer.find( '.repeatable-field-remove' );
-                if ( nodeRemoveButtons.length > 1 ) nodeRemoveButtons.show();     
+                if ( nodeRemoveButtons.length > 1 ) { nodeRemoveButtons.css( 'visibility', 'visible' ); }
                                     
                 /* Return the newly created element */
                 return nodeNewField; // media uploader needs this 
@@ -137,16 +150,16 @@ class AdminPageFramework_Script_RepeatableField {
             $.fn.removeAPFRepeatableField = function() {
                 
                 /* Need to remove the element: the field container */
-                var nodeFieldContainer = $( this ).closest( '.admin-page-framework-field' );
+                var nodeFieldContainer  = $( this ).closest( '.admin-page-framework-field' );
                 var nodeFieldsContainer = $( this ).closest( '.admin-page-framework-fields' );
-                var sFieldsContainerID = nodeFieldsContainer.attr( 'id' );
+                var sFieldsContainerID  = nodeFieldsContainer.attr( 'id' );
                 
                 /* If the set minimum number of fields already exists, do not remove */
-                var sMinNumberOfFields = $.fn.aAPFRepeatableFieldsOptions[ sFieldsContainerID ]['min'];
+                var sMinNumberOfFields  = $.fn.aAPFRepeatableFieldsOptions[ sFieldsContainerID ]['min'];
                 if ( sMinNumberOfFields != 0 && nodeFieldsContainer.find( '.admin-page-framework-field' ).length <= sMinNumberOfFields ) {
                     var nodeLastRepeaterButtons = nodeFieldContainer.find( '.admin-page-framework-repeatable-field-buttons' ).last();
-                    var sMessage = $( this ).formatPrintText( '{$sCannotRemoveMore}', sMinNumberOfFields );
-                    var nodeMessage = $( '<span class=\"repeatable-error repeatable-field-error\" id=\"repeatable-error-' + sFieldsContainerID + '\">' + sMessage + '</span>' );
+                    var sMessage                = $( this ).formatPrintText( '{$sCannotRemoveMore}', sMinNumberOfFields );
+                    var nodeMessage             = $( '<span class=\"repeatable-error repeatable-field-error\" id=\"repeatable-error-' + sFieldsContainerID + '\">' + sMessage + '</span>' );
                     if ( nodeFieldsContainer.find( '#repeatable-error-' + sFieldsContainerID ).length > 0 ) {
                         nodeFieldsContainer.find( '#repeatable-error-' + sFieldsContainerID ).replaceWith( nodeMessage );
                     } else {
@@ -188,7 +201,7 @@ class AdminPageFramework_Script_RepeatableField {
                 
                 /* Count the remaining Remove buttons and if it is one, disable the visibility of it */
                 var nodeRemoveButtons = nodeFieldsContainer.find( '.repeatable-field-remove' );
-                if ( 1 === nodeRemoveButtons.length ) { nodeRemoveButtons.css( 'display', 'none' ); }
+                if ( 1 === nodeRemoveButtons.length ) { nodeRemoveButtons.css( 'visibility', 'hidden' ); }
                     
             };
                 

@@ -22,7 +22,19 @@ abstract class AdminPageFramework_Widget_View extends AdminPageFramework_Widget_
     /**
      * Filters the post type post content.
      * 
-     * This method is called in the same timing of the content_{instantiated class name.}. This is shorthand for it.
+     * This method is called in the same timing of the `content_{instantiated class name}`. This is shorthand for it.
+     * 
+     * <h4>Example</h4>
+     * <code>
+     *  public function content( $sContent, $aArguments, $aFormData ) {
+     *      
+     *      return $sContent
+     *          . '<p>' . __( 'Hello world! This is a widget created by Admin Page Framework with some custom field types.', 'admin-page-framework-demo' ) . '</p>'
+     *          . AdminPageFramework_Debug::get( $aArguments )
+     *          . AdminPageFramework_Debug::get( $aFormData );
+     *          
+     *  }   
+     * </code>
      * 
      * @remark  This class should be overridden in the extended class so that the user can display own contents.
      * @since   3.2.0
@@ -59,7 +71,8 @@ abstract class AdminPageFramework_Widget_View extends AdminPageFramework_Widget_
         /**
          * Returns the filtered section description output.
          * 
-         * @since 3.2.0
+         * @since       3.2.0
+         * @internal
          */
         public function _replyToGetSectionHeaderOutput( $sSectionDescription, $aSection ) {
             return $this->oUtil->addAndApplyFilters(

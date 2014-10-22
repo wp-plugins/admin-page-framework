@@ -10,14 +10,24 @@ if ( ! class_exists( 'AdminPageFramework_Script_AttributeUpdator' ) ) :
 /**
  * Provides JavaScript scripts to update attribute values.
  * 
- * @since 3.0.0     
+ * @since       3.0.0     
+ * @since       3.3.0       Extends `AdminPageFramework_Script_Base`.
  * @package AdminPageFramework
  * @subpackage JavaScript
  * @internal
  */
-class AdminPageFramework_Script_AttributeUpdator {
-
-    static public function getjQueryPlugin() {
+class AdminPageFramework_Script_AttributeUpdator extends AdminPageFramework_Script_Base {
+    
+    /**
+     * Returns the script.
+     * 
+     * @since       3.0.0   
+     * @since       3.3.0   Changed the name from `getjQueryPlugin()`.
+     */
+    static public function getScript() {
+        
+        $_aParams   = func_get_args() + array( null );
+        $_oMsg      = $_aParams[ 0 ];         
         
         /**
          * Attribute increment/decrement jQuery Plugin
@@ -25,7 +35,7 @@ class AdminPageFramework_Script_AttributeUpdator {
         return "(function ( $ ) {
         
             /**
-             * Increments a first/last found digit with the prefix of underscore in a specified attribute value.
+             * Increments a digit of the given occurrence(nth/-nth) with the prefix of underscore in a specified attribute value.
              * if the biOccurrence is false, the last found one will be replaced.
              */
             $.fn.incrementIDAttribute = function( sAttribute, biOccurrence ) {     
@@ -34,7 +44,7 @@ class AdminPageFramework_Script_AttributeUpdator {
                 }); 
             };
             /**
-             * Increments a first/last found digit enclosed in [] in a specified attribute value.
+             * Increments a digit of the given occurrence(nth/-nth) enclosed in [] in a specified attribute value.
              */
             $.fn.incrementNameAttribute = function( sAttribute, biOccurrence ) {     
                 return this.attr( sAttribute, function( iIndex, sValue ) {    
@@ -43,7 +53,7 @@ class AdminPageFramework_Script_AttributeUpdator {
             };
     
             /**
-             * Decrements a first/last found digit with the prefix of underscore in a specified attribute value.
+             * Decrements a digit of the given occurrence(nth/-nth) with the prefix of underscore in a specified attribute value.
              */
             $.fn.decrementIDAttribute = function( sAttribute, biOccurrence ) {
                 return this.attr( sAttribute, function( iIndex, sValue ) {
@@ -192,7 +202,6 @@ class AdminPageFramework_Script_AttributeUpdator {
                             var _sResult = sMatch0 + '[' + ( Number( sMatch1 ) - 1 );
                             break;
                         default:
-                            console.log( 'returning: ' +  sMatch0 + '[' + ( iIndex ) );                        
                             var _sResult = sMatch0 + '[' + ( iIndex );
                             break;
                     }                    

@@ -28,10 +28,11 @@ class APF_Demo_CustomFieldTypes extends AdminPageFramework {
             $_sPluginDirName . '/third-party/grid-custom-field-type/GridCustomFieldType.php',
             $_sPluginDirName . '/third-party/autocomplete-custom-field-type/AutocompleteCustomFieldType.php',     
             $_sPluginDirName . '/third-party/link-custom-field-type/LinkCustomFieldType.php',     
-            $_sPluginDirName . '/third-party/system-custom-field-type/SystemCustomFieldType.php',
             $_sPluginDirName . '/third-party/github-custom-field-type/GitHubCustomFieldType.php',
             $_sPluginDirName . '/third-party/image_checkbox-custom-field-type/ImageCheckboxCustomFieldType.php',
             $_sPluginDirName . '/third-party/image_radio-custom-field-type/ImageRadioCustomFieldType.php',
+            $_sPluginDirName . '/third-party/reset-custom-field-type/ResetCustomFieldType.php',
+            $_sPluginDirName . '/third-party/ace-custom-field-type/AceCustomFieldType.php',
         );
         foreach( $_aFiles as $_sFilePath ) {
             if ( file_exists( $_sFilePath ) ) {     
@@ -53,11 +54,12 @@ class APF_Demo_CustomFieldTypes extends AdminPageFramework {
         new RevealerCustomFieldType( $_sClassName );
         new GridCustomFieldType( $_sClassName );
         new AutocompleteCustomFieldType( $_sClassName );     
-        new LinkCustomFieldType( $_sClassName );     
-        new SystemCustomFieldType( $_sClassName );     
+        new LinkCustomFieldType( $_sClassName );       
         new GitHubCustomFieldType( $_sClassName );     
         new ImageCheckboxCustomFieldType( $_sClassName );     
         new ImageRadioCustomFieldType( $_sClassName );     
+        new ResetCustomFieldType( $_sClassName );     
+        new AceCustomFieldType( $_sClassName );     
         
     }    
 
@@ -150,10 +152,6 @@ class APF_Demo_CustomFieldTypes extends AdminPageFramework {
                 'title'     => __( 'Links', 'admin-page-framework-demo' ),    
             ),     
             array(
-                'tab_slug'  => 'system',
-                'title'     => __( 'System', 'admin-page-framework-demo' ),    
-            ),                 
-            array(
                 'tab_slug'  => 'github',
                 'title'     => __( 'GitHub', 'admin-page-framework-demo' ),    
             ),
@@ -161,6 +159,10 @@ class APF_Demo_CustomFieldTypes extends AdminPageFramework {
                 'tab_slug'  => 'image_selectors',
                 'title'     => __( 'Image Selectors', 'admin-page-framework-demo' ),    
             ),            
+            array(
+                'tab_slug'  => 'ace',
+                'title'     => __( 'Code', 'admin-page-framework-demo' ),    
+            ),                  
             array()     
         );    
                 
@@ -223,23 +225,27 @@ class APF_Demo_CustomFieldTypes extends AdminPageFramework {
                 'tab_slug'      => 'link',
                 'title'         => __( 'Link Custom Field Type', 'admin-page-framework-demo' ),
                 'description'   => __( 'Allows to insert page and post links.', 'admin-page-framework-demo' ),     
-            ),
-            array(
-                'section_id'    => 'system',
-                'tab_slug'      => 'system',
-                'title'         => __( 'System Custom Field Type', 'admin-page-framework-demo' ),
-                'description'   => __( 'Displays the system information.', 'admin-page-framework-demo' ),     
-            ),            
+            ),        
             array(
                 'section_id'    => 'github',
                 'tab_slug'      => 'github',
                 'title'         => __( 'GitHub Buttons', 'admin-page-framework-demo' ),
+                'description'   => sprintf( __( 'These buttons use GitHub API and perform asynchronomus external access to %1$s.', 'admin-paeg-framework-demo' ), 'https://api.github.com' ),
             ),     
             array(
                 'section_id'    => 'image_selectors',
                 'tab_slug'      => 'image_selectors',
                 'title'         => __( 'Image Selectors', 'admin-page-framework-demo' ),
             ),                 
+            array(
+                'section_id'    => 'ace',
+                'tab_slug'      => 'ace',
+                'title'         => __( 'ACE Code Editors', 'admin-page-framework-demo' ),
+                'description'   => sprintf( 
+                    __( 'This field type uses the external script located at %1$s.', 'admin-page-framework-demo' ),
+                   ( is_ssl() ? 'https:' : 'http:' ) . '//cdnjs.cloudflare.com/ajax/libs/ace/1.1.3/ace.js' 
+                ),
+            ),                
             array()
         );
 
@@ -250,26 +256,37 @@ class APF_Demo_CustomFieldTypes extends AdminPageFramework {
          */
         $this->addSettingFields(     
             array(
-                'field_id' => 'geometrical_coordinates',
-                'section_id' => 'geometry',
-                'title' => __( 'Geometrical Coordinates', 'admin-page-framework-demo' ),
-                'type' => 'geometry',
-                'description' => __( 'Get the coordinates from the map.', 'admin-page-framework-demo' ),
-                'default' => array(
-                    'latitude' => 20,
+                'field_id'      => 'geometrical_coordinates',
+                'section_id'    => 'geometry',
+                'title'         => __( 'Geometrical Coordinates', 'admin-page-framework-demo' ),
+                'type'          => 'geometry',
+                'description'   => __( 'Get the coordinates from the map.', 'admin-page-framework-demo' ),
+                'default'       => array(
+                    'latitude'  => 20,
                     'longitude' => 20,
                 ),
-            )
+            ),  
+            array()            
         );
         $this->addSettingFields(
             // To use advanced options, pass the options in the 'options' argument.
             // The argument keys are the same as the ones documented here : http://trentrichardson.com/examples/timepicker/#rest_examples     
             'date_pickers', // the target section ID.
             array( // Single date picker
-                'field_id' => 'date',
-                'title' => __( 'Date', 'admin-page-framework-demo' ),
-                'type' => 'date',
+                'field_id'      => 'date',
+                'title'         => __( 'Date', 'admin-page-framework-demo' ),
+                'type'          => 'date',
             ),     
+            array( // Custom date format - use a unix timestamp.
+                'field_id'      => 'date_custom_date_format',
+                'title'         => __( 'Date Format', 'admin-page-framework-demo' ),
+                'type'          => 'date',
+                'date_format'   => '@',
+                'description'   => __( 'Setting <code>@</code> to the <code>date_format</code> argument will save the date as a timestamp.', 'admin-page-framework-demo' ),
+                'attributes'    => array(
+                    'size'  => 16,
+                ),
+            ),                 
             array( // Repeatable date picker fields
                 'field_id' => 'date_repeatable',
                 'type' => 'date',
@@ -454,7 +471,26 @@ class APF_Demo_CustomFieldTypes extends AdminPageFramework {
                 'time_format' => 'HH:mm:ss',
                 'repeatable' =>    true,
                 'sortable' =>    true,     
-            ),     
+            ),    
+            array(
+                'field_id'          => 'send',
+                'type'              => 'reset',
+                'label'             => __( 'Reset', 'admin-page-framework-demo' ),
+                'label_min_width'   => 0,
+                array(
+                    'type'  => 'submit',
+                    'label' => __( 'Save', 'admin-page-framework-demo' ),                  
+                ),
+                'attributes'    => array(
+                    'style'    => 'float: right;',
+                    'fieldset' => array(
+                        'style' => 'float: right;'
+                    ),
+                    'field'     => array(
+                        'style' => 'float: none;'
+                    ),            
+                ),
+            ),               
             array()
         );
         $this->addSettingFields(     
@@ -627,8 +663,8 @@ class APF_Demo_CustomFieldTypes extends AdminPageFramework {
                 'field_id'      => 'revealer_field_by_id',
                 'type'          => 'revealer',     
                 'title'         => __( 'Reveal Hidden Fields' ),
-                'value'         => 'undefined', // always set the 'Select a Field' label.
-                'label'         => array( // the keys represent the selector to reveal, in this case, their tag id : #fieldrow-{field id}
+                // 'value'         => 'undefined', // always set the 'Select a Field' label.
+                'label'         => array( // the keys represent the selector to reveal, in this case, their tag id : #fieldrow-{section id}_{field id}
                     'undefined' => __( '-- Select a Field --', 'admin-page-framework-demo' ),     
                     '#fieldrow-revealer_revealer_field_option_a' => __( 'Option A', 'admin-page-framework-demo' ),     
                     '#fieldrow-revealer_revealer_field_option_b, #fieldrow-revealer_revealer_field_option_c' => __( 'Option B and C', 'admin-page-framework-demo' ),
@@ -652,7 +688,47 @@ class APF_Demo_CustomFieldTypes extends AdminPageFramework {
                 'type'          => 'text',     
                 'description'   => __( 'Type text.', 'admin-page-framework-demo' ),     
                 'hidden'        => true,
-            )
+            ),
+            array(
+                'field_id'      => 'another_revealer_field',
+                'type'          => 'revealer',     
+                'title'         => __( 'Another Hidden Fields' ),
+                'label'         => array( // the keys represent the selector to reveal, in this case, their tag id : #fieldrow-{field id}
+                    '#fieldrow-revealer_revealer_field_option_d' => __( 'Option D', 'admin-page-framework-demo' ),     
+                    '#fieldrow-revealer_revealer_field_option_e' => __( 'Option E', 'admin-page-framework-demo' ),
+                    '#fieldrow-revealer_revealer_field_option_f' => __( 'Option F', 'admin-page-framework-demo' ),
+                ),
+                'default'       => '#fieldrow-revealer_revealer_field_option_e',
+            ),
+            array(
+                'field_id'      => 'revealer_field_option_d',
+                'type'          => 'textarea',     
+                'rich'          => true,
+                'hidden'        => true,
+            ),        
+            array(
+                'field_id'      => 'revealer_field_option_e',
+                'type'          => 'radio',
+                'hidden'        => true,
+                'label'         => array(
+                    'a' => __( 'A', 'admin-page-framework-demo' ),
+                    'b' => __( 'B', 'admin-page-framework-demo' ),
+                    'c' => __( 'C', 'admin-page-framework-demo' ),
+                ),
+                'default'       => 'c',
+            ),                        
+            array(
+                'field_id'      => 'revealer_field_option_f',
+                'type'          => 'select',     
+                'hidden'        => true,
+                'label'         => array(
+                    'i'     => __( 'i', 'admin-page-framework-demo' ),
+                    'ii'    => __( 'ii', 'admin-page-framework-demo' ),
+                    'iii'   => __( 'iii', 'admin-page-framework-demo' ),
+                ),                
+                'default'       => 'ii',
+            ),      
+            array()            
         );
         $this->addSettingFields(
             'grid', // the target section id
@@ -732,7 +808,7 @@ class APF_Demo_CustomFieldTypes extends AdminPageFramework {
                         'size_x' => 1,
                     ),     
                 ),
-            ),     
+            ),                
             array()
         );
         $this->addSettingFields(
@@ -846,37 +922,7 @@ class APF_Demo_CustomFieldTypes extends AdminPageFramework {
             ),     
             array()
         );     
-        
-        $this->addSettingFields(
-            'system', // the target section id
-            array(
-                'field_id'      => 'system_information',
-                'type'          => 'system',     
-                'title'         => __( 'System Information', 'admin-page-framework-demo' ),
-                'data'          => array(
-                    __( 'Custom Data', 'admin-page-framework-demo' )    => __( 'This is custom data inserted with the data argument.', 'admin-page-framework-demo' ),
-                    __( 'Current Time', 'admin-page-framework' )        => '', // Removes the Current Time Section.
-                ),
-            ),
-            array(
-                'field_id'      => 'saved_options',
-                'type'          => 'system',     
-                'title'         => __( 'Saved Options', 'admin-page-framework-demo' ),
-                'data'          => array(
-                    // Removes the default data by passing an empty value below.
-                    'Admin Page Framework'   => '', 
-                    'WordPress'             => '', 
-                    'PHP'                   => '', 
-                    'MySQL'                 => '', 
-                    'Server'                => '',
-                ) 
-                + array(    
-                    __( 'Plugin Options', 'admin-page-framework-demo' ) => $this->oProp->aOptions,
-                ),
-            ),            
-            array()
-        );     
-        
+                
         // Github buttons. For the arguments, see https://github.com/ntkme/github-buttons#syntax
         $this->addSettingFields(
             'github', // the target section id
@@ -1086,13 +1132,55 @@ class APF_Demo_CustomFieldTypes extends AdminPageFramework {
             ),            
             array()
         );     
+     
+        // Image Checkbox
+        $this->addSettingFields(
+            'ace', // the target section id
+            array(
+                'field_id'      => 'ace_css',
+                'type'          => 'ace',     
+                'title'         => __( 'CSS', 'admin-page-framework-demo' ),
+                'default'       => AdminPageFramework_CSS::getDefaultCSS(),
+                'attributes'    =>  array(
+                    'cols'        => 80,
+                    'rows'        => 20,
+                ),                
+                'options'   => array(
+                    'language'              => 'css',
+                    'theme'                 => 'chrome',
+                    'gutter'                => false,
+                    'readonly'              => false,
+                    'fontsize'              => 12,
+                ),                
+            ),
+            array(
+                'field_id'      => 'ace_php',
+                'type'          => 'ace',     
+                'title'         => __( 'PHP', 'admin-page-framework-demo' ),
+                'default'       => 'echo "hello world!";',
+                'attributes'    =>  array(
+                    'cols'        => 80,
+                    'rows'        => 10,
+                ),                
+                'options'   => array(
+                    'language'              => 'php',
+                ),           
+                'repeatable'    => true,
+            ),            
+            array()
+        );     
         
+     
     }
     
     /*
      * Custom Field Types Page
      * */
     public function do_apf_custom_field_types() { // do_{page slug}
+    
+        if ( isset( $_GET['tab'] ) && 'date' === $_GET['tab'] ) {
+            return;
+        }
         submit_button();
     }
     

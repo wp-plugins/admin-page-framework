@@ -62,7 +62,7 @@ class AdminPageFramework_Message {
         
         $this->_sTextDomain = $sTextDomain;
         
-        // As of v3.1.3, no item is defined by default. The below array structure is kept for backward compatibility.
+        // As of v3.1.3, no item is defined by default but done on the fly per request. The below array structure is kept for backward compatibility.
         $this->aMessages = array(    
     
             // AdminPageFramework
@@ -84,6 +84,9 @@ class AdminPageFramework_Message {
             'confirm_perform_task'                  => null,
             'specified_option_been_deleted'         => null,
             'nonce_verification_failed'             => null,
+            'send_email'                            => null,    // 3.3.0+
+            'email_sent'                            => null,    // 3.3.0+
+            'email_could_not_send'                  => null,    // 3.3.0+
             
             // AdminPageFramework_PostType
             'title'                                 => null,
@@ -103,12 +106,14 @@ class AdminPageFramework_Message {
             // AdminPageFramework_Link_PostType
             'manage'                                => null,
             
-            // AdminPageFramework_FieldType_Base
+            // AdminPageFramework_FieldType_{...}
             'select_image'                          => null,
             'upload_file'                           => null,
             'use_this_file'                         => null,
             'select_file'                           => null,
             'remove_value'                          => null,    // 3.2.0+
+            'select_all'                            => null,    // 3.3.0+
+            'select_none'                           => null,    // 3.3.0+
             
             // AdminPageFramework_PageLoadInfo_Base
             'queries_in_seconds'                    => null,
@@ -119,8 +124,8 @@ class AdminPageFramework_Message {
             // AdminPageFramework_FormField
             'allowed_maximum_number_of_fields'      => null,
             'allowed_minimum_number_of_fields'      => null,
-            'add' => null,
-            'remove' => null,
+            'add'                                   => null,
+            'remove'                                => null,
             
             // AdminPageFramework_FormTable
             'allowed_maximum_number_of_sections'    => null,
@@ -128,6 +133,8 @@ class AdminPageFramework_Message {
             'add_section'                           => null,
             'remove_section'                        => null,
             
+            // AdminPageFramework_FieldType_reset   
+            'reset'                                 => null,    // 3.3.0+
         );     
         
     }
@@ -228,11 +235,17 @@ class AdminPageFramework_Message {
                 case 'reset_options':
                     return __( 'Are you sure you want to reset the options?', 'admin-page-framework' );
                 case 'confirm_perform_task':
-                    return __( 'Please confirm if you want to perform the specified task.', 'admin-page-framework' );
+                    return __( 'Please confirm your action.', 'admin-page-framework' );
                 case 'specified_option_been_deleted':
                     return __( 'The specified options have been deleted.', 'admin-page-framework' );
                 case 'nonce_verification_failed':
                     return __( 'A problem occurred while processing the form data. Please try again.', 'admin-page-framework' );
+                case 'send_email':  // 3.3.0+
+                    return __( 'Are you sure you want to send the email?', 'admin-page-framewok' );
+                case 'email_sent':  // 3.3.0+
+                    return __( 'The email has been sent.', 'admin-page-framework' );
+                case 'email_could_not_send':  // 3.3.0+
+                    return __( 'There was a problem sending the email', 'admin-page-framework' );
                 
                 // AdminPageFramework_PostType
                 case 'title':
@@ -262,7 +275,7 @@ class AdminPageFramework_Message {
                 case 'manage':
                     return __( 'Manage', 'admin-page-framework' );
 
-                // AdminPageFramework_FieldType_Base
+                // AdminPageFramework_FieldType_{...}
                 case 'select_image':
                     return __( 'Select Image', 'admin-page-framework' );
                 case 'upload_file':
@@ -273,7 +286,11 @@ class AdminPageFramework_Message {
                     return __( 'Select File', 'admin-page-framework' );
                 case 'remove_value':    // 3.2.0+
                     return __( 'Remove Value', 'admin-page-framework' );
-
+                case 'select_all':      // 3.3.0+
+                    return __( 'Select All', 'admin-page-framework' );
+                case 'select_none':     // 3.3.0+
+                    return __( 'Select None', 'admin-page-framework' );                    
+                    
                 // AdminPageFramework_PageLoadInfo_Base
                 case 'queries_in_seconds':
                     return __( '%1$s queries in %2$s seconds.', 'admin-page-framework' );
@@ -300,9 +317,13 @@ class AdminPageFramework_Message {
                 case 'allowed_minimum_number_of_sections':
                     return __( 'The allowed minimum number of sections is {0}', 'admin-page-framework' );
                 case 'add_section':
-                    return __( 'Add Section' );
+                    return __( 'Add Section', 'admin-page-framework' );
                 case 'remove_section':
-                    return __( 'Remove Section' );     
+                    return __( 'Remove Section', 'admin-page-framework' );
+                    
+                // AdminPageFramework_FieldType_reset          
+                case 'reset':   // 3.3.0+
+                    return __( 'Reset', 'admin-page-framework' );
                     
             }
     

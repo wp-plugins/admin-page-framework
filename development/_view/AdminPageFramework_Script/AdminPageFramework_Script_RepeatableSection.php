@@ -10,15 +10,26 @@ if ( ! class_exists( 'AdminPageFramework_Script_RepeatableSection' ) ) :
 /**
  * Provides JavaScript utility scripts.
  * 
- * @since 3.0.0     
- * @package AdminPageFramework
- * @subpackage JavaScript
+ * @since       3.0.0     
+ * @since       3.3.0      Extends `AdminPageFramework_Script_Base`.
+ * @package     AdminPageFramework
+ * @subpackage  JavaScript
  * @internal
  */
-class AdminPageFramework_Script_RepeatableSection {
+class AdminPageFramework_Script_RepeatableSection extends AdminPageFramework_Script_Base {
 
-    static public function getjQueryPlugin( $sCannotAddMore, $sCannotRemoveMore ) {
-
+    /**
+     * Returns the script.
+     * 
+     * @since       3.0.0
+     * @since       3.3.0       Changed the name from `getjQueryPlugin()`.
+     */
+    static public function getScript() {
+        
+        $_aParams           = func_get_args() + array( null );
+        $_oMsg              = $_aParams[ 0 ];        
+        $sCannotAddMore     = $_oMsg->get( 'allowed_maximum_number_of_sections' );
+        $sCannotRemoveMore  = $_oMsg->get( 'allowed_minimum_number_of_sections' );
         return "( function( $ ) {
 
             $.fn.updateAPFRepeatableSections = function( aSettings ) {
@@ -101,7 +112,7 @@ class AdminPageFramework_Script_RepeatableSection {
                 nodeNewSection.insertAfter( nodeSectionContainer );    
 
                 /* It seems radio buttons of the original field need to be reassigned. Otherwise, the checked items will be gone. */
-                nodeSectionContainer.find( 'input[type=radio][checked=checked]' ).attr( 'checked', 'Checked' );    
+                nodeSectionContainer.find( 'input[type=radio][checked=checked]' ).attr( 'checked', 'checked' );    
                 
                 /* Iterate each section and increment the names and ids of the next following siblings. */
                 nodeSectionContainer.nextAll().each( function( iSectionIndex ) {

@@ -62,15 +62,13 @@ class AdminPageFramework_FieldType_radio extends AdminPageFramework_FieldType_Ba
      */ 
     public function _replyToGetScripts() {
 
-        /* The below JavaScript function will be triggered when a new repeatable field is added. Since the APF repeater script does not
-            renew the color piker element (while it does on the input tag value), the renewal task must be dealt here separately. */    
         $aJSArray = json_encode( $this->aFieldTypeSlugs );
         return "     
             jQuery( document ).ready( function(){
                 jQuery().registerAPFCallback( {     
                     added_repeatable_field: function( nodeField, sFieldType, sFieldTagID, sCallType ) {
-            
-                        /* If it is not the color field type, do nothing. */
+         
+                        /* If it is not the field type, do nothing. */
                         if ( jQuery.inArray( sFieldType, {$aJSArray} ) <= -1 ) return;
                                                     
                         /* the checked state of radio buttons somehow lose their values so re-check them again */    
@@ -83,7 +81,7 @@ class AdminPageFramework_FieldType_radio extends AdminPageFramework_FieldType_Ba
                             jQuery( this ).closest( '.admin-page-framework-field' )
                                 .find( 'input[type=radio]' )
                                 .attr( 'checked', false );
-                            jQuery( this ).attr( 'checked', 'Checked' );
+                            jQuery( this ).attr( 'checked', 'checked' );
                         });
 
                     }
@@ -108,7 +106,7 @@ class AdminPageFramework_FieldType_radio extends AdminPageFramework_FieldType_Ba
             /* Prepare attributes */
             $_aInputAttributes = array(
                 'type'          => 'radio',
-                'checked'       => $_sValue == $_sKey ? 'checked' : '',
+                'checked'       => $_sValue == $_sKey ? 'checked' : null,
                 'value'         => $_sKey,
                 'id'            => $aField['input_id'] . '_' . $_sKey,
                 'data-default'  => $aField['default'],
@@ -117,7 +115,7 @@ class AdminPageFramework_FieldType_radio extends AdminPageFramework_FieldType_Ba
             + $aField['attributes'];
             $_aLabelAttributes = array(
                 'for'   => $_aInputAttributes['id'],
-                'class' => $_aInputAttributes['disabled'] ? 'disabled' : '',
+                'class' => $_aInputAttributes['disabled'] ? 'disabled' : null,
             );
 
             /* Insert the output */
@@ -154,7 +152,7 @@ class AdminPageFramework_FieldType_radio extends AdminPageFramework_FieldType_Ba
                     jQuery( document ).ready( function(){
                         jQuery( '#{$sFieldContainerID} input[type=radio]' ).change( function() {
                             jQuery( this ).closest( '.admin-page-framework-field' ).find( 'input[type=radio]' ).attr( 'checked', false );
-                            jQuery( this ).attr( 'checked', 'Checked' );
+                            jQuery( this ).attr( 'checked', 'checked' );
                         });
                     });     
                 </script>";     

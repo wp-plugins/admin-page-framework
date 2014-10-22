@@ -11,25 +11,22 @@ if ( ! class_exists( 'AdminPageFramework_Page' ) ) :
  * Provides methods to render admin page elements.
  *
  * @abstract
- * @extends AdminPageFramework_Page_MetaBox
- * @since 2.0.0
- * @since 2.1.0 Extends AdminPageFramework_HelpPane_Page.
- * @since 3.0.0 No longer extends AdminPageFramework_HelpPane_Page.
- * @package AdminPageFramework
- * @subpackage Page
- * @staticvar array $_aScreenIconIDs stores the ID selector names for screen icons.
- * @staticvar array $_aHookPrefixes stores the prefix strings for filter and action hooks.
- * @staticvar array $_aStructure_InPageTabElements represents the array structure of an in-page tab array.
+ * @extends     AdminPageFramework_Page_MetaBox
+ * @since       2.0.0
+ * @since       2.1.0       Extends AdminPageFramework_HelpPane_Page.
+ * @since       3.0.0       No longer extends AdminPageFramework_HelpPane_Page.
+ * @package     AdminPageFramework
+ * @subpackage  AdminPage
  */
 abstract class AdminPageFramework_Page extends AdminPageFramework_Page_MetaBox {
                 
     /**
-     * Stores the ID selector names for screen icons. <em>generic</em> is not available in WordPress v3.4.x.
+     * Stores the ID selector names for screen icons. `generic` is not available in WordPress v3.4.x.
      * 
-     * @since 2.0.0
-     * @var array
+     * @since       2.0.0
+     * @var         array
      * @static
-     * @access protected
+     * @access      protected
      * @internal
      */     
     protected static $_aScreenIconIDs = array(
@@ -41,19 +38,19 @@ abstract class AdminPageFramework_Page extends AdminPageFramework_Page_MetaBox {
     /**
      * Represents the array structure of an in-page tab array.
      * 
-     * @since 2.0.0
-     * @var array
+     * @since       2.0.0
+     * @var         array
      * @static
-     * @access private
+     * @access      private
      * @internal
      */     
     private static $_aStructure_InPageTabElements = array(
-        'page_slug' => null,
-        'tab_slug' => null,
-        'title' => null,
-        'order' => null,
-        'show_in_page_tab' => true,
-        'parent_tab_slug' => null, // this needs to be set if the above show_in_page_tab is false so that the framework can mark the parent tab to be active when the hidden page is accessed.
+        'page_slug'         => null,
+        'tab_slug'          => null,
+        'title'             => null,
+        'order'             => null,
+        'show_in_page_tab'  => true,
+        'parent_tab_slug'   => null, // this needs to be set if the above show_in_page_tab is false so that the framework can mark the parent tab to be active when the hidden page is accessed.
     );
         
     /**
@@ -68,7 +65,8 @@ abstract class AdminPageFramework_Page extends AdminPageFramework_Page_MetaBox {
         if ( $this->oProp->bIsAdminAjax ) {
             return;
         }     
-        add_action( "load_after_{$this->oProp->sClassName}", array( $this, '_replyToFinalizeInPageTabs' ), 19 ); // must be called before the _replyToRegisterSettings() method 
+        // @deprecated since 3.3.0, the timing of finalizing in-page tabs has changed to load_{page slug}
+        // add_action( "load_after_{$this->oProp->sClassName}", array( $this, '_replyToFinalizeInPageTabs' ), 19 ); // must be called before the _replyToRegisterSettings() method 
                 
     }
     
@@ -79,63 +77,65 @@ abstract class AdminPageFramework_Page extends AdminPageFramework_Page_MetaBox {
      * 
      * <h4>Example</h4>
      * <code>$this->addInPageTabs(
-     * array(
-     * 'page_slug' => 'myfirstpage'
-     * 'tab_slug' => 'firsttab',
-     * 'title' => __( 'Text Fields', 'my-text-domain' ),
-     * ),
-     * array(
-     * 'page_slug' => 'myfirstpage'
-     * 'tab_slug' => 'secondtab',
-     * 'title' => __( 'Selectors and Checkboxes', 'my-text-domain' ),
-     * )
+     *      array(
+     *          'page_slug' => 'myfirstpage'
+     *          'tab_slug'  => 'firsttab',
+     *          'title'     => __( 'Text Fields', 'my-text-domain' ),
+     *      ),
+     *      array(
+     *          'page_slug' => 'myfirstpage'
+     *          'tab_slug'  => 'secondtab',
+     *          'title'     => __( 'Selectors and Checkboxes', 'my-text-domain' ),
+     *      )
      * );</code>
      *
      * <code>$this->addInPageTabs(
-     * 'myfirstpage', // sets the target page slug
-     * array(
-     * 'tab_slug' => 'firsttab',
-     * 'title' => __( 'Text Fields', 'my-text-domain' ),
-     * ),
-     * array(
-     * 'tab_slug' => 'secondtab',
-     * 'title' => __( 'Selectors and Checkboxes', 'my-text-domain' ),
-     * )
+     *      'myfirstpage', // sets the target page slug
+     *      array(
+     *          'tab_slug'  => 'firsttab',
+     *          'title'     => __( 'Text Fields', 'my-text-domain' ),
+     *      ),
+     *      array(
+     *          'tab_slug'  => 'secondtab',
+     *          'title'     => __( 'Selectors and Checkboxes', 'my-text-domain' ),
+     *      )
      * );</code>
-     * @since 2.0.0
-     * @since 3.0.0 Changed the scope to public. Added page slug target support. 
-     * @param array $aTab1 The in-page tab array.
+     * @since       2.0.0
+     * @since       3.0.0     Changed the scope to public. Added page slug target support. 
+     * @param       array     $aTab1 The in-page tab array.
      * <h4>In-Page Tab Array</h4>
      * <ul>
-     *     <li><strong>page_slug</strong> - ( string ) the page slug that the tab belongs to.</li>
-     *     <li><strong>tab_slug</strong> -  ( string ) the tab slug. Non-alphabetical characters should not be used including dots(.) and hyphens(-).</li>
-     *     <li><strong>title</strong> - ( string ) the title of the tab.</li>
-     *     <li><strong>order</strong> - ( optional, integer ) the order number of the tab. The lager the number is, the lower the position it is placed in the menu.</li>
-     *     <li><strong>show_in_page_tab</strong> - ( optional, boolean ) default: false. If this is set to false, the tab title will not be displayed in the tab navigation menu; however, it is still accessible from the direct URL.</li>
-     *     <li><strong>parent_tab_slug</strong> - ( optional, string ) this needs to be set if the above show_in_page_tab is true so that the parent tab will be emphasized as active when the hidden page is accessed.</li>
+     *     <li>**page_slug** - (string) the page slug that the tab belongs to.</li>
+     *     <li>**tab_slug** -  (string) the tab slug. Non-alphabetical characters should not be used including dots(.) and hyphens(-).</li>
+     *     <li>**title** - (string) the title of the tab.</li>
+     *     <li>**order** - (optional, integer) the order number of the tab. The lager the number is, the lower the position it is placed in the menu.</li>
+     *     <li>**show_in_page_tab** - (optional, boolean) default: `false`. If this is set to false, the tab title will not be displayed in the tab navigation menu; however, it is still accessible from the direct URL.</li>
+     *     <li>**parent_tab_slug** - (optional, string) this needs to be set if the above show_in_page_tab is true so that the parent tab will be emphasized as active when the hidden page is accessed.</li>
      * </ul>
-     * @param array $aTab2 Another in-page tab array.
-     * @param array $_and_more Add in-page tab arrays as many as necessary to the next parameters.
-     * @param string (optional) $sPageSlug If the passed parameter item is a string, it will be stored as the target page slug so that it will be applied to the next passed tab arrays as the page_slug element.
-     * @remark Accepts variadic parameters; the number of accepted parameters are not limited to three.
-     * @remark In-page tabs are different from page-heading tabs which is automatically added with page titles.  
-     * @return void
+     * @param       array       $aTab2      Another in-page tab array.
+     * @param       array       $_and_more  (optional) Add in-page tab arrays as many as necessary to the next parameters.
+     * @param       string      $sPageSlug  (optional) If the passed parameter item is a string, it will be stored as the target page slug so that it will be applied to the next passed tab arrays as the page_slug element.
+     * @remark      Accepts variadic parameters; the number of accepted parameters are not limited to three.
+     * @remark      In-page tabs are different from page-heading tabs which is automatically added with page titles.  
+     * @return      void
      */             
     public function addInPageTabs( $aTab1, $aTab2=null, $_and_more=null ) {
-        foreach( func_get_args() as $asTab ) $this->addInPageTab( $asTab );
+        foreach( func_get_args() as $asTab ) { 
+            $this->addInPageTab( $asTab ); 
+        }
     }
     
     /**
      * Adds an in-page tab.
      * 
-     * The singular form of the addInPageTabs() method, which takes only one parameter.
+     * The singular form of the `addInPageTabs()` method, which takes only one parameter.
      * 
-     * @since 2.0.0
-     * @since 3.0.0 Changed the scope to public.
-     * @param array|string $asInPageTab The in-page tab array or the target page slug. If the target page slug is set, the page_slug key can be omitted from next calls.
-     * @remark Use this method to add in-page tabs to ensure the array holds all the necessary keys.
-     * @remark In-page tabs are different from page-heading tabs which are automatically added with page titles.
-     * @return void
+     * @since       2.0.0
+     * @since       3.0.0           Changed the scope to public.
+     * @param       array|string    $asInPageTab        The in-page tab array or the target page slug. If the target page slug is set, the page_slug key can be omitted from next calls.
+     * @remark      Use this method to add in-page tabs to ensure the array holds all the necessary keys.
+     * @remark      In-page tabs are different from page-heading tabs which are automatically added with page titles.
+     * @return      void
      */         
     public function addInPageTab( $asInPageTab ) {    
         
@@ -145,15 +145,15 @@ abstract class AdminPageFramework_Page extends AdminPageFramework_Page_MetaBox {
             return;
         }         
         
-        $aInPageTab = $this->oUtil->uniteArrays( $asInPageTab, self::$_aStructure_InPageTabElements, array( 'page_slug' => $__sTargetPageSlug ) ); // avoid undefined index warnings.     
-        $__sTargetPageSlug = $aInPageTab['page_slug']; // set the target page slug for next calls
+        $aInPageTab         = $this->oUtil->uniteArrays( $asInPageTab, self::$_aStructure_InPageTabElements, array( 'page_slug' => $__sTargetPageSlug ) ); // avoid undefined index warnings.     
+        $__sTargetPageSlug  = $aInPageTab['page_slug']; // set the target page slug for next calls
         if ( ! isset( $aInPageTab['page_slug'], $aInPageTab['tab_slug'] ) ) return; // check the required keys.
         
-        $iCountElement = isset( $this->oProp->aInPageTabs[ $aInPageTab['page_slug'] ] ) ? count( $this->oProp->aInPageTabs[ $aInPageTab['page_slug'] ] ) : 0;
-        $aInPageTab = array( // sanitize some elements
+        $iCountElement      = isset( $this->oProp->aInPageTabs[ $aInPageTab['page_slug'] ] ) ? count( $this->oProp->aInPageTabs[ $aInPageTab['page_slug'] ] ) : 0;
+        $aInPageTab         = array( // sanitize some elements
             'page_slug' => $this->oUtil->sanitizeSlug( $aInPageTab['page_slug'] ),
-            'tab_slug' => $this->oUtil->sanitizeSlug( $aInPageTab['tab_slug'] ),
-            'order' => is_numeric( $aInPageTab['order'] ) ? $aInPageTab['order'] : $iCountElement + 10,
+            'tab_slug'  => $this->oUtil->sanitizeSlug( $aInPageTab['tab_slug'] ),
+            'order'     => is_numeric( $aInPageTab['order'] ) ? $aInPageTab['order'] : $iCountElement + 10,
         ) + $aInPageTab;
 
         $this->oProp->aInPageTabs[ $aInPageTab['page_slug'] ][ $aInPageTab['tab_slug'] ] = $aInPageTab;
@@ -167,10 +167,10 @@ abstract class AdminPageFramework_Page extends AdminPageFramework_Page_MetaBox {
      * <code>$this->setPageTitleVisibility( false );    // disables the page title.
      * </code>
      * 
-     * @since 2.0.0
-     * @since 3.0.0 Changed the scope to public.
-     * @param boolean $bShow If false, the page title will not be displayed.
-     * @return void
+     * @since       2.0.0
+     * @since       3.0.0       Changed the scope to public.
+     * @param       boolean     $bShow If false, the page title will not be displayed.
+     * @return      void
      */ 
     public function setPageTitleVisibility( $bShow=true, $sPageSlug='' ) {
         
@@ -180,8 +180,9 @@ abstract class AdminPageFramework_Page extends AdminPageFramework_Page_MetaBox {
             return;
         }
         $this->oProp->bShowPageTitle = $bShow;
-        foreach( $this->oProp->aPages as &$aPage ) 
+        foreach( $this->oProp->aPages as &$aPage ) {
             $aPage['show_page_title'] = $bShow;
+        }
         
     }    
     
@@ -192,12 +193,12 @@ abstract class AdminPageFramework_Page extends AdminPageFramework_Page_MetaBox {
      * <code>$this->setPageHeadingTabsVisibility( false );    // disables the page heading tabs by passing false.
      * </code>
      * 
-     * @since 2.0.0
-     * @since 3.0.0 Changed the scope to public.
-     * @param boolean $bShow If false, page-heading tabs will be disabled; otherwise, enabled.
-     * @param string $sPageSlug The page to apply the visibility setting. If not set, it applies to all the pages.
-     * @remark Page-heading tabs and in-page tabs are different. The former displays page titles and the latter displays tab titles.
-     * @remark If the second parameter is omitted, it sets the default value.
+     * @since       2.0.0
+     * @since       3.0.0       Changed the scope to public.
+     * @param       boolean     $bShow      If false, page-heading tabs will be disabled; otherwise, enabled.
+     * @param       string      $sPageSlug  The page to apply the visibility setting. If not set, it applies to all the pages.
+     * @remark      Page-heading tabs and in-page tabs are different. The former displays page titles and the latter displays tab titles.
+     * @remark      If the second parameter is omitted, it sets the default value.
      */ 
     public function setPageHeadingTabsVisibility( $bShow=true, $sPageSlug='' ) {
         
@@ -207,8 +208,9 @@ abstract class AdminPageFramework_Page extends AdminPageFramework_Page_MetaBox {
             return;     
         }     
         $this->oProp->bShowPageHeadingTabs = $bShow;
-        foreach( $this->oProp->aPages as &$aPage ) 
+        foreach( $this->oProp->aPages as &$aPage ) {
             $aPage['show_page_heading_tabs'] = $bShow;
+        }
         
     }
     
@@ -217,11 +219,11 @@ abstract class AdminPageFramework_Page extends AdminPageFramework_Page_MetaBox {
      * 
      * Sometimes, it is required to disable in-page tabs in certain pages. In that case, use the second parameter.
      * 
-     * @since 2.1.1
-     * @since 3.0.0 Changed the scope to public. Changed the name from showInPageTabs() to setInPageTabsVisibility().
-     * @param boolean $bShow If false, in-page tabs will be disabled.
-     * @param string $sPageSlug The page to apply the visibility setting. If not set, it applies to all the pages.
-     * @remark If the second parameter is omitted, it sets the default value.
+     * @since       2.1.1
+     * @since       3.0.0       Changed the scope to public. Changed the name from `showInPageTabs()` to `setInPageTabsVisibility()`.
+     * @param       boolean     $bShow      If false, in-page tabs will be disabled.
+     * @param       string      $sPageSlug  The page to apply the visibility setting. If not set, it applies to all the pages.
+     * @remark      If the second parameter is omitted, it sets the default value.
      */
     public function setInPageTabsVisibility( $bShow=true, $sPageSlug='' ) {
         
@@ -231,8 +233,9 @@ abstract class AdminPageFramework_Page extends AdminPageFramework_Page_MetaBox {
             return;
         }
         $this->oProp->bShowInPageTabs = $bShow;
-        foreach( $this->oProp->aPages as &$aPage )
+        foreach( $this->oProp->aPages as &$aPage ) {
             $aPage['show_in_page_tabs'] = $bShow;
+        }
         
     }
     
@@ -243,11 +246,11 @@ abstract class AdminPageFramework_Page extends AdminPageFramework_Page_MetaBox {
      * <code>$this->setInPageTabTag( 'h2' );
      * </code>
      * 
-     * @since 2.0.0
-     * @since 3.0.0 Changed the scope to public.
-     * @param string $sTag The HTML tag that encloses each in-page tab title. Default: h3.
-     * @param string $sPageSlug The page slug that applies the setting.    
-     * @remark If the second parameter is omitted, it sets the default value.
+     * @since       2.0.0
+     * @since       3.0.0       Changed the scope to public.
+     * @param       string      $sTag           The HTML tag that encloses each in-page tab title. Default: `h3`.
+     * @param       string      $sPageSlug      The page slug that applies the setting.    
+     * @remark      If the second parameter is omitted, it sets the default value.
      */     
     public function setInPageTabTag( $sTag='h3', $sPageSlug='' ) {
         
@@ -257,8 +260,9 @@ abstract class AdminPageFramework_Page extends AdminPageFramework_Page_MetaBox {
             return;
         }
         $this->oProp->sInPageTabTag = $sTag;
-        foreach( $this->oProp->aPages as &$aPage )
+        foreach( $this->oProp->aPages as &$aPage ) {
             $aPage['in_page_tab_tag'] = $sTag;
+        }
         
     }
     
@@ -269,11 +273,11 @@ abstract class AdminPageFramework_Page extends AdminPageFramework_Page_MetaBox {
      * <code>$this->setPageHeadingTabTag( 'h2' );
      * </code>
      * 
-     * @since 2.1.2
-     * @since 3.0.0 Changed the scope to public.
-     * @param string $sTag The HTML tag that encloses the page-heading tab title. Default: h2.
-     * @param string $sPageSlug The page slug that applies the setting.    
-     * @remark If the second parameter is omitted, it sets the default value.
+     * @since       2.1.2
+     * @since       3.0.0       Changed the scope to public.
+     * @param       string      $sTag       The HTML tag that encloses the page-heading tab title. Default: `h2`.
+     * @param       string      $sPageSlug  The page slug that applies the setting.    
+     * @remark      If the second parameter is omitted, it sets the default value.
      */
     public function setPageHeadingTabTag( $sTag='h2', $sPageSlug='' ) {
         
@@ -283,8 +287,9 @@ abstract class AdminPageFramework_Page extends AdminPageFramework_Page_MetaBox {
             return;
         }
         $this->oProp->sPageHeadingTabTag = $sTag;
-        foreach( $this->oProp->aPages as &$aPage )
+        foreach( $this->oProp->aPages as &$aPage ) {
             $aPage[ $sPageSlug ]['page_heading_tab_tag'] = $sTag;
+        }
         
     }
     
@@ -295,30 +300,40 @@ abstract class AdminPageFramework_Page extends AdminPageFramework_Page_MetaBox {
     /**
      * Renders the admin page.
      * 
-     * @remark This is not intended for the users to use.
-     * @since 2.0.0
-     * @access protected
-     * @return void
+     * @remark      This is not intended for the users to use.
+     * @since       2.0.0
+     * @access      protected
+     * @return      void
      * @internal
      */ 
     protected function _renderPage( $sPageSlug, $sTabSlug=null ) {
 
         // Do actions before rendering the page. In this order, global -> page -> in-page tab
         $this->oUtil->addAndDoActions( 
-            $this,     // the caller object
+            $this,  // the caller object
             $this->oUtil->getFilterArrayByPrefix( 'do_before_', $this->oProp->sClassName, $sPageSlug, $sTabSlug, true ), // the action hooks
-            $this // the argument 1
+            $this   // the argument 1
         );
         ?>
         <div class="wrap">
             <?php
                 // Screen icon, page heading tabs(page title), and in-page tabs.
-                $sContentTop = $this->_getScreenIcon( $sPageSlug );    
+                $sContentTop  = $this->_getScreenIcon( $sPageSlug );    
                 $sContentTop .= $this->_getPageHeadingTabs( $sPageSlug, $this->oProp->sPageHeadingTabTag );
                 $sContentTop .= $this->_getInPageTabs( $sPageSlug, $this->oProp->sInPageTabTag );
 
                 // Apply filters in this order, in-page tab -> page -> global.
-                echo $this->oUtil->addAndApplyFilters( $this, $this->oUtil->getFilterArrayByPrefix( 'content_top_', $this->oProp->sClassName, $sPageSlug, $sTabSlug, false ), $sContentTop );
+                echo $this->oUtil->addAndApplyFilters( 
+                    $this, 
+                    $this->oUtil->getFilterArrayByPrefix( 
+                        'content_top_', 
+                        $this->oProp->sClassName, 
+                        $sPageSlug, 
+                        $sTabSlug, 
+                        false 
+                    ), 
+                    $sContentTop 
+                );
 
             ?>
             <div class="admin-page-framework-container">    
@@ -334,7 +349,7 @@ abstract class AdminPageFramework_Page extends AdminPageFramework_Page_MetaBox {
                     <div id="post-body" class="metabox-holder columns-<?php echo $this->_getNumberOfColumns(); ?>">
                     <?php
                         $this->_printMainContent( $sPageSlug, $sTabSlug );
-                        $this->_printMetaBox( 'side', 1 ); // defined in the parrent class.
+                        $this->_printMetaBox( 'side', 1 );      // defined in the parent class.
                         $this->_printMetaBox( 'normal', 2 );
                         $this->_printMetaBox( 'advanced', 3 );
                     ?>     
@@ -352,16 +367,16 @@ abstract class AdminPageFramework_Page extends AdminPageFramework_Page_MetaBox {
         <?php
         // Do actions after rendering the page.
         $this->oUtil->addAndDoActions( 
-            $this, // the caller object
+            $this,  // the caller object
             $this->oUtil->getFilterArrayByPrefix( 'do_after_', $this->oProp->sClassName, $sPageSlug, $sTabSlug, true ), // the action hooks
-            $this // the argument 1
+            $this   // the argument 1
         );
         
     }
 
         /**
          * Renders the main content of the admin page.
-         * @since 3.0.0
+         * @since       3.0.0
          */
         private function _printMainContent( $sPageSlug, $sTabSlug ) {
             
@@ -379,18 +394,17 @@ abstract class AdminPageFramework_Page extends AdminPageFramework_Page_MetaBox {
                                         
             // Render the form elements.
             if ( $this->oProp->bEnableForm ) {
-                
-                // do_settings_sections( $sPageSlug ); // deprecated     
+                  
                 if ( $this->oForm->isPageAdded( $sPageSlug ) ) {
 
                     $this->aFieldErrors = isset( $this->aFieldErrors ) ? $this->aFieldErrors : $this->_getFieldErrors( $sPageSlug ); 
-                    $oFieldsTable = new AdminPageFramework_FormTable( $this->oProp->aFieldTypeDefinitions, $this->aFieldErrors, $this->oMsg );
+                    $_oFieldsTable = new AdminPageFramework_FormTable( $this->oProp->aFieldTypeDefinitions, $this->aFieldErrors, $this->oMsg );
                     $this->oForm->setCurrentPageSlug( $sPageSlug );
                     $this->oForm->setCurrentTabSlug( $sTabSlug );
                     $this->oForm->applyConditions();
                     $this->oForm->applyFiltersToFields( $this, $this->oProp->sClassName ); // applies filters to the conditioned field definition arrays.
                     $this->oForm->setDynamicElements( $this->oProp->aOptions ); // will update $this->oForm->aConditionedFields
-                    echo $oFieldsTable->getFormTables( $this->oForm->aConditionedSections, $this->oForm->aConditionedFields, array( $this, '_replyToGetSectionHeaderOutput' ), array( $this, '_replyToGetFieldOutput' ) );
+                    echo $_oFieldsTable->getFormTables( $this->oForm->aConditionedSections, $this->oForm->aConditionedFields, array( $this, '_replyToGetSectionHeaderOutput' ), array( $this, '_replyToGetFieldOutput' ) );
 
                 } 
                 
@@ -409,18 +423,19 @@ abstract class AdminPageFramework_Page extends AdminPageFramework_Page_MetaBox {
                 $this // the argument 1
             );     
             
-            if ( $_bIsSideMetaboxExist )
+            if ( $_bIsSideMetaboxExist ) {
                 echo "</div><!-- #post-body-content -->";
+            }
             echo "</div><!-- .admin-page-framework-content -->";
         }
     
         /**
          * Retrieves the form opening tag.
          * 
-         * @since 2.0.0
-         * @since 3.1.0 Changed to echo the output. Changed to remove disallowed query keys in the target action url.
+         * @since       2.0.0
+         * @since       3.1.0     Changed to echo the output. Changed to remove disallowed query keys in the target action url.
          * @internal
-         * @return void
+         * @return      void
          */ 
         private function _printFormOpeningTag( $fEnableForm=true ) {    
             
@@ -431,23 +446,25 @@ abstract class AdminPageFramework_Page extends AdminPageFramework_Page_MetaBox {
             echo "<form " 
                     . $this->oUtil->generateAttributes(
                         array(
-                            'method' => 'post',
-                            'enctype' => $this->oProp->sFormEncType,
-                            'id' => 'admin-page-framework-form',
-                            'action' => wp_unslash( remove_query_arg( 'settings-updated', $this->oProp->sTargetFormPage ) ),
+                            'method'    => 'post',
+                            'enctype'   => $this->oProp->sFormEncType,
+                            'id'        => 'admin-page-framework-form',
+                            'action'    => wp_unslash( remove_query_arg( 'settings-updated', $this->oProp->sTargetFormPage ) ),
                         )    
                     ) 
-                . ">";
+                . " >";
+                
+            // @todo: The framework no longer relies on WordPress Settings API so check if the following line is necessary or not.
             settings_fields( $this->oProp->sOptionKey );
             
         }
         /**
          * Retrieves the form closing tag.
          * 
-         * @since 2.0.0
-         * @since 3.1.0 Prints out the output.
+         * @since       2.0.0
+         * @since       3.1.0     Prints out the output.
          * @internal
-         * @return void
+         * @return      void
          */     
         private function _printFormClosingTag( $sPageSlug, $sTabSlug, $fEnableForm=true ) {
             
@@ -468,31 +485,58 @@ abstract class AdminPageFramework_Page extends AdminPageFramework_Page_MetaBox {
         /**
          * Retrieves the screen icon output as HTML.
          * 
-         * @remark     the screen object is supported in WordPress 3.3 or above.
-         * @since 2.0.0
+         * @remark      the screen object is supported in WordPress 3.3 or above.
+         * @since       2.0.0
          */     
         private function _getScreenIcon( $sPageSlug ) {
 
             // If the icon path is explicitly set, use it.
-            if ( isset( $this->oProp->aPages[ $sPageSlug ]['href_icon_32x32'] ) ) 
-                return '<div class="icon32" style="background-image: url(' . $this->oProp->aPages[ $sPageSlug ]['href_icon_32x32'] . ');"><br /></div>';
+            if ( isset( $this->oProp->aPages[ $sPageSlug ]['href_icon_32x32'] ) ) { 
+                return "<div " . $this->oUtil->generateAttributes(
+                        array(
+                            'class'    => 'icon32',
+                            'style'    => $this->oUtil->generateInlineCSS(
+                                array(
+                                    'background-image' => "url('" . esc_url( $this->oProp->aPages[ $sPageSlug ]['href_icon_32x32'] ) . "')"
+                                )
+                            )
+                        )    
+                    ) . ">"
+                        . "<br />"
+                    . "</div>";
+                
+            }
             
             // If the screen icon ID is explicitly set, use it.
-            if ( isset( $this->oProp->aPages[ $sPageSlug ]['screen_icon_id'] ) )
-                return '<div class="icon32" id="icon-' . $this->oProp->aPages[ $sPageSlug ]['screen_icon_id'] . '"><br /></div>';
+            if ( isset( $this->oProp->aPages[ $sPageSlug ]['screen_icon_id'] ) ) {
+                return "<div " . $this->oUtil->generateAttributes(
+                        array(
+                            'class'    => 'icon32',
+                            'id'       => "icon-" . $this->oProp->aPages[ $sPageSlug ]['screen_icon_id'],
+                        )    
+                    ) . ">"
+                        . "<br />"
+                    . "</div>";
+            }
                 
             // Retrieve the screen object for the current page.
-            $oScreen = get_current_screen();
-            $sIconIDAttribute = $this->_getScreenIDAttribute( $oScreen );
-
-            $sClass = 'icon32';
-            if ( empty( $sIconIDAttribute ) && $oScreen->post_type ) 
-                $sClass .= ' ' . sanitize_html_class( 'icon32-posts-' . $oScreen->post_type );
-            
-            if ( empty( $sIconIDAttribute ) || $sIconIDAttribute == $this->oProp->sClassName )
-                $sIconIDAttribute = 'generic'; // the default value
-            
-            return '<div id="icon-' . $sIconIDAttribute . '" class="' . $sClass . '"><br /></div>';
+            $_oScreen           = get_current_screen();
+            $_sIconIDAttribute  = $this->_getScreenIDAttribute( $_oScreen );
+            $_sClass            = 'icon32';
+            if ( empty( $_sIconIDAttribute ) && $_oScreen->post_type ) {
+                $_sClass .= ' ' . sanitize_html_class( 'icon32-posts-' . $_oScreen->post_type );
+            }
+            if ( empty( $_sIconIDAttribute ) || $_sIconIDAttribute == $this->oProp->sClassName ) {
+                $_sIconIDAttribute = 'generic'; // the default value
+            }
+            return "<div " . $this->oUtil->generateAttributes(
+                    array(
+                        'class'    => $_sClass,
+                        'id'       => "icon-" . $_sIconIDAttribute,
+                    )    
+                ) . ">"
+                    . "<br />"
+                . "</div>";
                 
         }
             /**
@@ -502,12 +546,12 @@ abstract class AdminPageFramework_Page extends AdminPageFramework_Page_MetaBox {
              */     
             private function _getScreenIDAttribute( $oScreen ) {
                 
-                if ( ! empty( $oScreen->parent_base ) )
+                if ( ! empty( $oScreen->parent_base ) ) {
                     return $oScreen->parent_base;
-            
-                if ( 'page' == $oScreen->post_type )
+                }
+                if ( 'page' == $oScreen->post_type ) {
                     return 'edit-pages';     
-                    
+                }
                 return esc_attr( $oScreen->base );
                 
             }
@@ -515,59 +559,75 @@ abstract class AdminPageFramework_Page extends AdminPageFramework_Page_MetaBox {
         /**
          * Retrieves the output of page heading tab navigation bar as HTML.
          * 
-         * @since 2.0.0
-         * @return string     the output of page heading tabs.
+         * @since   2.0.0
+         * @return  string     the output of page heading tabs.
          */         
         private function _getPageHeadingTabs( $sCurrentPageSlug, $sTag='h2', $aOutput=array() ) {
             
             // If the page title is disabled, return an empty string.
-            if ( ! $this->oProp->aPages[ $sCurrentPageSlug ][ 'show_page_title' ] ) return "";
+            if ( ! $this->oProp->aPages[ $sCurrentPageSlug ][ 'show_page_title' ] ) { return ""; }
 
             $sTag = $this->oProp->aPages[ $sCurrentPageSlug ][ 'page_heading_tab_tag' ]
                 ? $this->oProp->aPages[ $sCurrentPageSlug ][ 'page_heading_tab_tag' ]
                 : $sTag;
-        
+            $sTag = tag_escape( $sTag );
+            
             // If the page heading tab visibility is disabled, or only one page is registered, return the title.
-            if ( ! $this->oProp->aPages[ $sCurrentPageSlug ][ 'show_page_heading_tabs' ] || count( $this->oProp->aPages ) == 1 )
+            if ( ! $this->oProp->aPages[ $sCurrentPageSlug ][ 'show_page_heading_tabs' ] || count( $this->oProp->aPages ) == 1 ) {
                 return "<{$sTag}>" . $this->oProp->aPages[ $sCurrentPageSlug ]['title'] . "</{$sTag}>";     
+            }
 
             foreach( $this->oProp->aPages as $aSubPage ) {
                 
                 // For added sub-pages
                 if ( isset( $aSubPage['page_slug'] ) && $aSubPage['show_page_heading_tab'] ) {
+                    
                     // Check if the current tab number matches the iteration number. If not match, then assign blank; otherwise put the active class name.
-                    $sClassActive =  $sCurrentPageSlug == $aSubPage['page_slug']  ? 'nav-tab-active' : '';     
-                    $aOutput[] = "<a class='nav-tab {$sClassActive}' "
-                        . "href='" . $this->oUtil->getQueryAdminURL( array( 'page' => $aSubPage['page_slug'], 'tab' => false ), $this->oProp->aDisallowedQueryKeys ) 
-                        . "'>"
-                        . $aSubPage['title']
-                        . "</a>";    
+                    $aOutput[] = "<a " . $this->oUtil->generateAttributes(
+                            array(
+                                // 'class' => 'nav-tab ' . ( $sCurrentPageSlug === $aSubPage['page_slug']  ? 'nav-tab-active' : '' ),
+                                'class' => $this->oUtil->generateClassAttribute(
+                                    'nav-tab',
+                                    $sCurrentPageSlug === $aSubPage['page_slug'] ? 'nav-tab-active' : ''
+                                ),                                
+                                'href'  => esc_url( $this->oUtil->getQueryAdminURL( array( 'page' => $aSubPage['page_slug'], 'tab' => false ), $this->oProp->aDisallowedQueryKeys ) ),
+                            )    
+                        ) . ">"
+                            . $aSubPage['title']
+                        . "</a>";
+                        
                 }
                 
                 // For added menu links
                 if ( 
                     isset( $aSubPage['href'] )
-                    && $aSubPage['type'] == 'link' 
+                    && 'link' === $aSubPage['type'] 
                     && $aSubPage['show_page_heading_tab']
-                ) 
-                    $aOutput[] = 
-                        "<a class='nav-tab link' "
-                        . "href='{$aSubPage['href']}'>"
+                ) {
+                    $aOutput[] = "<a " . $this->oUtil->generateAttributes(
+                            array(
+                                'class' => 'nav-tab link',
+                                'href'  => esc_url( $aSubPage['href'] ),
+                            )    
+                        ) . ">" 
                             . $aSubPage['title']
-                        . "</a>";     
+                        . "</a>";
+                }
                 
             }     
-            return "<div class='admin-page-framework-page-heading-tab'><{$sTag} class='nav-tab-wrapper'>" 
-                .  implode( '', $aOutput ) 
-                . "</{$sTag}></div>";
+            return "<div class='admin-page-framework-page-heading-tab'>"
+                    ."<{$sTag} class='nav-tab-wrapper'>" 
+                        .  implode( '', $aOutput ) 
+                    . "</{$sTag}>"
+                . "</div>";
             
         }
 
         /**
          * Retrieves the output of in-page tab navigation bar as HTML.
          * 
-         * @since 2.0.0
-         * @return string     the output of in-page tabs.
+         * @since   2.0.0
+         * @return  string     the output of in-page tabs.
          */     
         private function _getInPageTabs( $sCurrentPageSlug, $sTag='h3', $aOutput=array() ) {
             
@@ -583,7 +643,8 @@ abstract class AdminPageFramework_Page extends AdminPageFramework_Page_MetaBox {
             $sTag = $this->oProp->aPages[ $sCurrentPageSlug ][ 'in_page_tab_tag' ]
                 ? $this->oProp->aPages[ $sCurrentPageSlug ][ 'in_page_tab_tag' ]
                 : $sTag;
-        
+            $sTag = tag_escape( $sTag );
+            
             // If the in-page tabs' visibility is set to false, returns the title.
             if ( ! $this->oProp->aPages[ $sCurrentPageSlug ][ 'show_in_page_tabs' ] ) {
                 return isset( $this->oProp->aInPageTabs[ $sCurrentPageSlug ][ $sCurrentTabSlug ]['title'] ) 
@@ -601,32 +662,37 @@ abstract class AdminPageFramework_Page extends AdminPageFramework_Page_MetaBox {
                 $sInPageTabSlug = isset( $aInPageTab['parent_tab_slug'], $this->oProp->aInPageTabs[ $sCurrentPageSlug ][ $aInPageTab['parent_tab_slug'] ] ) 
                     ? $aInPageTab['parent_tab_slug'] 
                     : $aInPageTab['tab_slug'];
-                    
-                // Check if the current tab slug matches the iteration slug. If not match, assign blank; otherwise, put the active class name.
-                $bIsActiveTab = ( $sCurrentTabSlug == $sInPageTabSlug );
-
-                $aOutput[ $sInPageTabSlug ] = "<a class='nav-tab " . ( $bIsActiveTab ? "nav-tab-active" : "" ) . "' "
-                    . "href='" . $this->oUtil->getQueryAdminURL( array( 'page' => $sCurrentPageSlug, 'tab' => $sInPageTabSlug ), $this->oProp->aDisallowedQueryKeys ) 
-                    . "'>"
-                    . $this->oProp->aInPageTabs[ $sCurrentPageSlug ][ $sInPageTabSlug ]['title'] // "{$aInPageTab['title']}"
+                                        
+                $aOutput[ $sInPageTabSlug ] = "<a " . $this->oUtil->generateAttributes(
+                        array(
+                            'class' => $this->oUtil->generateClassAttribute(
+                                'nav-tab',
+                                $sCurrentTabSlug == $sInPageTabSlug ? "nav-tab-active" : "" // check whether the current tab is the active one
+                            ),
+                            'href'  => esc_url( $this->oUtil->getQueryAdminURL( array( 'page' => $sCurrentPageSlug, 'tab' => $sInPageTabSlug ), $this->oProp->aDisallowedQueryKeys ) ),
+                        )    
+                    ) . ">"
+                        . $this->oProp->aInPageTabs[ $sCurrentPageSlug ][ $sInPageTabSlug ]['title']
                     . "</a>";
             
             }     
             
             return empty( $aOutput )
                 ? ""
-                : "<div class='admin-page-framework-in-page-tab'><{$sTag} class='nav-tab-wrapper in-page-tab'>" 
-                        . implode( '', $aOutput )
-                    . "</{$sTag}></div>";
+                : "<div class='admin-page-framework-in-page-tab'>"
+                        . "<{$sTag} class='nav-tab-wrapper in-page-tab'>"
+                            . implode( '', $aOutput )
+                        . "</{$sTag}>"
+                    . "</div>";
                 
         }
 
             /**
              * Retrieves the parent tab slug from the given tab slug.
              * 
-             * @since 2.0.0
-             * @since 2.1.2 If the parent slug has the show_in_page_tab to be true, it returns an empty string.
-             * @return string     the parent tab slug.
+             * @since       2.0.0
+             * @since       2.1.2       If the parent slug has the show_in_page_tab to be true, it returns an empty string.
+             * @return      string      the parent tab slug.
              */     
             private function _getParentTabSlug( $sPageSlug, $sTabSlug ) {
                 
@@ -647,11 +713,12 @@ abstract class AdminPageFramework_Page extends AdminPageFramework_Page_MetaBox {
      * Also this sorts the in-page tab property array.
      * This must be done before registering settings sections because the default tab needs to be determined in the process.
      * 
-     * @since 2.0.0
-     * @remark A callback for the <em>admin_menu</em> hook. It must be called earlier than _replyToRegisterSettings() method.
-     * @return void
+     * @since       2.0.0
+     * @since       3.3.0       Changed the name from `_replyToFinalizeInPageTabs()` and been no longer a callback.
+     * @return      void
+     * @internal
      */         
-    public function _replyToFinalizeInPageTabs() {
+    protected function _finalizeInPageTabs() {
 
         if ( ! $this->oProp->isPageAdded() ) { return; }
 
@@ -688,6 +755,11 @@ abstract class AdminPageFramework_Page extends AdminPageFramework_Page_MetaBox {
         }
 
     }     
+        /**
+         * An alias of _finalizeInPageTabs().
+         * @deprecated  3.3.0
+         */
+        public function _replyToFinalizeInPageTabs() { $this->_finalizeInPageTabs(); }
     
 }
 endif;

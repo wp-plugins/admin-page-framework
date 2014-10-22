@@ -217,7 +217,10 @@ class AdminPageFramework_Property_Page extends AdminPageFramework_Property_Base 
      * @remark Currently this does not take effect on the meta box and post type classes of the framework.
      * @since 2.1.2
      */
-    public $aDisallowedQueryKeys = array( 'settings-updated' );
+    public $aDisallowedQueryKeys = array( 
+        'settings-updated', 
+        'confirmation',     // 3.3.0+
+    );
         
         
     /** 
@@ -272,7 +275,7 @@ class AdminPageFramework_Property_Page extends AdminPageFramework_Property_Base 
         $this->sTargetFormPage          = $_SERVER['REQUEST_URI'];
         $this->sOptionKey               = $sOptionKey ? $sOptionKey : $sClassName;
         $this->_bDisableSavingOptions   = '' === $sOptionKey ? true : false;
-                
+
         /* Store the page class objects in the global storage. These will be referred by the meta box class to determine if the passed page slug's screen ID (hook suffix). */
         $GLOBALS['aAdminPageFramework']['aPageClasses'] = isset( $GLOBALS['aAdminPageFramework']['aPageClasses'] ) && is_array( $GLOBALS['aAdminPageFramework']['aPageClasses'] )
             ? $GLOBALS['aAdminPageFramework']['aPageClasses']
@@ -303,17 +306,40 @@ class AdminPageFramework_Property_Page extends AdminPageFramework_Property_Base 
     /**
      * Returns the option array.
      * 
-     * @since 3.1.0
+     * @since       3.1.0
+     * @since       3.3.0       Forced to return an array as it is possible that the options value get modified by third party scripts. 
      * @internal
+     * @return      array       The options array.
      */
     protected function _getOptions() {
     
-        return AdminPageFramework_WPUtility::addAndApplyFilter( // Parameters: $oCallerObject, $sFilter, $vInput, $vArgs...
+        $_aOptions = AdminPageFramework_WPUtility::addAndApplyFilter( // Parameters: $oCallerObject, $sFilter, $vInput, $vArgs...
             $GLOBALS['aAdminPageFramework']['aPageClasses'][ $this->sClassName ], // the caller object
             'options_' . $this->sClassName, // options_{instantiated class name}
             $this->sOptionKey ? get_option( $this->sOptionKey, array() ) : array()
         );
+        return empty( $_aOptions ) 
+            ? array()
+            : AdminPageFramework_WPUtility::getAsArray( $_aOptions );
             
+    }
+    
+    /**
+     * Returns the last user form input array.
+     * 
+     * @remark  This temporrary data is not always set. This is only set when the form needs to show a confirmation message to the user such as for sending an email.
+     * @since   3.3.0
+     * @internal
+     * @return  array   The last input array.
+     */
+    protected function _getLastInput() {
+        
+        $_vValue = AdminPageFramework_WPUtility::getTransient( 'apf_tfd' . md5( 'temporary_form_data_' . $this->sClassName . get_current_user_id() ) );
+        if ( is_array( $_vValue ) ) {
+            return $_vValue;
+        }
+        return array();
+        
     }
     
     /*
@@ -327,9 +353,15 @@ class AdminPageFramework_Property_Page extends AdminPageFramework_Property_Base 
         
         // If $this->aOptions is called for the first time, retrieve the option data from the database and assign them to the property.
         // Once this is done, calling $this->aOptions will not trigger the __get() magic method any more.
-        if ( 'aOptions' == $sName ) {
+        if ( 'aOptions' === $sName ) {
             $this->aOptions = $this->_getOptions();
             return $this->aOptions;    
+        }
+        
+        // [3.3.0+] Sets and returns the last user form input data as an array.
+        if ( 'aLastInput' === $sName ) {
+            $this->aLastInput = $this->_getLastInput();
+            return $this->aLastInput;
         }
         
         // For regular undefined items, 
@@ -347,7 +379,12 @@ class AdminPageFramework_Property_Page extends AdminPageFramework_Property_Base 
      * @since 3.1.0
      */
     public function updateOption( $aOptions=null ) {
+
+        if ( $this->_bDisableSavingOptions ) {
+            return;
+        }
         update_option( $this->sOptionKey, $aOptions !== null ? $aOptions : $this->aOptions );
+        
     }
     
     

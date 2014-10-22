@@ -23,21 +23,48 @@ if ( is_admin() ) :
     // Create meta boxes with form fields that appear in post definition pages (where you create a post) of the given post type.
     include( APFDEMO_DIRNAME . '/example/APF_MetaBox_BuiltinFieldTypes.php' );    
     new APF_MetaBox_BuiltinFieldTypes(
-        'sample_custom_meta_box',                           // meta box ID
+        null,  // meta box ID - can be null. If null is passed, the ID gets automatically generated and the class name with all lower case characters will be applied.
         __( 'Demo Meta Box with Built-in Field Types', 'admin-page-framework-demo' ), // title
+        array( 'apf_posts' ),                               // post type slugs: post, page, etc.
+        'normal',                                           // context (what kind of metabox this is)
+        'high'                                           // priority
+    );
+    
+    include( APFDEMO_DIRNAME . '/example/APF_MetaBox_TabbedSections.php' );    
+    new APF_MetaBox_TabbedSections(
+        null,  // meta box ID - can be null. If null is passed, the ID gets automatically generated and the class name with all lower case characters will be applied.
+        __( 'Section Tabs', 'admin-page-framework-demo' ), // title
+        array( 'apf_posts' ),                               // post type slugs: post, page, etc.
+        'normal',                                           // context (what kind of metabox this is)
+        'default'                                           // priority
+    );    
+    
+    include( APFDEMO_DIRNAME . '/example/APF_MetaBox_RepeatableTabbedSections.php' );    
+    new APF_MetaBox_RepeatableTabbedSections(
+        null,  // meta box ID - can be null. If null is passed, the ID gets automatically generated and the class name with all lower case characters will be applied.
+        __( 'Repeatable Section Tabs', 'admin-page-framework-demo' ), // title
         array( 'apf_posts' ),                               // post type slugs: post, page, etc.
         'normal',                                           // context (what kind of metabox this is)
         'default'                                           // priority
     );
+        
     
     include( APFDEMO_DIRNAME . '/example/APF_MetaBox_CustomFieldTypes.php' );    
     new APF_MetaBox_CustomFieldTypes(
-        'sample_custom_meta_box_with_custom_field_types',   // meta box ID
+        null,   // meta box ID - can be null.
         __( 'Demo Meta Box with Custom Field Types', 'admin-page-framework-demo' ), // title
         array( 'apf_posts' ),                               // post type slugs: post, page, etc.
         'normal',                                           // context
-        'default'                                           // priority
+        'low'                                           // priority
     ); 
+    
+    include( APFDEMO_DIRNAME . '/example/APF_MetaBox_DateFields.php' );
+    new APF_MetaBox_DateFields(
+        null,       // meta box id
+        __( 'Custom Date Fields', 'admin-page-framework-demo' ),
+        array( 'apf_posts' ),                             
+        'side'      // context                                      
+    );
     
     // Add fields in the taxonomy page
     include( APFDEMO_DIRNAME . '/example/APF_TaxonomyField.php' );
@@ -55,7 +82,7 @@ if ( is_admin() ) :
         // Create meta boxes that belongs to the 'apf_first_page' page.
         include( APFDEMO_DIRNAME . '/example/APF_MetaBox_For_Pages_Normal.php' );
         new APF_MetaBox_For_Pages_Normal(
-            'apf_metabox_for_pages_normal',                 // meta box id
+            null,                                           // meta box id - passing null will make it auto generate
             __( 'Sample Meta Box for Admin Pages Inserted in Normal Area', 'admin-page-framework-demo' ), // title
             'apf_first_page',                               // page slugs
             'normal',                                       // context
@@ -63,7 +90,7 @@ if ( is_admin() ) :
         );
         include( APFDEMO_DIRNAME . '/example/APF_MetaBox_For_Pages_Advanced.php' );
         new APF_MetaBox_For_Pages_Advanced(    
-            'apf_metabox_for_pages_advanced',               // meta box id
+            null,                                           // meta box id - passing null will make it auto generate
             __( 'Sample Meta Box for Admin Pages Inserted in Advanced Area', 'admin-page-framework-demo' ), // title
             'apf_first_page',                               // page slugs
             'advanced',                                     // context
@@ -71,7 +98,7 @@ if ( is_admin() ) :
         );    
         include( APFDEMO_DIRNAME . '/example/APF_MetaBox_For_Pages_Side.php' );    
         new APF_MetaBox_For_Pages_Side(    
-            'apf_metabox_for_pages_side',                   // meta box id
+            null,                                           // meta box id - passing null will make it auto generate
             __( 'Sample Meta Box for Admin Pages Inserted in Advanced Area', 'admin-page-framework-demo' ), // title
             array( 'apf_first_page', 'apf_second_page' ),   // page slugs - setting multiple slugs is possible
             'side',                                         // context
@@ -115,9 +142,19 @@ if ( is_admin() ) :
         new APF_Demo_Readme(
             '',                         // passing an empty string will disable the form data to be saved.
             APFDEMO_FILE,               // the caller script path.
-            'manage_options',           // the default capability
+            'read',                     // the default capability
             'admin-page-framework-demo' // the text domain        
         );
+
+        // Add the contact page
+        include( APFDEMO_DIRNAME . '/example/APF_Demo_Contact.php' );
+        new APF_Demo_Contact(
+            '',                         // passing an empty string will disable the form data to be saved.
+            APFDEMO_FILE,               // the caller script path.
+            'read',                     // the default capability
+            'admin-page-framework-demo' // the text domain        
+        );
+                
         
         // Modify the top part of the pages with a separate script
         include( APFDEMO_DIRNAME . '/example/APF_Demo_AddPluginTitle.php' );

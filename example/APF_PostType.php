@@ -11,7 +11,7 @@ class APF_PostType extends AdminPageFramework_PostType {
      */
     public function start() {    
 
-        $this->setPostTypeArgs(
+        $this->setArguments(
             array( // argument - for the array structure, refer to http://codex.wordpress.org/Function_Reference/register_post_type#Arguments
                 'labels' => array(
                     'name'               => 'Admin Page Framework',
@@ -32,11 +32,13 @@ class APF_PostType extends AdminPageFramework_PostType {
                 ),
                 'public'            =>    true,
                 'menu_position'     => 110,
-                'supports'          => array( 'title' ), // e.g. array( 'title', 'editor', 'comments', 'thumbnail' ),    
+                'supports'          => array( 'title' ), // e.g. array( 'title', 'editor', 'comments', 'thumbnail', 'excerpt' ),    
                 'taxonomies'        => array( '' ),
-                'has_archive'       =>    true,
-                'show_admin_column' =>    true, // this is for custom taxonomies to automatically add the column in the listing table.
-                'menu_icon'         => $this->oProp->bIsAdmin ? plugins_url( 'asset/image/wp-logo_16x16.png', APFDEMO_FILE ) : null, // do not call the function in the front-end.
+                'has_archive'       => true,
+                'show_admin_column' => true, // this is for custom taxonomies to automatically add the column in the listing table.
+                'menu_icon'         => $this->oProp->bIsAdmin 
+                    ? ( version_compare( $GLOBALS['wp_version'], '3.8', '>=' ) ? 'dashicons-wordpress' : plugins_url( 'asset/image/wp-logo_16x16.png', APFDEMO_FILE ) )
+                    : null, // do not call the function in the front-end.
                 // ( framework specific key ) this sets the screen icon for the post type for WordPress v3.7.1 or below.
                 'screen_icon' => dirname( APFDEMO_FILE  ) . '/asset/image/wp-logo_32x32.png', // a file path can be passed instead of a url, plugins_url( 'asset/image/wp-logo_32x32.png', APFDEMO_FILE )
             )    
@@ -168,6 +170,9 @@ class APF_PostType extends AdminPageFramework_PostType {
             $_aPostData[ $sKey ] = get_post_meta( $_iPostID, $sKey, true );
         }    
         
+        // Or you may do this but the nested elements will be a serialized array.
+        // $_aPostData = get_post_custom( $_iPostID ) ;
+        
         // 2. To retrieve the saved options in the setting pages created by the framework - use the get_option() function.
         // The key name is the class name by default. The key can be changed by passing an arbitrary string 
         // to the first parameter of the constructor of the AdminPageFramework class.     
@@ -176,7 +181,8 @@ class APF_PostType extends AdminPageFramework_PostType {
         return "<h3>" . __( 'Saved Meta Field Values', 'admin-page-framework-demo' ) . "</h3>" 
             . $this->oDebug->getArray( $_aPostData )
             . "<h3>" . __( 'Saved Setting Options', 'admin-page-framework-demo' ) . "</h3>" 
-            . $this->oDebug->getArray( $_aSavedOptions );
+            . $this->oDebug->getArray( $_aSavedOptions )
+            ;
 
     }    
     

@@ -10,15 +10,34 @@ if ( ! class_exists( 'AdminPageFramework_Script_Sortable' ) ) :
 /**
  * Provides JavaScript scripts for the sortable method.
  * 
- * @since 3.0.0     
- * @package AdminPageFramework
- * @subpackage JavaScript
+ * @since           3.0.0     
+ * @since           3.3.0       Extends `AdminPageFramework_Script_Base`.
+ * @package         AdminPageFramework
+ * @subpackage      JavaScript
  * @internal
  */
-class AdminPageFramework_Script_Sortable {
+class AdminPageFramework_Script_Sortable extends AdminPageFramework_Script_Base {
+    
+    /**
+     * The user constructor.
+     * 
+     * @since       3.3.0
+     */
+    protected function construct() {
+        wp_enqueue_script( 'jquery-ui-sortable' ); 
+    }
+    
+    /**
+     * Returns the script.
+     * 
+     * @since       3.0.0
+     * @since       3.3.0       Changed the name from `getjQueryPlugin()`.
+     */
+    static public function getScript() {
 
-    static public function getjQueryPlugin() {
-
+        $_aParams   = func_get_args() + array( null );
+        $_oMsg      = $_aParams[ 0 ];            
+    
         /**
          * HTML5 Sortable jQuery Plugin
          * http://farhadi.ir/projects/html5sortable
@@ -101,7 +120,7 @@ class AdminPageFramework_Script_Sortable {
             };
             
             $.fn.enableAPFSortable = function( sFieldsContainerID ) {
-                
+
                 var _oTarget    = typeof sFieldsContainerID === 'string' 
                     ? $( '#' + sFieldsContainerID + '.sortable' )
                     : this;
@@ -139,14 +158,14 @@ class AdminPageFramework_Script_Sortable {
                         $( this ).find( 'input[type=radio]' ).each( function() {    
                             var sAttr = $( this ).prop( 'checked' );
                             if ( 'undefined' !== typeof sAttr && false !== sAttr ) {
-                                $( this ).attr( 'checked', 'Checked' );
+                                $( this ).attr( 'checked', 'checked' );
                             } 
                         });
                             
                     });
                     
                     /* It seems radio buttons need to be taken cared of again. Otherwise, the checked items will be gone. */
-                    $( this ).find( 'input[type=radio][checked=checked]' ).attr( 'checked', 'Checked' );    
+                    $( this ).find( 'input[type=radio][checked=checked]' ).attr( 'checked', 'checked' );    
                     
                     /* Callback the registered functions */
                     $( this ).callBackSortedFields( 

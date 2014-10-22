@@ -1,176 +1,191 @@
 <?php
 if ( ! class_exists( 'GitHubCustomFieldType' ) ) :
 class GitHubCustomFieldType extends AdminPageFramework_FieldType {
-		
-	/**
-	 * Defines the field type slugs used for this field type.
-	 * 
-	 * The slug is used for the type key in a field definition array.
-	 * 	$this->addSettingFields(
-			array(
-				'section_id'	=>	'...',
-				'type'	=>	'autocomplete',		// <--- THIS PART
-				'field_id'	=>	'...',
-				'title'		=>	'...',
-			)
-		);
-	 */
-	public $aFieldTypeSlugs = array( 'github', );
-	
-	/**
-	 * Defines the default key-values of this field type. 
-	 * 
-	 * The keys are used for the field definition array.
-	 * 	$this->addSettingFields(
-			array(
-				'section_id'	=>	'...',	
-				'type'	=>	'...',
-				'field_id'	=>	'...',
-				'my_custom_key' => '...',	// <-- THIS PART
-			)
-		);
-	 * @remark			$_aDefaultKeys holds shared default key-values defined in the base class.
-	 */
-	protected $aDefaultKeys = array(
-        'user_name'     =>  'michaeluno',
+        
+    /**
+     * Defines the field type slugs used for this field type.
+     * 
+     * The slug is used for the type key in a field definition array.
+     * <code>$this->addSettingFields(
+     *      array(
+     *          'section_id'    => '...',
+     *          'type'          => 'github',        // <--- THIS PART
+     *          'field_id'      => '...',
+     *          'title'         => '...',
+     *      )
+     *  );</code>
+     */
+    public $aFieldTypeSlugs = array( 'github', );
+    
+    /**
+     * Defines the default key-values of this field type. 
+     * 
+     * The keys are used for the field definition array.
+     * <code>$this->addSettingFields(
+     *      array(
+     *          'section_id'    => '...',    
+     *          'type'          => '...',
+     *          'field_id'      => '...',
+     *          'my_custom_key' => '...',    // <-- THIS PART
+     *      )
+     *  );</code>
+     * @remark            $_aDefaultKeys holds shared default key-values defined in the base class.
+     */
+    protected $aDefaultKeys = array(
+        'user_name'     => 'michaeluno',
         'button_type'   => 'follow',        // either of the followings: follow, star, watch, fork, issue
         'count'         => true,            // whether or not the count should be displayed
         'repository'    => 'admin-page-framework',        
         'size'          => null,
-		'attributes'	    =>	array(
+        'attributes'    =>    array(
             'href'              => null,
             'data-style'        => null,
             'data-icon'         => null,
             'data-text'         => null,
             'data-count-href'   => null,
             'data-count-api'    => null,        
-		),	
-	);
+        ),    
+    );
 
-	/**
-	 * User constructor.
-	 * 
-	 * Loaded at the end of the constructor.
-	 */
-	public function construct() {}
-		
-	
-	/**
-	 * Loads the field type necessary components.
-	 * 
-	 * This method is triggered when a field definition array that calls this field type is parsed. 
-	 */ 
-	public function setUp() {
+    /**
+     * User constructor.
+     * 
+     * Loaded at the end of the constructor.
+     */
+    protected function construct() {}
         
-        add_action( 'admin_footer', array( $this, '_replyToInsertScript' ) );
+    
+    /**
+     * Loads the field type necessary components.
+     * 
+     * This method is triggered when a field definition array that calls this field type is parsed. 
+     */ 
+    protected function setUp() {}    
+
+
+    /**
+     * Returns an array holding the urls of enqueuing scripts.
+     * 
+     * The returning array should be composed with all numeric keys. Each element can be either a string( the url or the path of the source file) or an array of custom argument.
+     * 
+     * <h4>Custom Argument Array</h4>
+     * <ul>
+     *     <li><strong>src</strong> - ( required, string ) The url or path of the target source file</li>
+     *     <li><strong>handle_id</strong> - ( optional, string ) The handle ID of the script.</li>
+     *     <li><strong>dependencies</strong> - ( optional, array ) The dependency array. For more information, see <a href="http://codex.wordpress.org/Function_Reference/wp_enqueue_script">codex</a>.</li>
+     *     <li><strong>version</strong> - ( optional, string ) The stylesheet version number.</li>
+     *     <li><strong>translation</strong> - ( optional, array ) The translation array. The handle ID will be used for the object name.</li>
+     *     <li><strong>in_footer</strong> - ( optional, boolean ) Whether to enqueue the script before < / head > or before < / body > Default: <code>false</code>.</li>
+     *     <li><strong>arguments</strong> - ( optional, array ) [3.3.0+] argument array. <code>array( 'async' => '', 'data-id' => '...' )</code></li>
+     * </ul>     
+     * <h4>Example</h4>
+     * <code>array( 
+     *     'src'           => dirname( __FILE__ ) . '/asset/github-buttons/buttons.js',
+     *     'handle_id'     => 'github-bjs',
+     *     'in_footer'     => true,
+     *     'attributes'    => array(
+     *         'async'     => '',
+     *         'defer'     => '',
+     *     ),
+     * )</code>
+     */
+    protected function getEnqueuingScripts() { 
+        return array(
+            array( 
+                'src'           => dirname( __FILE__ ) . '/asset/github-buttons/buttons.js',
+                'handle_id'     => 'github-bjs',
+                'in_footer'     => true,
+                'attributes'    => array(
+                    'async'     => '',
+                    'defer'     => '',
+                    'id'        => 'github-bjs',
+                ),
+            ),
+        );
+    }
+    
+    /**
+     * Returns an array holding the urls of enqueuing styles.
+     * 
+     * <h4>Custom Argument Array</h4>
+     * <ul>
+     *     <li><strong>src</strong> - ( required, string ) The url or path of the target source file</li>
+     *     <li><strong>handle_id</strong> - ( optional, string ) The handle ID of the stylesheet.</li>
+     *     <li><strong>dependencies</strong> - ( optional, array ) The dependency array. For more information, see <a href="http://codex.wordpress.org/Function_Reference/wp_enqueue_style">codex</a>.</li>
+     *     <li><strong>version</strong> - ( optional, string ) The stylesheet version number.</li>
+     *     <li><strong>media</strong> - ( optional, string ) the description of the field which is inserted into the after the input field tag.</li>
+     *     <li><strong>arguments</strong> - ( optional, array ) [3.3.0+] argument array. <code>array( 'data-id' => '...' )</code></li>
+     * </ul>
+     * <h4>Example</h4>
+     * <code>array(    
+     *      array( 
+     *          'src'       => dirname( __FILE__ ) . '/assets/css/main.css',
+     *          'handle_id' => 'custom_button_css',
+     *      ),
+     *  );</code>
+     */
+    protected function getEnqueuingStyles() { 
+        return array(    
+            array( 
+                'src'       => dirname( __FILE__ ) . '/asset/github-buttons/assets/css/main.css',
+                'handle_id' => 'github_button_css',
+            ),
+        );
+    }            
+
+
+    /**
+     * Returns the field type specific JavaScript script.
+     */ 
+    protected function getScripts() { 
+
+        $aJSArray = json_encode( $this->aFieldTypeSlugs );
+        /*    
+         * The below function will be triggered when a new repeatable field is added. 
+         * 
+         * Use the registerAPFCallback method to register a callback.
+         * Available callbacks are:
+         *     added_repeatable_field      - triggered when a repeatable field gets repeated. Parameters 1. (object) the jQuery element object. 2. (string) the field type slug. 3. (string) the field tag id.
+         *     removed_repeatable_field    - triggered when a repeatable field gets removed. Parameters 1. (object) the jQuery element object. 2. (string) the field type slug. 3. (string) the field tag id.
+         *     sorted_fields               - triggered when a sortable field gets sorted. Parameters 1. (object) the jQuery element object. 2. (string) the field type slug. 3. (string) the field tag id.
+         *     stopped_sorting_fields      - triggered when sorting fields finishes. 
+         * */
+        return "" . PHP_EOL;
         
-    }	
-        static public $_bAddedScriptToFooter;
-        public function _replyToInsertScript() {
-            
-            if ( isset( self::$_bAddedScriptToFooter ) && self::$_bAddedScriptToFooter ) {
-                return;
-            }
-            self::$_bAddedScriptToFooter = true;
-            echo "<script async defer id='github-bjs' src='" . $this->resolveSRC( dirname( __FILE__ ) . '/asset/github-buttons/buttons.js' ) . "'>"
-                . "</script>";
-            
-        }
+    }
 
-	/**
-	 * Returns an array holding the urls of enqueuing scripts.
-	 * 
-	 * The returning array should be composed with all numeric keys. Each element can be either a string( the url or the path of the source file) or an array of custom argument.
-	 * 
-	 * <h4>Custom Argument Array</h4>
-	 * <ul>
-	 * 	<li><strong>src</strong> - ( required, string ) The url or path of the target source file</li>
-	 * 	<li><strong>handle_id</strong> - ( optional, string ) The handle ID of the script.</li>
-	 * 	<li><strong>dependencies</strong> - ( optional, array ) The dependency array. For more information, see <a href="http://codex.wordpress.org/Function_Reference/wp_enqueue_script">codex</a>.</li>
-	 * 	<li><strong>version</strong> - ( optional, string ) The stylesheet version number.</li>
-	 * 	<li><strong>translation</strong> - ( optional, array ) The translation array. The handle ID will be used for the object name.</li>
-	 * 	<li><strong>in_footer</strong> - ( optional, boolean ) Whether to enqueue the script before < / head > or before < / body > Default: <code>false</code>.</li>
-	 * </ul>	 
-	 */
-	protected function getEnqueuingScripts() { 
-		return array(
-		);
-	}
-	
-	/**
-	 * Returns an array holding the urls of enqueuing styles.
-	 * 
-	 * <h4>Custom Argument Array</h4>
-	 * <ul>
-	 * 	<li><strong>src</strong> - ( required, string ) The url or path of the target source file</li>
-	 * 	<li><strong>handle_id</strong> - ( optional, string ) The handle ID of the stylesheet.</li>
-	 * 	<li><strong>dependencies</strong> - ( optional, array ) The dependency array. For more information, see <a href="http://codex.wordpress.org/Function_Reference/wp_enqueue_style">codex</a>.</li>
-	 * 	<li><strong>version</strong> - ( optional, string ) The stylesheet version number.</li>
-	 * 	<li><strong>media</strong> - ( optional, string ) the description of the field which is inserted into the after the input field tag.</li>
-	 * </ul>
-	 */
-	protected function getEnqueuingStyles() { 
-		return array(	
-            '//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700',
-			dirname( __FILE__ ) . '/github-buttons/assets/css/main.css',		
-		);
-	}			
+    /**
+     * Returns IE specific CSS rules.
+     */
+    protected function getIEStyles() { return ''; }
 
-
-	/**
-	 * Returns the field type specific JavaScript script.
-	 */ 
-	protected function getScripts() { 
-
-		$aJSArray = json_encode( $this->aFieldTypeSlugs );
-		/*	
-		 * The below function will be triggered when a new repeatable field is added. 
-		 * 
-		 * Use the registerAPFCallback method to register a callback.
-		 * Available callbacks are:
-		 * 	added_repeatable_field      - triggered when a repeatable field gets repeated. Parameters 1. (object) the jQuery element object. 2. (string) the field type slug. 3. (string) the field tag id.
-		 * 	removed_repeatable_field    - triggered when a repeatable field gets removed. Parameters 1. (object) the jQuery element object. 2. (string) the field type slug. 3. (string) the field tag id.
-		 * 	sorted_fields               - triggered when a sortable field gets sorted. Parameters 1. (object) the jQuery element object. 2. (string) the field type slug. 3. (string) the field tag id.
-		 * 	stopped_sorting_fields      - triggered when sorting fields finishes. 
-		 * */
-		return "" . PHP_EOL;
-		
-	}
-
-	/**
-	 * Returns IE specific CSS rules.
-	 */
-	protected function getIEStyles() { return ''; }
-
-	/**
-	 * Returns the field type specific CSS rules.
-	 */ 
-	protected function getStyles() {
-		return "
+    /**
+     * Returns the field type specific CSS rules.
+     */ 
+    protected function getStyles() {
+        return "
             .github-button-container {
                 vertical-align: middle;
                 display: inline-block;
                 margin-top: 0.2em;
             }
-		";
-	}
+        ";
+    }
 
-	
-	/**
-	 * Returns the output of the geometry custom field type.
-	 * 
-	 */
-	/**
-	 * Returns the output of the field type.
-	 */
-	protected function getField( $aField ) { 
-// var_dump( $aField );
+    
+    /**
+     * Returns the output of the geometry custom field type.
+     * 
+     */
+    /**
+     * Returns the output of the field type.
+     */
+    protected function getField( $aField ) { 
 
-		$_aAttributes           = $aField['attributes'];
-		$_aAttributes['class'] .= ' github github-button';
+        $_aAttributes           = $aField['attributes'];
+        $_aAttributes['class'] .= ' github github-button';
         $_aAttributes = $this->uniteArrays( 
             $_aAttributes,
-            // array(),
             array(
                 'href'              => $this->_getHrefByType( $aField['button_type'], $aField['user_name'], $aField['repository'] ),
                 'class'             => $_aAttributes['class'],
@@ -182,12 +197,10 @@ class GitHubCustomFieldType extends AdminPageFramework_FieldType {
                 
             )
         );
-        
-// var_dump( $_aAttributes );
-        // $_aAttributes = array_filter( $_aAttributes );
-		return 
-			$aField['before_label']
-			. "<div class='admin-page-framework-input-label-container'>"		
+
+        return 
+            $aField['before_label']
+            . "<div class='admin-page-framework-input-label-container'>"        
                 . $aField['before_input']
                 . ( $aField['label'] && ! $aField['repeatable']
                     ? "<span class='admin-page-framework-input-label-string' style='min-width:" . $this->sanitizeLength( $aField['label_min_width'] ) . ";'>" . $aField['label'] . "</span>"
@@ -199,11 +212,11 @@ class GitHubCustomFieldType extends AdminPageFramework_FieldType {
                     . "</a>"
                 . "</div>"
                 . $aField['after_input']
-				
-			. "</div>"
-			. $aField['after_label'];
-		
-	}	         
+                
+            . "</div>"
+            . $aField['after_label'];
+        
+    }             
         private function _getHrefByType( $sButtonType, $sUserName, $sRepository ) {
             $sButtonType = strtolower( $sButtonType );
             switch( $sButtonType ) {

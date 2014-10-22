@@ -21,16 +21,34 @@ class AdminPageFramework_WPUtility_HTML extends AdminPageFramework_WPUtility_URL
     /**
      * Enhances the parent method generateAttributes() by escaping the attribute values.
      * 
-     * @since 3.0.0
+     * For example, 
+     * 
+     *      array( 'id' => 'my_id', 'name' => 'my_name', 'class' => 'my_class' ) 
+     * 
+     * will become
+     * 
+     *      id='my_id' name='my_name' class='my_class'
+     * 
+     * @since   3.0.0
+     * @remark  The single quotes will be used.
+     * @remark  For an element with an empty string, only the attribute name will be placed. To prevent the attribute name gets inserted, set null to it.
      */
-    static public function generateAttributes( array $aAttributes ) {
+    static public function generateAttributes( array $aAttributes ) {  
         
-        foreach( $aAttributes as $sAttribute => &$asProperty ) {
-            if ( is_array( $asProperty ) || is_object( $asProperty ) )
-                unset( $aAttributes[ $sAttribute ] );
-            if ( is_string( $asProperty ) )
-                $asProperty = esc_attr( $asProperty );  // $aAttributes = array_map( 'esc_attr', $aAttributes ); // this also converts arrays into string value, Array.
+        // Sanitize the attribute array.
+        foreach( $aAttributes as $_sAttribute => &$_vProperty ) {
+            if ( is_array( $_vProperty ) || is_object( $_vProperty ) ) {
+                unset( $aAttributes[ $_sAttribute ] );
+            }
+            if ( is_null( $_vProperty ) ) {
+                unset( $aAttributes[ $_sAttribute ] );
+            }
+            if ( is_string( $_vProperty ) ) {
+                $_vProperty = esc_attr( $_vProperty );  
+            }
         }     
+        
+        // Generate the attributes string.
         return parent::generateAttributes( $aAttributes );
         
     }    
@@ -41,11 +59,11 @@ class AdminPageFramework_WPUtility_HTML extends AdminPageFramework_WPUtility_URL
      */
     static public function generateDataAttributes( array $aArray ) {
         
-        $aNewArray = array();
-        foreach( $aArray as $sKey => $v ) 
-            $aNewArray[ "data-{$sKey}" ] = $v;
-            
-        return self::generateAttributes( $aNewArray );
+        $_aNewArray = array();
+        foreach( $aArray as $sKey => $v ) {
+            $_aNewArray[ "data-{$sKey}" ] = $v;
+        }
+        return self::generateAttributes( $_aNewArray );
         
     }
     

@@ -249,8 +249,8 @@ class AdminPageFramework_FormField extends AdminPageFramework_FormField_Base {
                     'id'        => $__aField['_field_container_id'],
                     'data-type' => "{$__aField['type']}", // this is referred by the repeatable field JavaScript script.
                     'class'     => "admin-page-framework-field admin-page-framework-field-{$__aField['type']}" 
-                        . ( $__aField['attributes']['disabled'] ? ' disabled' : '' )
-                        . ( $_bIsSubField ? ' admin-page-framework-subfield' : '' ),
+                        . ( $__aField['attributes']['disabled'] ? ' disabled' : null )
+                        . ( $_bIsSubField ? ' admin-page-framework-subfield' : null ),
                 ) + $__aField['attributes']['field'];    
                 $_aOutput[] = $__aField['before_field']
                     . "<div " . $this->generateAttributes( $_aFieldAttributes ) . ">"
@@ -318,8 +318,8 @@ class AdminPageFramework_FormField extends AdminPageFramework_FormField_Base {
                 $_aOutput = array();
                 
                 // Add the description
-                if ( isset( $aField['description'] ) && trim( $aField['description'] ) != '' )  {
-                    $_aOutput[] = "<p class='admin-page-framework-fields-description'><span class='description'>{$aField['description']}</span></p>";
+                if ( isset( $aField['description'] ) )  {
+                    $_aOutput[] = $this->_getDescription( $aField['description'] );
                 }
                     
                 // Add the repeater & sortable scripts 
@@ -328,6 +328,25 @@ class AdminPageFramework_FormField extends AdminPageFramework_FormField_Base {
                 return implode( PHP_EOL, $_aOutput );
                 
             }
+                /**
+                 * Returns the HTML formatted description blocks by the given description definition.
+                 * 
+                 * @since   3.3.0
+                 * @return  string      The description output.
+                 */
+                private function _getDescription( $asDescription ) {
+                    
+                    if ( empty( $asDescription ) ) { return ''; }
+                    
+                    $_aOutput = array();
+                    foreach( $this->getAsArray( $asDescription ) as $_sDescription ) {
+                        $_aOutput[] = "<p class='admin-page-framework-fields-description'>"
+                                . "<span class='description'>{$_sDescription}</span>"
+                            . "</p>";
+                    }
+                    return implode( PHP_EOL, $_aOutput );
+                    
+                }
                 /**
                  * Returns the output of JavaScript scripts for the field (and its sub-fields).
                  * 

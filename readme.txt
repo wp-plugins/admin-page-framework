@@ -17,26 +17,28 @@ It provides plugin and theme developers with easier means of creating option pag
 
 = What you can do =
 
-with it, easily create:
+with it easily create:
 
 - **Root Page, Sub Pages, and Tabs** - where your users will access to operate your plugin or theme.
 - **Forms** - to let your users store their options.
 - **Custom Post Types** - and the custom columns in the post listing table.
-- **Meta Boxes and Fields** - which help to store meta data stored associated with posts of set post types. Also meta boxes can be added to the pages created with the framework.
+- **Custom Taxonomies and Fields** - to store options associated with a taxonomy in the taxonomy definition page.
+- **Meta Boxes and Fields** - which help to store meta data associated with posts of set post types. Also meta boxes can be added to the pages created with the framework.
 - **Widgets and Fields** - to display modular outputs based on the user's settings in the front end.
 - **Network Admin Pages and Forms** - for WordPress multi-sites.
+- **Contact Form** - to let the user report issues or feedback via emails.
 
 = What are useful about =
 - **Extensible** - the created admin pages will become highly extensible with the automatically created hooks. In other words, it empowers other developers to customize your plugin or theme. That will result on making your projects grow.
 - **Section Tabs** - form sections can be displayed in a tabbed box.
-- **Repeatability** - supports repeatable form sections and fields which means the user can dynamically add/remove form fields.
-- **Sortability** - supports sortable form fields which means the user can set the order of fields by moving the field with drag-and-drop.
+- **Repeatable Fields** - dynamically add/remove form sections and fields.
+- **Sortable Fields** - drag and drop fields to change the order.
 - **Import and Export Options** - buttons that the user can import and export settings by uploading and downloading text files.
 - **Reset Button** - lets the user to initialize the saved options.
 - **Validation and Error Messages** - with the pre-defined validation callbacks, the user's submitting form data can be verified. Furthermore, by setting the error array, you can display the error message to the user.
-- **Taxonomy Fields** - the framework provides methods to add fields in the taxonomy definition page.
 - **Contextual Help Pane** - help contents can be added to the contextual help pane that appears at the top right of each screen.
 - **Custom Field Types** - your own field type can be registered. This allows you to design own fields such as a combination of a checkbox with a text field. 
+- **Portable** - use the framework as a library and include the minified version and your plugin or theme does not require an extra plugin install. Therefore, your product will be perfectly portable.
 
 = Built-in Field Types =
 - `text` - a normal field to enter text input.
@@ -57,6 +59,7 @@ with it, easily create:
 - `taxonomy` - check-lists of taxonomies enabled on the site in a tabbed box.
 - `size` - a combination field of the text and the select fields that let the user set sizes with a selectable unit.
 - `section_title` - a text field type that will be placed in the section title so that it lets the user set the section title.
+- `system` - displays the site system information.
 
 = Bundled Custom Field Types = 
 You can include your own custom field types when they are necessary. The reason that they are not built-in is to keep the library size as small as possible. The followings are example custom field types.
@@ -69,9 +72,10 @@ You can include your own custom field types when they are necessary. The reason 
 - `grid` - a drag and drop grid composer.
 - `autocomplete` - a custom text field that shows a predefined pop-up autocomplete list.
 - `link` - it lets pick a post and set the url.
-- `system` - displays the site system information.
 - `github` - displays GitHub buttons.
 - `image_checkbox`, `image_radio` - displays images instead of text labels to be selected.
+- `reset` - a custom submit button that initialize the text form inputs.
+- `ace` - a rich code editor.
 
 = Necessary Files =
 - **`admin-page-framework.min.php`** is in the *library* folder. Alternatively you may use **`admin-page-framework.php`** located in the *development* folder. In that case, all the class files in the sub-folders need to be copied.
@@ -443,6 +447,35 @@ See examples, https://gist.github.com/michaeluno/c30713fcfe0d9d45d89f, https://g
 Check out [the issues](https://github.com/michaeluno/admin-page-framework/issues?labels=enhancement&page=1&state=open) on GitHub labeled *enhancement*.
 
 == Changelog ==
+
+= 3.3.0 - 2014/10/22 =
+- Added the 'Select All' and 'Select None' buttons for check boxes.
+- Added the <code>[ace](https://github.com/soderlind/AceCustomFieldType)</code> custom field type.
+- Added the ability to have different menu title from the page title with the `page_title` and `menu_title` argument pass to the `addSubMenuItems()` method.
+- Added the ability for the `description` field/section definition argument to accept an array to process elements as multiple paragraphs.
+- Added the ability to set custom arguments to enqueuing resource(style/script) tags.
+- Added an example of querying posts by custom meta key and value in the demo plugin.
+- Added the ability to send emails with the `submit` field type.
+- Added the `reset` custom field type.
+- Added the `system` field type (changed from a custom field type and became built-in).
+- Fixed an issue that JavaScript scripts added by widget fields could not be properly loaded in `customize.php`.
+- Fixed an issue of the `revealer` custom field type that the saved selected item could not be displayed after saving the form.
+- Fixed unescaped tags and attributes in tabs.
+- Fixed a bug that the `reset` argument of the `submit` field type caused a loss of stored options when the form fields are not added via the load_{...} hooks and have multiple pages are added.
+- Fixed an issue that when setting form elements with the `load_{page slug}_{tab}` hook, the fields could not be displayed if the user clicked on the sidebar menu and the tab is the default tab.
+- Fixed an issue that the TinyMCE rich editor could not be enabled in widget forms.
+- Fixed an issue that Quick Tags of rich editors could not be repeated.
+- Fixed an issue that values set to textarea tags were not escaped.
+- Optimized the process of handling field errors in post meta boxes. 
+- Tweaked the timing of jQuery event binding of the `date`, 'date_time', and 'time' custom field types.
+- Tweaked the styling of remove buttons for `image`, `media`, `font` field types for WordPress 3.7.x or below.
+- Tweaked the styling of sortable fields.
+- Tweaked the styling of widget forms.
+- Changed to prevent posts from being published if there are field errors of meta boxes. 
+- Changed the layout of meta-box field table by making the field title column to be displayed as inline-block.
+- Changed the metabox factory class to accept an empty ID to be passed to let the factory class automatically generates an ID from the class name.
+- Changed the timing of finalizing in-page tabs.
+- Changed the positions of the + and - repeatable buttons.
 
 = 3.2.1 - 2014/09/29 =
 - Added an example of using the `content_top_{...}` and the `style_common_admin_page_framework` filters.

@@ -31,7 +31,7 @@ class AdminPageFramework_FormTable extends AdminPageFramework_FormTable_Base {
                 $_aOutput[] = "<div " . $this->generateAttributes(
                         array(
                             'class' => 'admin-page-framework-sectionset',
-                            'id' => "sectionset-{$_sSectionTabSlug}_" . md5( serialize( $_aSections ) ),
+                            'id'    => "sectionset-{$_sSectionTabSlug}_" . md5( serialize( $_aSections ) ),
                         )
                     ) . ">" 
                         . $_sSectionSet
@@ -136,8 +136,8 @@ class AdminPageFramework_FormTable extends AdminPageFramework_FormTable_Base {
                 "<div " . $this->generateAttributes(
                         array(
                             'class' => 'admin-page-framework-sections'
-                                . ( ! $_sSectionTabSlug || $_sSectionTabSlug == '_default' ? '' : ' admin-page-framework-section-tabs-contents' ),
-                            'id' => "sections-" . md5( serialize( $aSections ) ),
+                                . ( ! $_sSectionTabSlug || $_sSectionTabSlug == '_default' ? null : ' admin-page-framework-section-tabs-contents' ),
+                            'id'    => "sections-" . md5( serialize( $aSections ) ),
                         )
                     ) . ">"                 
                     . ( $_sSectionTabSlug // if the section tab slug yields true, insert the section tab list
@@ -212,20 +212,19 @@ class AdminPageFramework_FormTable extends AdminPageFramework_FormTable_Base {
          */
         private function getRepeatableSectionsEnablerScript( $sContainerTagID, $iSectionCount, $aSettings ) {
             
-            add_action( 'admin_footer', array( $this, '_replyToAddRepeatableSectionjQueryPlugin' ) );
+            new AdminPageFramework_Script_RepeatableSection( $this->oMsg );            
             
             if ( empty( $aSettings ) ) return '';     
-            $aSettings = ( is_array( $aSettings ) ? $aSettings : array() ) + array( 'min' => 0, 'max' => 0 ); // do not cast array since it creates a zero key for an empty variable.
+            $aSettings              = ( is_array( $aSettings ) ? $aSettings : array() ) + array( 'min' => 0, 'max' => 0 ); // do not cast array since it creates a zero key for an empty variable.
             
-            
-            $_sAdd = $this->oMsg->get( 'add_section' );
-            $_sRemove = $this->oMsg->get( 'remove_section' );
-            $_sVisibility = $iSectionCount <= 1 ? " style='display:none;'" : "";
-            $_sSettingsAttributes = $this->generateDataAttributes( $aSettings );
-            $_sButtons = 
+            $_sAdd                  = $this->oMsg->get( 'add_section' );
+            $_sRemove               = $this->oMsg->get( 'remove_section' );
+            $_sVisibility           = $iSectionCount <= 1 ? " style='display:none;'" : "";
+            $_sSettingsAttributes   = $this->generateDataAttributes( $aSettings );
+            $_sButtons              = 
                 "<div class='admin-page-framework-repeatable-section-buttons' {$_sSettingsAttributes} >"
-                    . "<a class='repeatable-section-add button-secondary repeatable-section-button button button-large' href='#' title='{$_sAdd}' data-id='{$sContainerTagID}'>+</a>"
                     . "<a class='repeatable-section-remove button-secondary repeatable-section-button button button-large' href='#' title='{$_sRemove}' {$_sVisibility} data-id='{$sContainerTagID}'>-</a>"
+                    . "<a class='repeatable-section-add button-secondary repeatable-section-button button button-large' href='#' title='{$_sAdd}' data-id='{$sContainerTagID}'>+</a>"
                 . "</div>";
             $aJSArray = json_encode( $aSettings );
             return
@@ -237,7 +236,6 @@ class AdminPageFramework_FormTable extends AdminPageFramework_FormTable_Base {
                 </script>";     
             
         }
-
         
     /**
      * Returns a single HTML table output of a set of fields generated from the given field definition arrays.
@@ -246,7 +244,7 @@ class AdminPageFramework_FormTable extends AdminPageFramework_FormTable_Base {
      */
     public function getFormTable( $sSectionTagID, $iSectionIndex, $aSection, $aFields, $hfSectionCallback, $hfFieldCallback ) {
 
-        if ( count( $aFields ) <= 0 ) return '';
+        if ( count( $aFields ) <= 0 ) { return ''; }
         
         // For regular repeatable fields, the title should be omitted exept the first item.
         $_sDisplayNone = ( $aSection['repeatable'] && $iSectionIndex != 0 && ! $aSection['section_tab_slug'] )
@@ -261,7 +259,7 @@ class AdminPageFramework_FormTable extends AdminPageFramework_FormTable_Base {
         $_aOutput[] = "<table "
             . $this->generateAttributes(  
                     array( 
-                        'id' => 'section_table-' . $sSectionTagID,
+                        'id'    => 'section_table-' . $sSectionTagID,
                         'class' => 'form-table', // temporarily deprecated: admin-page-framework-section-table
                     )
                 )
@@ -276,7 +274,7 @@ class AdminPageFramework_FormTable extends AdminPageFramework_FormTable_Base {
                             )     
                             . ( is_callable( $hfSectionCallback )
                                 ? "<div class='admin-page-framework-section-description'>"     // admin-page-framework-section-description is referred by the repeatable section buttons
-                                        . call_user_func_array( $hfSectionCallback, array( '<p>' . $aSection['description'] . '</p>', $aSection ) )
+                                        . call_user_func_array( $hfSectionCallback, array( $this->_getDescription( $aSection['description'] ) , $aSection ) )
                                     . "</div>"
                                 : ""
                             )
@@ -292,9 +290,9 @@ class AdminPageFramework_FormTable extends AdminPageFramework_FormTable_Base {
         return "<div "
             . $this->generateAttributes(
                     array( 
-                        'id' => $sSectionTagID, // section-{section id}__{index}
+                        'id'    => $sSectionTagID, // section-{section id}__{index}
                         'class' => 'admin-page-framework-section'
-                            . ( $aSection['section_tab_slug'] ? ' admin-page-framework-tab-content' : '' ),
+                            . ( $aSection['section_tab_slug'] ? ' admin-page-framework-tab-content' : null ),
                     )     
                 )
             . ">"
@@ -302,7 +300,25 @@ class AdminPageFramework_FormTable extends AdminPageFramework_FormTable_Base {
             . "</div>";
         
     }
-
+        /**
+         * Returns the HTML formatted description blocks by the given description definition.
+         * 
+         * @since   3.3.0
+         * @return  string      The description output.
+         */
+        private function _getDescription( $asDescription ) {
+            
+            if ( empty( $asDescription ) ) { return ''; }
+            
+            $_aOutput = array();
+            foreach( $this->getAsArray( $asDescription ) as $_sDescription ) {
+                $_aOutput[] = "<p class='admin-page-framework-section-description'>"
+                        . "<span class='description'>{$_sDescription}</span>"
+                    . "</p>";
+            }
+            return implode( PHP_EOL, $_aOutput );
+            
+        }    
     /**
      * Returns the output of a set of fields generated from the given field definition arrays enclosed in a table row tag for each.
      * 
@@ -325,22 +341,22 @@ class AdminPageFramework_FormTable extends AdminPageFramework_FormTable_Base {
          */
         protected function _getFieldRow( $aField, $hfCallback ) {
             
-            if ( $aField['type'] == 'section_title' ) return '';
+            if ( 'section_title' === $aField['type'] ) { return ''; }
             
             $aOutput = array();
             $_aField = $this->_mergeDefault( $aField );
             $_sAttributes_TR = $this->_getAttributes( 
                 $_aField,
                 array( 
-                    'id' => 'fieldrow-' . AdminPageFramework_FormField::_getInputTagID( $_aField ),
-                    'valign' => 'top',
-                    'class' => 'admin-page-framework-fieldrow',
+                    'id'        => 'fieldrow-' . AdminPageFramework_FormField::_getInputTagID( $_aField ),
+                    'valign'    => 'top',
+                    'class'     => 'admin-page-framework-fieldrow',
                 )
             );
             $_sAttributes_TD = $this->generateAttributes( 
                 array(
-                    'colspan' => $_aField['show_title_column'] ? 1 : 2,
-                    'class' => $_aField['show_title_column'] ? '' : 'admin-page-framework-field-td-no-title',
+                    'colspan'   => $_aField['show_title_column'] ? 1 : 2,
+                    'class'     => $_aField['show_title_column'] ? null : 'admin-page-framework-field-td-no-title',
                 )
             );
             $aOutput[] = "<tr {$_sAttributes_TR}>";

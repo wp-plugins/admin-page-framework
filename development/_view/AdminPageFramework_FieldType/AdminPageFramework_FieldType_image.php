@@ -476,12 +476,23 @@ class AdminPageFramework_FieldType_image extends AdminPageFramework_FieldType_Ba
                 margin-top: 0.4em;
                 margin-bottom: 0.8em;
                 display: block; 
-                
+                max-width: 100%;
+                height: auto;   
+                width: inherit;                
             }     
+
+            .admin-page-framework-field .image_preview img {     
+                height: auto; 
+                max-width: 100%;
+                display: block;         
+            }
+            .widget .admin-page-framework-field .image_preview {
+                max-width: 100%;
+            }            
             @media only screen and ( max-width: 1200px ) {
                 .admin-page-framework-field .image_preview {
                     max-width: 600px;
-                }
+                }             
             } 
             @media only screen and ( max-width: 900px ) {
                 .admin-page-framework-field .image_preview {
@@ -503,12 +514,7 @@ class AdminPageFramework_FieldType_image extends AdminPageFramework_FieldType_Ba
                     max-width: 600px;
                 }
             }  
-            .admin-page-framework-field .image_preview img {     
-                width: auto;
-                height: auto; 
-                max-width: 100%;
-                display: block;
-            }
+
             /* Image Uploader Input Field */
             .admin-page-framework-field-image input {
                 margin-right: 0.5em;
@@ -595,11 +601,11 @@ class AdminPageFramework_FieldType_image extends AdminPageFramework_FieldType_Ba
             foreach( ( array ) $aField['attributes_to_store'] as $sAttribute )
                 $_aOutputs[] = "<input " . $this->generateAttributes( 
                         array(
-                            'id' => "{$aField['input_id']}_{$sAttribute}",
-                            'type' => 'hidden',
-                            'name' => "{$aField['_input_name']}[{$sAttribute}]",
-                            'disabled' => isset( $aField['attributes']['diabled'] ) && $aField['attributes']['diabled'] ? 'Disabled' : '',
-                            'value' => isset( $aField['attributes']['value'][ $sAttribute ] ) ? $aField['attributes']['value'][ $sAttribute ] : '',
+                            'id'        => "{$aField['input_id']}_{$sAttribute}",
+                            'type'      => 'hidden',
+                            'name'      => "{$aField['_input_name']}[{$sAttribute}]",
+                            'disabled'  => isset( $aField['attributes']['disabled'] ) && $aField['attributes']['disabled'] ? 'disabled' : null,
+                            'value'     => isset( $aField['attributes']['value'][ $sAttribute ] ) ? $aField['attributes']['value'][ $sAttribute ] : '',
                         )
                     ) . "/>";
             return implode( PHP_EOL, $_aOutputs );
@@ -707,7 +713,7 @@ class AdminPageFramework_FieldType_image extends AdminPageFramework_FieldType_Ba
                     'title' => $_bIsLabelSet ? $aButtonAttributes['data-label'] : $this->oMsg->get( 'remove_value' ),
                 );
             $_aAttributes['class']  = $this->generateClassAttribute( 
-                'remove_image button button-small', 
+                'remove_value remove_image button button-small', 
                 trim( $aButtonAttributes['class'] ) ? $aButtonAttributes['class'] : $_sDashIconSelector
             );
             $_sButton               = 

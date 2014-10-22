@@ -30,16 +30,16 @@ class AdminPageFramework_FieldType_textarea extends AdminPageFramework_FieldType
     protected $aDefaultKeys = array(
         'rich'          => false,
         'attributes'    => array(     
-            'autofocus'     => '',
+            'autofocus'     => null,
             'cols'          => 60,
-            'disabled'      => '',
-            'formNew'       => '',
-            'maxlength'     => '',
-            'placeholder'   => '',
-            'readonly'      => '',
-            'required'      => '',
+            'disabled'      => null,
+            'formNew'       => null,
+            'maxlength'     => null,
+            'placeholder'   => null,
+            'readonly'      => null,
+            'required'      => null,
             'rows'          => 4,
-            'wrap'          => '',     
+            'wrap'          => null,     
         ),
     );
 
@@ -103,7 +103,8 @@ class AdminPageFramework_FieldType_textarea extends AdminPageFramework_FieldType
                  * @param   string  sTextAreaID     The textarea element ID without the sharp mark(#).
                  */
                 var updateEditor = function( sTextAreaID, oTinyMCESettings, oQickTagSettings ) {
-                
+                    
+                    removeEditor( sTextAreaID );
                     var aTMCSettings    = jQuery.extend( 
                         {}, 
                         oTinyMCESettings, 
@@ -138,7 +139,8 @@ class AdminPageFramework_FieldType_textarea extends AdminPageFramework_FieldType
                     
                      // Enable quick tags
                     quicktags( aQTSettings );   // does not work... See https://core.trac.wordpress.org/ticket/26183
-                                          
+                    QTags._buttonsInit();                     
+                    
                     window.tinymce.dom.Event.domLoaded = true;   
                     tinyMCE.init( aTMCSettings );
                     jQuery( this ).find( '.wp-editor-wrap' ).first().on( 'click.wp-editor', function() {
@@ -146,8 +148,7 @@ class AdminPageFramework_FieldType_textarea extends AdminPageFramework_FieldType
                             window.wpActiveEditor = this.id.slice( 3, -5 );
                         }
                     }); 
-                
-                    
+   
                 }
                 
                 /**
@@ -223,9 +224,8 @@ class AdminPageFramework_FieldType_textarea extends AdminPageFramework_FieldType
                             oWrap.empty()
                                 .prepend( oEditorContainer.prepend( oTextArea.show() ) )
                                 .prepend( oToolBar );   
-
+                                
                             // Update the editor. For repeatable sections, remove the previously assigned editor.                        
-                            removeEditor( oTextArea.attr( 'id' ) );
                             updateEditor( oTextArea.attr( 'id' ), oSettings['TinyMCE'], oSettings['QuickTags'] );
                                                   
                             // The ID attributes of sub-elements are not updated yet
@@ -299,7 +299,7 @@ class AdminPageFramework_FieldType_textarea extends AdminPageFramework_FieldType
                             if ( 0 === iIndex ) {
                                 removeEditor( oTextAreaPrevious.attr( 'id' ) );
                             }
-                            removeEditor( oTextArea.attr( 'id' ) );
+
                             updateEditor( oTextArea.attr( 'id' ), oSettings['TinyMCE'], oSettings['QuickTags'] );
                                                       
                             // The ID attributes of sub-elements are not updated yet
@@ -364,7 +364,7 @@ class AdminPageFramework_FieldType_textarea extends AdminPageFramework_FieldType
                                 .prepend( oEditorContainer.prepend( oTextArea.show() ) )
                                 .prepend( oToolBar );   
 
-                            removeEditor( oTextArea.attr( 'id' ) );
+                            
                             updateEditor( oTextArea.attr( 'id' ), oSettings['TinyMCE'], oSettings['QuickTags'] );
 
                             // The ID attributes of sub-elements are not updated yet
@@ -377,8 +377,62 @@ class AdminPageFramework_FieldType_textarea extends AdminPageFramework_FieldType
                                                                                 
                         });
                         
-                    }
-					
+                    },
+                    /**
+                     * The saved widget callback.
+                     * 
+                     * It is called when a widget is saved.
+                     */
+					saved_widget : function( oWidget ) { 
+                    
+                         // If tinyMCE is not ready, return.
+                        if ( 'object' !== typeof tinyMCEPreInit ){
+                            return;
+                        }       
+ 
+                        var _sWidgetInitialTextareaID;
+                        jQuery( oWidget ).find( '.admin-page-framework-field' ).each( function( iIndex ) {
+                                                        
+                            /* If the textarea tag is not found, do nothing  */
+                            var oTextAreas = jQuery( this ).find( 'textarea.wp-editor-area' );
+                            if ( oTextAreas.length <= 0 ) {
+                                return true;
+                            }                    
+                            
+                            // Find the tinyMCE wrapper element
+                            var oWrap       = jQuery( this ).find( '.wp-editor-wrap' );
+                            if ( oWrap.length <= 0 ) {
+                                return true;
+                            }                                   
+
+                            // Retrieve the TinyMCE and Quick Tags settings from the initial widget form element. The initial widget is the one from which the user drags.
+                            var oTextArea  = jQuery( this ).find( 'textarea.wp-editor-area' ).first(); // .show().removeAttr( 'aria-hidden' );
+                            var _sID                  = oTextArea.attr( 'id' );
+                            var _sInitialTextareaID   = _sID.replace( /(widget-.+-)([0-9]+)(-)/i, '$1__i__$3' );
+                            _sWidgetInitialTextareaID = 'undefined' === typeof  tinyMCEPreInit.mceInit[ _sInitialTextareaID ]
+                                ? _sWidgetInitialTextareaID 
+                                : _sInitialTextareaID;
+                            if ( 'undefined' === typeof  tinyMCEPreInit.mceInit[ _sWidgetInitialTextareaID ] ) {
+                                return true;
+                            }
+                            
+                            updateEditor( 
+                                oTextArea.attr( 'id' ), 
+                                tinyMCEPreInit.mceInit[ _sWidgetInitialTextareaID ],
+                                tinyMCEPreInit.qtInit[ _sWidgetInitialTextareaID ]
+                            );          
+
+                            // Store the settings.
+                            jQuery().storeAPFInputOptions( 
+                                oWrap.attr( 'data-id' ), 
+                                { 
+                                    TinyMCE:    tinyMCEPreInit.mceInit[ _sWidgetInitialTextareaID ],
+                                    QuickTags:  tinyMCEPreInit.qtInit[ _sWidgetInitialTextareaID ]
+                                } 
+                            );                            
+                        });                                          
+                    
+                    }   // end of 'saved_widget'
 				});	        
             });
         ";     
@@ -389,17 +443,21 @@ class AdminPageFramework_FieldType_textarea extends AdminPageFramework_FieldType
      */ 
     public function _replyToGetStyles() {
         return "/* Textarea Field Type */
-            .admin-page-framework-field-textarea .admin-page-framework-input-label-string {
-                vertical-align: top;
-                margin-top: 2px;
-            }     
-            /* Rich Text Editor */
-            .admin-page-framework-field-textarea .wp-core-ui.wp-editor-wrap {
-                margin-bottom: 0.5em;
-            }
-            .admin-page-framework-field-textarea.admin-page-framework-field .admin-page-framework-input-label-container {
-                vertical-align: top; 
-            } 
+.admin-page-framework-field-textarea .admin-page-framework-input-label-string {
+    vertical-align: top;
+    margin-top: 2px;
+}     
+/* Rich Text Editor */
+.admin-page-framework-field-textarea .wp-core-ui.wp-editor-wrap {
+    margin-bottom: 0.5em;
+}
+.admin-page-framework-field-textarea.admin-page-framework-field .admin-page-framework-input-label-container {
+    vertical-align: top; 
+} 
+/* For meta-boxes */
+.postbox .admin-page-framework-field-textarea .admin-page-framework-input-label-container {
+    width: 100%;
+}
         " . PHP_EOL;     
     }    
         
@@ -440,7 +498,7 @@ class AdminPageFramework_FieldType_textarea extends AdminPageFramework_FieldType
             // For no TinyMCE
             if ( empty( $aField['rich'] ) || ! version_compare( $GLOBALS['wp_version'], '3.3', '>=' ) || ! function_exists( 'wp_editor' ) ) {
                 return "<textarea " . $this->generateAttributes( $aField['attributes'] ) . " >" // this method is defined in the base class
-                            . $aField['value']
+                            . esc_textarea( $aField['value'] )
                         . "</textarea>";
             }
             

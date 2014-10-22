@@ -33,7 +33,7 @@ class FontCustomFieldType extends AdminPageFramework_FieldType {
      * 
      * @remark  This must be instantiated also in in ...wp-admin/async-upload.php to modify the allowed mime types.
      */
-    function construct() {
+    protected function construct() {
             
         add_filter( 'upload_mimes', array( $this, 'replyToFilterUploadMimes' ) );
 
@@ -54,14 +54,14 @@ class FontCustomFieldType extends AdminPageFramework_FieldType {
     /**
      * Loads the field type necessary components.
      */ 
-    public function setUp() {
+    protected function setUp() {
         
         $this->enqueueMediaUploader();    // defined in the parent class.
         
         wp_enqueue_script( 'jquery' );
         wp_enqueue_script( 'jquery-ui-core' );
 
-         wp_enqueue_script(
+        wp_enqueue_script(
             'getAPFFontUploaderSelectObject',
             $this->resolveSRC( dirname( __FILE__ ) . '/js/getAPFFontUploaderSelectObject.js' ),
             array( 'jquery' )    // dependency
@@ -471,7 +471,7 @@ class FontCustomFieldType extends AdminPageFramework_FieldType {
         $aBaseAttributes    = $aField['attributes'] + array( 'class' => null );
         unset( $aBaseAttributes['input'], $aBaseAttributes['button'], $aBaseAttributes['preview'], $aBaseAttributes['name'], $aBaseAttributes['value'], $aBaseAttributes['type'] );
         $aInputAttributes   = array(
-            'name'    => $aField['attributes']['name'] . ( $iCountAttributes ? "[url]" : "" ),
+            'name'    => $aField['attributes']['name'] . ( $iCountAttributes ? "[url]" : '' ),
             'value'   => $sFontURL,
             'type'    => 'text',
         ) + $aField['attributes']['input'] + $aBaseAttributes;
@@ -515,11 +515,11 @@ class FontCustomFieldType extends AdminPageFramework_FieldType {
             foreach( ( array ) $aField['attributes_to_store'] as $sAttribute )
                 $aOutputs[] = "<input " . $this->generateAttributes( 
                         array(
-                            'id'    =>    "{$aField['input_id']}_{$sAttribute}",
-                            'type'    =>    'hidden',
-                            'name'    =>    "{$aField['_input_name']}[{$sAttribute}]",
-                            'disabled'    =>    isset( $aField['attributes']['diabled'] ) && $aField['attributes']['diabled'] ? 'Disabled' : '',
-                            'value'    =>    isset( $aField['attributes']['value'][ $sAttribute ] ) ? $aField['attributes']['value'][ $sAttribute ] : '',
+                            'id'        => "{$aField['input_id']}_{$sAttribute}",
+                            'type'      => 'hidden',
+                            'name'      => "{$aField['_input_name']}[{$sAttribute}]",
+                            'disabled'  => isset( $aField['attributes']['disabled'] ) && $aField['attributes']['disabled'] ? 'disabled' : null,
+                            'value'     => isset( $aField['attributes']['value'][ $sAttribute ] ) ? $aField['attributes']['value'][ $sAttribute ] : null,
                         )
                     ) . "/>";
             return implode( PHP_EOL, $aOutputs );
@@ -538,8 +538,8 @@ class FontCustomFieldType extends AdminPageFramework_FieldType {
             return 
                 "<div " . $this->generateAttributes( 
                         array(
-                            'id'        =>    "font_preview_container_{$aField['input_id']}",                            
-                            'class'     =>    'font_preview ' . ( isset( $aPreviewAtrributes['class'] ) ? $aPreviewAtrributes['class'] : '' ),
+                            'id'        => "font_preview_container_{$aField['input_id']}",                            
+                            'class'     => 'font_preview ' . ( isset( $aPreviewAtrributes['class'] ) ? $aPreviewAtrributes['class'] : null ),
                             // 'style'     => ( $sFontURL ? '' : "display; none; "  ). ( isset( $aPreviewAtrributes['style'] ) ? $aPreviewAtrributes['style'] : '' ),
                         ) + $aPreviewAtrributes
                     )
@@ -693,7 +693,7 @@ class FontCustomFieldType extends AdminPageFramework_FieldType {
                     'title' => $_bIsLabelSet ? $aButtonAttributes['data-label'] : $this->oMsg->get( 'remove_value' ),
                 );
             $_aAttributes['class']  = $this->generateClassAttribute( 
-                'remove_font button button-small', 
+                'remove_value remove_font button button-small', 
                 trim( $aButtonAttributes['class'] ) ? $aButtonAttributes['class'] : $_sDashIconSelector
             );
             $_sButton               = 

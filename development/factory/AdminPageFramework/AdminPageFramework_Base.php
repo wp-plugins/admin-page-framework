@@ -13,7 +13,7 @@ if ( ! class_exists( 'AdminPageFramework_Base' ) ) :
  * @abstract
  * @since           3.0.0     
  * @package         AdminPageFramework
- * @subpackage      Page
+ * @subpackage      AdminPage
  * @internal
  */
 abstract class AdminPageFramework_Base extends AdminPageFramework_Factory {
@@ -24,8 +24,8 @@ abstract class AdminPageFramework_Base extends AdminPageFramework_Factory {
      * This must not use the private scope as the extended class accesses it, such as 'start_' and must use the public since another class uses this externally.
      * 
      * @since       2.0.0
-     * @since       2.1.5 Made it public from protected since the HeadTag class accesses it.
-     * @since       3.0.0 Moved from AdminPageFramework_Page. Changed the scope to protected as the head tag class no longer access this property.
+     * @since       2.1.5       Made it public from protected since the HeadTag class accesses it.
+     * @since       3.0.0       Moved from AdminPageFramework_Page. Changed the scope to protected as the head tag class no longer access this property.
      * @var         array
      * @static
      * @access      protected
@@ -73,10 +73,10 @@ abstract class AdminPageFramework_Base extends AdminPageFramework_Factory {
     /**
     * The common properties shared among sub-classes. 
     * 
-    * @since 2.0.0
-    * @since 3.0.0 Changed the name from $oProps and moved from the main class. Changed the scope to public as all instantiated class became to be stored in the global aAdminPageFramework variable.
-    * @access protected
-    * @var object an instance of AdminPageFramework_Property_Page will be assigned in the constructor.
+    * @since        2.0.0
+    * @since        3.0.0      Changed the name from $oProps and moved from the main class. Changed the scope to public as all instantiated class became to be stored in the global <var>aAdminPageFramework</var> variable.
+    * @access       protected
+    * @var          object an instance of `AdminPageFramework_Property_Page` will be assigned in the constructor.
     */     
     public $oProp;
     
@@ -153,21 +153,21 @@ abstract class AdminPageFramework_Base extends AdminPageFramework_Factory {
     /**
      * The magic method which redirects callback-function calls with the pre-defined prefixes for hooks to the appropriate methods. 
      * 
-     * @access public
-     * @remark     the users do not need to call or extend this method unless they know what they are doing.
-     * @param string     the called method name. 
-     * @param array     the argument array. The first element holds the parameters passed to the called method.
-     * @return mixed depends on the called method. If the method name matches one of the hook prefixes, the redirected methods return value will be returned. Otherwise, none.
-     * @since 2.0.0
+     * @access      public
+     * @remark      the users do not need to call or extend this method unless they know what they are doing.
+     * @param       string      the called method name. 
+     * @param       array       the argument array. The first element holds the parameters passed to the called method.
+     * @return      mixed       depends on the called method. If the method name matches one of the hook prefixes, the redirected methods return value will be returned. Otherwise, none.
+     * @since       2.0.0
      * @internal
      */
     public function __call( $sMethodName, $aArgs=null ) {     
 
         // The currently loading in-page tab slug. Be careful that not all cases $sMethodName have the page slug.
-        $sPageSlug = isset( $_GET['page'] ) ? $_GET['page'] : null;    
-        $sTabSlug = isset( $_GET['tab'] ) ? $_GET['tab'] : $this->oProp->getDefaultInPageTab( $sPageSlug );    
+        $sPageSlug  = isset( $_GET['page'] ) ? $_GET['page'] : null;    
+        $sTabSlug   = isset( $_GET['tab'] ) ? $_GET['tab'] : $this->oProp->getDefaultInPageTab( $sPageSlug );    
 
-        if ( 'setup_pre' == $sMethodName ) {
+        if ( 'setup_pre' === $sMethodName ) {
             $this->_setUp();
             $this->oUtil->addAndDoAction( $this, "set_up_{$this->oProp->sClassName}", $this );
             $this->oProp->_bSetupLoaded = true;
@@ -201,11 +201,11 @@ abstract class AdminPageFramework_Base extends AdminPageFramework_Factory {
         /**
          * Redirects the callback of the load-{page} action hook to the framework's callback.
          * 
-         * @since 2.1.0
-         * @access protected
+         * @since       2.1.0
+         * @access      protected
          * @internal
-         * @remark This method will be triggered before the header gets sent.
-         * @return void
+         * @remark      This method will be triggered before the header gets sent.
+         * @return      void
          * @internal
          */ 
         protected function _doPageLoadCall( $sPageSlug, $sTabSlug, $oScreen ) {
@@ -217,15 +217,21 @@ abstract class AdminPageFramework_Base extends AdminPageFramework_Factory {
             // Do actions, class ->  page -> in-page tab
             $this->oUtil->addAndDoActions( 
                 $this, // the caller object
-                $this->oUtil->getFilterArrayByPrefix( 
-                    "load_", 
-                    $this->oProp->sClassName, 
-                    $sPageSlug, 
-                    $sTabSlug,
-                    true
+                array( 
+                    "load_{$this->oProp->sClassName}",
+                    "load_{$sPageSlug}",
                 ),
                 $this // the admin page object - this lets third-party scripts use the framework methods.
             );
+            
+            // It is possible that a in-page tab is added during the above hooks and the current page is the default tab without the tab GET query key in the url. 
+            $this->_finalizeInPageTabs();
+            $this->oUtil->addAndDoActions( 
+                $this, // the caller object
+                array( "load_{$sPageSlug}_" . $this->oProp->getCurrentTab() ),
+                $this // the admin page object - this lets third-party scripts use the framework methods.
+            );         
+            
             $this->oUtil->addAndDoActions( 
                 $this, // the caller object
                 array( "load_after_{$this->oProp->sClassName}" ),
@@ -236,14 +242,14 @@ abstract class AdminPageFramework_Base extends AdminPageFramework_Factory {
         
     /* Shared methods */
     /**
-     * Calculates the subtraction of two values with the array key of <em>order</em>
+     * Calculates the subtraction of two values with the array key of `order`.
      * 
      * This is used to sort arrays.
      * 
-     * @since 2.0.0
-     * @since 3.0.0 Moved from the property class.
-     * @remark a callback method for uasort().
-     * @return integer
+     * @since       2.0.0
+     * @since       3.0.0       Moved from the property class.
+     * @remark      a callback method for `uasort()`.
+     * @return      integer
      * @internal
      */ 
     public function _sortByOrder( $a, $b ) {
@@ -256,7 +262,7 @@ abstract class AdminPageFramework_Base extends AdminPageFramework_Factory {
     /**
      * Checks whether the class should be instantiated.
      * 
-     * @since 3.1.0
+     * @since       3.1.0
      * @internal
      */
     protected function _isInstantiatable() {
@@ -275,7 +281,7 @@ abstract class AdminPageFramework_Base extends AdminPageFramework_Factory {
      * Checks whether the currently loading page is of the given pages. 
      * 
      * @since       3.0.2
-     * @since       3.2.0   Changed the scope to public from protected as the head tag object will access it.
+     * @since       3.2.0       Changed the scope to public from protected as the head tag object will access it.
      * @internal
      */
     public function _isInThePage( $aPageSlugs=array() ) {

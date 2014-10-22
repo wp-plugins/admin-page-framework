@@ -7,26 +7,33 @@
  * @author      Michael Uno <michael@michaeluno.jp>
  * @copyright   2013-2014 (c) Michael Uno
  * @license     MIT <http://opensource.org/licenses/MIT>
- * @see         http://wordpress.org/plugins/admin-page-framework/
- * @see         https://github.com/michaeluno/admin-page-framework
- * @link        http://en.michaeluno.jp/admin-page-framework
  * @package     AdminPageFramework
- * @remarks     To use the framework, 1. Extend the class 2. Override the setUp() method. 3. Use the hook functions.
- * @remarks     Requirements: WordPress 3.3 or above, PHP 5.2.4 or above.
- * @remarks     The documentation employs the <a href="http://en.wikipedia.org/wiki/PHPDoc">PHPDOc(DocBlock)</a> syntax.
  */
 if ( ! class_exists( 'AdminPageFramework_Registry_Base' ) ) :
 /**
- * Provides the basic information about the framework.
+ * Provides plugin and theme developers with simpler means of creating option pages, custom post types, meta boxes, and widgets..
  * 
- * @since       3.1.3
- * @package     AdminPageFramework
- * @subpackage  Property
- * @internal
+ * @heading             Admin Page Framework
+ * @author              Michael Uno <michael@michaeluno.jp>
+ * @copyright           2013-2014 (c) Michael Uno
+ * @license             http://opensource.org/licenses/MIT  MIT
+ * @since               3.1.3
+ * @repository          https://github.com/michaeluno/admin-page-framework
+ * @link                http://wordpress.org/plugins/admin-page-framework/
+ * @link                http://en.michaeluno.jp/admin-page-framework
+ * @package             AdminPageFramework
+ * @requirement         >= WordPress 3.3
+ * @requirement         >= PHP 5.2.4
+ * @remark              To use the framework, 1. Extend the class 2. Override the setUp() method. 3. Use the hook functions.
+ * @remark              The documentation employs the <a href="http://en.wikipedia.org/wiki/PHPDoc">PHPDOc(DocBlock)</a> syntax.
+ * @download_latest     https://github.com/michaeluno/admin-page-framework/archive/master.zip
+ * @download_stable     http://downloads.wordpress.org/plugin/admin-page-framework.latest-stable.zip
+ * @catchcopy           The framework for all WordPress developers.
+ * @version             3.3.0
  */
 abstract class AdminPageFramework_Registry_Base {
     
-    const Version       = '3.2.1'; // <--- DON'T FORGET TO CHANGE THIS AS WELL!!
+    const Version       = '3.3.0'; // <--- DON'T FORGET TO CHANGE THIS AS WELL!!
     const Name          = 'Admin Page Framework';
     const Description   = 'Provides plugin and theme developers with simpler means of creating option pages, custom post types, meta boxes, and widgets.';
     const URI           = 'http://en.michaeluno.jp/admin-page-framework';
@@ -44,7 +51,6 @@ if ( ! class_exists( 'AdminPageFramework_Registry' ) ) :
  * 
  * @since       3.1.3
  * @package     AdminPageFramework
- * @subpackage  Property
  * @internal
  */
 final class AdminPageFramework_Registry extends AdminPageFramework_Registry_Base {

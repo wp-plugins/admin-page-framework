@@ -150,17 +150,26 @@ abstract class AdminPageFramework_Property_Base {
         
 
     /**
-     * Stores enqueuing script URLs and their criteria.
+     * Stores enqueuing script URLs and their criteria by md5 hash of the source url.
      * @since 2.1.2
      * @since 2.1.5 Moved to the base class.
      */
     public $aEnqueuingScripts = array();
     /**    
-     * Stores enqueuing style URLs and their criteria.
+     * Stores enqueuing style URLs and their criteria by md5 hash of the source url.
      * @since 2.1.2
      * @since 2.1.5 Moved to the base class.
      */    
     public $aEnqueuingStyles = array();
+
+
+    /**
+     * Stores enqueued script/style argument array by its url.
+     * @since   3.3.0
+     */
+    public $aResourceAttributes = array();
+
+    
     /**
      * Stores the index of enqueued scripts.
      * 
@@ -255,26 +264,25 @@ abstract class AdminPageFramework_Property_Base {
         'hfNameFlat'    => null,    // the flat input name attribute
         'hfClass'       => null,    // the class attribute
     );
-        
-        
+                
     /**
      * Sets up necessary property values.
      */
     public function __construct( $oCaller, $sCallerPath, $sClassName, $sCapability, $sTextDomain, $sFieldsType ) {
         
-        $this->oCaller      = $oCaller;
-        $this->sCallerPath  = $sCallerPath ? $sCallerPath : null;
-        $this->sClassName   = $sClassName;     
-        $this->sClassHash   = md5( $sClassName );    
-        $this->sCapability  = empty( $sCapability ) ? 'manage_options' : $sCapability ;
-        $this->sTextDomain  = empty( $sTextDomain ) ? 'admin-page-framework' : $sTextDomain;
-        $this->sFieldsType  = $sFieldsType;
+        $this->oCaller          = $oCaller;
+        $this->sCallerPath      = $sCallerPath ? $sCallerPath : null;
+        $this->sClassName       = $sClassName;     
+        $this->sClassHash       = md5( $sClassName );    
+        $this->sCapability      = empty( $sCapability ) ? 'manage_options' : $sCapability ;
+        $this->sTextDomain      = empty( $sTextDomain ) ? 'admin-page-framework' : $sTextDomain;
+        $this->sFieldsType      = $sFieldsType;
         $GLOBALS['aAdminPageFramework'] = isset( $GLOBALS['aAdminPageFramework'] ) && is_array( $GLOBALS['aAdminPageFramework'] ) 
             ? $GLOBALS['aAdminPageFramework']
             : array( 'aFieldFlags' => array() );
-        $this->sPageNow     = AdminPageFramework_WPUtility::getPageNow();
-        $this->bIsAdmin     = is_admin();
-        $this->bIsAdminAjax = in_array( $this->sPageNow, array( 'admin-ajax.php' ) );
+        $this->sPageNow         = AdminPageFramework_WPUtility::getPageNow();
+        $this->bIsAdmin         = is_admin();
+        $this->bIsAdminAjax     = in_array( $this->sPageNow, array( 'admin-ajax.php' ) );
         
     }
         

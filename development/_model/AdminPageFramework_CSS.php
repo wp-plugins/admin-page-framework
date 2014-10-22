@@ -26,11 +26,13 @@ class AdminPageFramework_CSS {
     static public function getDefaultCSS() {
         $_sCSS = 
 "/* Settings Notice */
-.wrap div.updated, 
-.wrap div.settings-error { 
-    clear: both; 
+.wrap div.updated.admin-page-framework-settings-notice-container, 
+.wrap div.error.admin-page-framework-settings-notice-container, 
+.media-upload-form div.error.admin-page-framework-settings-notice-container
+{
+    clear: both;
     margin-top: 16px;
-}         
+}
         
 /* Contextual Help Page */
 .contextual-help-description {
@@ -57,11 +59,17 @@ class AdminPageFramework_CSS {
     padding: 0;
     font-family: 'Open Sans', sans-serif;
 }
+
+/* In-page tabs */ 
+.admin-page-framework-in-page-tab .nav-tab.nav-tab-active {
+    border-bottom-width: 2px;
+}
   
 ";        
         return $_sCSS . PHP_EOL 
             . self::_getFormFieldRules() . PHP_EOL
             . self::_getFieldErrorRules() . PHP_EOL
+            . self::_getMetaBoxFormRules() . PHP_EOL
             . self::_getWidgetFormRules() . PHP_EOL
             . self::_getPageLoadStatsRules() . PHP_EOL
             . self::_getVersionSpecificRules( $GLOBALS['wp_version'] );
@@ -87,7 +95,7 @@ td.admin-page-framework-field-td-no-title {
     margin-top: 0;
 }
 .admin-page-framework-section .form-table td label {
-       display: inline;  /* adjusts the horizontal alignment with the th element */
+   display: inline;  /* adjusts the horizontal alignment with the th element */
 }
 /* Section Tabs */
 .admin-page-framework-section-tabs-contents {
@@ -150,29 +158,12 @@ td.admin-page-framework-field-td-no-title {
     -webkit-box-shadow: none;
     box-shadow: none;
 }
-/* Metabox Section Heading Info */
-#poststuff .metabox-holder .admin-page-framework-section-title h3{
-    border: none;
-    font-weight: bold;
-    font-size: 1.3em;
-    margin: 1em 0;
-    padding: 0;
-    font-family: 'Open Sans', sans-serif;     
-    cursor: inherit;     
-    -webkit-user-select: inherit;
-    -moz-user-select: inherit;
-    user-select: inherit;    
 
-    /* v3.5 or below */
-    text-shadow: none;
-    -webkit-box-shadow: none;
-    box-shadow: none;
-    background: none;
-}            
 /* Fields Container */
 .admin-page-framework-fields {
     display: table; /* the block property does not give the element the solid height */
     width: 100%;
+    table-layout: fixed;    /* in Firefox fixes the issue that preview images causes the container element to expand */
 }
 
 /* Number Input */
@@ -273,7 +264,7 @@ td.admin-page-framework-field-td-no-title {
     clear: both;
     float: left;
     display: inline-block;
-    padding: 1em 1.2em 0.72em;
+    padding: 1em 1.2em 0.76em;
     margin: 1px 0 0 0;
     border-top-width: 1px;
     border-bottom-width: 1px;
@@ -320,6 +311,115 @@ td.admin-page-framework-field-td-no-title {
 }
 ";            
         }   
+
+        /**
+         * Returns the meta-box form specific CSS rules.
+         * 
+         * @since       3.3.0
+         * @internal
+         */
+        static private function _getMetaBoxFormRules() {            
+            return 
+"/* Meta-box form fields */
+.postbox .title-colon {
+    margin-left: 0.2em;
+}
+.postbox .admin-page-framework-section .form-table > tbody > tr > td,
+.postbox .admin-page-framework-section .form-table > tbody > tr > th
+{
+    display: inline-block;
+    width: 100%;
+    padding: 0;
+}
+
+.postbox .admin-page-framework-field {
+    width: 100%;
+}            
+            
+/* Field Titles */             
+.postbox .admin-page-framework-section .form-table > tbody > tr > th {
+    font-size: 13px;
+    line-height: 1.5;
+    margin: 1em 0px;    
+    font-weight: 700;
+}
+
+/* Metabox Section Heading Info */
+#poststuff .metabox-holder .admin-page-framework-section-title h3 {
+    border: none;
+    font-weight: bold;
+    font-size: 1.3em;
+    margin: 1em 0;
+    padding: 0;
+    font-family: 'Open Sans', sans-serif;     
+    cursor: inherit;     
+    -webkit-user-select: inherit;
+    -moz-user-select: inherit;
+    user-select: inherit;    
+
+    /* v3.5 or below */
+    text-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    background: none;
+}         
+";
+        }
+        /**
+         * Returns the widget form specific CSS rules.
+         * 
+         * @since       3.2.0
+         * @internal
+         */
+        static private function _getWidgetFormRules() {            
+            return
+"/* Widget Forms [3.2.0+] */
+.widget .admin-page-framework-section .form-table > tbody > tr > td,
+.widget .admin-page-framework-section .form-table > tbody > tr > th
+{
+    display: inline-block;
+    width: 100%;
+    padding: 0;
+}
+
+.widget .admin-page-framework-field,
+.widget .admin-page-framework-input-label-container
+{
+    width: 100%;
+}
+.widget .sortable .admin-page-framework-field {
+    /* Sortable fields have paddings so the width need to be adjusted to fit to 100% */
+    padding: 4% 4.4% 3.2% 4.4%;
+    width: 91.2%;
+}
+/* Gives a slight margin between the input field and buttons */
+.widget .admin-page-framework-field input {
+    margin-bottom: 0.1em;
+    margin-top: 0.1em;
+}
+
+/* Input fields should have 100% width */
+.widget .admin-page-framework-field input[type=text],
+.widget .admin-page-framework-field textarea {
+    width: 100%;
+}
+
+/* When the screen is less than 782px */ 
+@media screen and ( max-width: 782px ) {
+    
+    /* The framework render fields with table elements and those container border seems to affect the width of fields */
+    .widget .admin-page-framework-fields {
+        width: 99.2%;
+    }    
+    .widget .admin-page-framework-field input[type='checkbox'], 
+    .widget .admin-page-framework-field input[type='radio'] 
+    {
+        margin-top: 0;
+    }
+
+}
+";
+        }
         /**
          * Returns CSS rules for field errors.
          * @since   3.2.1
@@ -373,41 +473,6 @@ return "
 ";
             
         }
-                
-        /**
-         * Returns the widget form specific CSS rules.
-         * 
-         * @since       3.2.0
-         * @internal
-         */
-        static private function _getWidgetFormRules() {            
-            return
-"/* Widget Forms [3.2.0+] */
-.widget .form-table td,
-.widget .form-table th
-{
-    display: inline-block;
-    width: 100%;
-    padding: 0;
-}
-.widget .admin-page-framework-field,
-.widget .admin-page-framework-input-label-container
-{
-    width: 100%;
-}
-
-/* Gives a slight margin between the input field and buttons */
-.widget .admin-page-framework-field input {
-    margin-bottom: 0.3em;
-}
-
-/* Input fields should have 100% width */
-.widget .admin-page-framework-field input[type=text],
-.widget .admin-page-framework-field textarea {
-    width: 100%;
-}
-";
-        }
         
         /**
          * Returns the framework default CSS rules.
@@ -417,16 +482,35 @@ return "
          */    
         static private function _getVersionSpecificRules( $sWPVersion ) {
             
-            // If the WordPress version is greater than equal to 3.8, return MP6(the admin style introduced in 3.8) specific CSS rules.
+            $_sCSSRules = '';
+            if ( version_compare( $sWPVersion, '3.8', '<' ) ) {        
+
+                $_sCSSRules .= 
+"
+.admin-page-framework-field .remove_value.button.button-small {
+    line-height: 1.5em; 
+}
+
+/* Fix tinyMCE width in 3.7x or below */
+.widget .admin-page-framework-section table.mceLayout {
+    table-layout: fixed;
+}
+";            
+            
+            }
+            // If the WordPress version is greater than equal to 3.8, add MP6(the admin style introduced in 3.8) specific CSS rules.
             if ( version_compare( $sWPVersion, '3.8', '>=' ) ) {        
             
-                return
+                $_sCSSRules .= 
 "
 /* Widget Forms */
-.widget .form-table th {
+.widget .admin-page-framework-section .form-table th
+{
     font-size: 13px;
     font-weight: normal;
+    margin-bottom: 0.2em;
 }
+
 .widget .admin-page-framework-section .form-table {
     margin-top: 1em;
 }
@@ -448,7 +532,7 @@ return "
                 
             }
             
-            return '';
+            return $_sCSSRules;
             
         }
     
