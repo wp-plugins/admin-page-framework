@@ -60,8 +60,9 @@ abstract class AdminPageFramework_FieldType extends AdminPageFramework_FieldType
      * <code>
      * public $aFieldTypeSlugs = array( 'my_field_type_slug', 'alternative_field_type_slug' );
      * </code>
+     * @access       public      This must be public as accessed from outside.
      */    
-    public $aFieldTypeSlugs = array();
+    public $aFieldTypeSlugs = array( 'default', );
     
     /**
      * Defines the default key-values of this field type. 
@@ -126,7 +127,7 @@ abstract class AdminPageFramework_FieldType extends AdminPageFramework_FieldType
      */    
     protected function getIEStyles() { return ''; }
     /**
-     * Returns the CSS output inside the `<style></style>` tags.
+     * Returns the field type specific CSS output inside the `<style></style>` tags.
      * @since   3.0.0
      */    
     protected function getStyles() { return ''; }

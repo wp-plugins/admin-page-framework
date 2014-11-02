@@ -120,11 +120,17 @@ abstract class AdminPageFramework_Factory_Router {
             }
     
             if ( ! $this->_isInThePage() ) { return; }
-
+            
+            // Do not load widget resources in the head tag because widgets can be loaded in any page unless it is in customize.php.
+            if ( in_array( $this->oProp->_sPropertyType, array( 'widget' ) ) && 'customize.php' !== $this->oProp->sPageNow ) {
+                return;
+            }
+            
             $this->oResource        = isset( $this->oResource ) // the user may have already accessed it
                 ? $this->oResource
                 : $this->_getResourceInstance( $this->oProp );
             $this->oHeadTag         = $this->oResource; // backward compatibility
+            
             $this->oLink            = isset( $this->oLink ) // the user may have already accessed it
                 ? $this->oLink
                 : $this->_getLinkInstancce( $this->oProp, $this->oMsg );     

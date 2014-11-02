@@ -6,7 +6,7 @@
 	<title>Class AdminPageFramework_FieldType | Admin Page Framework Documentation</title>
 
 	<script type="text/javascript" src="resources/combined.js?361344329"></script>
-	<script type="text/javascript" src="elementlist.js?3454352893"></script>
+	<script type="text/javascript" src="elementlist.js?3095268003"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/bootstrap.min.css?2514636104">
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?2195379744">
 
@@ -87,6 +87,13 @@
                 </li>
 				<li>
                     
+				<li>
+                    
+                    
+                    <a href="class-AdminPageFramework_FieldType_taxonomy.html">
+                        AdminPageFramework_FieldType_taxonomy
+                    </a>
+                </li>
 			</ul>
 
 
@@ -207,6 +214,12 @@ AdminPageFramework_FieldType_Base
 	</dl>
 
 
+	<div>
+		<h3>Direct known subclasses</h3>
+		<p class="elementList">
+			<code><a href="class-AdminPageFramework_FieldType_taxonomy.html">AdminPageFramework_FieldType_taxonomy</a></code>
+		</p>
+	</div>
 
 
 
@@ -403,8 +416,8 @@ type is parsed.</p>
 
 			<div class="description detailed">
 				
-<p>Returns the CSS output inside the <code>&lt;style&gt;&lt;/style&gt;</code>
-tags.</p>
+<p>Returns the field type specific CSS output inside the
+<code>&lt;style&gt;&lt;/style&gt;</code> tags.</p>
 
 
 
@@ -641,8 +654,6 @@ class="php-quote">'my_style2'</span>,
 		<h3>Methods inherited from AdminPageFramework_FieldType_Base</h3>
 		<p class="elementList">
 			<code>__construct()</code>, 
-			<code>_getScript_CustomMediaUploaderObject()</code>, 
-			<code>_replyToEnqueueMedia()</code>, 
 			<code>_replyToFieldLoader()</code>, 
 			<code>_replyToFieldTypeSetter()</code>, 
 			<code>_replyToGetEnqueuingScripts()</code>, 
@@ -713,6 +724,7 @@ class="php-quote">'my_style2'</span>,
 		<p class="elementList">
 			<code>generateClassAttribute()</code>, 
 			<code>generateInlineCSS()</code>, 
+			<code>generateStyleAttribute()</code>, 
 			<code>getQueryValueInURLByKey()</code>, 
 			<code>sanitizeLength()</code>
 		</p>
@@ -728,6 +740,7 @@ class="php-quote">'my_style2'</span>,
 		<h3>Methods inherited from AdminPageFramework_Utility_Array</h3>
 		<p class="elementList">
 			<code>castArrayContents()</code>, 
+			<code>dropElementsByType()</code>, 
 			<code>getArrayDimension()</code>, 
 			<code>getArrayValueByArrayKeys()</code>, 
 			<code>getAsArray()</code>, 

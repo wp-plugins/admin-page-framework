@@ -79,7 +79,7 @@ class APF_Demo extends AdminPageFramework {
         $this->setInPageTabTag( 'h2' ); // sets the tag used for in-page tabs     
     
     }
-    
+        
     /**
      * The pre-defined callback method that is triggered when the page loads.
      */
@@ -248,7 +248,7 @@ class APF_Demo extends AdminPageFramework {
                 'title'             => __( 'Section Tab A', 'admin-page-framework-demo' ),
                 'description'       => __( 'This is the first item of the tabbed section.', 'admin-page-framework-demo' ),
             ),
-            array(
+            array(         
                 'section_id'        => 'tabbed_sections_b',
                 'title'             => __( 'Section Tab B', 'admin-page-framework-demo' ),
                 'description'       => __( 'This is the second item of the tabbed section.', 'admin-page-framework-demo' ),

@@ -12,13 +12,14 @@ if ( ! class_exists( 'AdminPageFramework_FormField_Base' ) ) :
  * 
  * This class mainly handles JavaScript scripts and the constructor setting class properties.
  * 
- * @since       3.0.0      Separated the methods that defines field types to different classes.
- * @extends     AdminPageFramework_WPUtility
+ * @since       3.0.0       Separated the methods that defines field types to different classes.
+ * @since       3.3.1       Extends `AdminPageFramework_FormOutput`.
+ * @extends     AdminPageFramework_FormOutput
  * @package     AdminPageFramework
  * @subpackage  Form
  * @internal
  */
-class AdminPageFramework_FormField_Base extends AdminPageFramework_WPUtility {
+class AdminPageFramework_FormField_Base extends AdminPageFramework_FormOutput {
             
     /**
      * Sets up properties and load necessary scripts.
@@ -38,7 +39,9 @@ class AdminPageFramework_FormField_Base extends AdminPageFramework_WPUtility {
     public function __construct( &$aField, &$aOptions, $aErrors, &$aFieldTypeDefinitions, &$oMsg, array $aCallbacks=array() ) {
 
         /* 1. Set up the properties that will be accessed later in the methods. */
-        $aFieldTypeDefinition = isset( $aFieldTypeDefinitions[ $aField['type'] ] ) ? $aFieldTypeDefinitions[ $aField['type'] ] : $aFieldTypeDefinitions['default'];
+        $aFieldTypeDefinition = isset( $aFieldTypeDefinitions[ $aField['type'] ] ) 
+            ? $aFieldTypeDefinitions[ $aField['type'] ] 
+            : $aFieldTypeDefinitions['default'];
         
         /* 
          * 1-1. Set up the 'attributes' array - the 'attributes' element is dealt separately as it contains some overlapping elements with the regular elements such as 'value'.

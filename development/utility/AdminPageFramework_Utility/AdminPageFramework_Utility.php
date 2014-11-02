@@ -70,9 +70,46 @@ abstract class AdminPageFramework_Utility extends AdminPageFramework_Utility_URL
     }
     
     /**
-     * Generates the string of class selectors for the class attribute value from multiple arguments.
+     * Generates a string of inline styles for the style attribute value from multiple arguments.
      * 
-     * Duplicated items will be single.
+     * Duplicated items will be merged.
+     * 
+     * For example,
+     * <code>generateStyleAttribute( array( 'margin-top' => '10px', 'display: inline-block' ), 'float:right; display: none;' )</code>
+     * will generate
+     * <code>margin-top: 10px; display: inline-block; float:right;</code>
+     * @since       3.3.1
+     */
+    static public function generateStyleAttribute( $asInlineCSSes ) {
+        
+        $_aCSSRules = array();
+        foreach( array_reverse( func_get_args() ) as $_asCSSRules ) {
+            
+            // For array, store in the container.
+            if ( is_array( $_asCSSRules ) ) {
+                $_aCSSRules = array_merge( $_asCSSRules, $_aCSSRules );
+                continue;
+            }
+            
+            // At this point, it is a string. Break them down to array elements.
+            $__aCSSRules = explode( ';', $_asCSSRules );
+            foreach( $__aCSSRules as $_sPair ) {
+                $_aCSSPair = explode( ':', $_sPair );
+                if ( ! isset( $_aCSSPair[ 0 ], $_aCSSPair[ 1 ] ) ) {
+                    continue;
+                }
+                $_aCSSRules[ $_aCSSPair[ 0 ] ] = $_aCSSPair[ 1 ];
+            }
+            
+        }
+        return self::generateInlineCSS( array_unique( $_aCSSRules ) );
+        
+    }
+    
+    /**
+     * Generates a string of class selectors for the class attribute value from multiple arguments.
+     * 
+     * Duplicated items will be merged.
      * 
      * For example, 
      * <code>$sClasses = generateClassAttribute( array( 'button, button-primary' ), 'remove_button button' );</code>
@@ -101,7 +138,7 @@ abstract class AdminPageFramework_Utility extends AdminPageFramework_Utility_URL
     }
     
     /**
-     * Generates the string of attributes to be embedded in an HTML tag from an associative array.
+     * Generates a string of attributes to be embedded in an HTML tag from an associative array.
      * 
      * For example, 
      *     array( 'id' => 'my_id', 'name' => 'my_name', 'style' => 'background-color:#fff' )

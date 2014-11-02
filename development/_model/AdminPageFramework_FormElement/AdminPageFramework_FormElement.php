@@ -40,6 +40,15 @@ class AdminPageFramework_FormElement extends AdminPageFramework_FormElement_Util
         'help_aside'        => null,
         'repeatable'        => null, // 3.0.0+
         'section_tab_slug'  => null, // 3,0,0+
+        'attributes'        => array(       // 3.3.1+
+            'class'         => null,    // set null to avoid undefined index warnings.
+            'style'         => null,    // set null to avoid undefined index warnings.
+            'tab'           => array(),
+        ),
+        'class'             => array(       // 3.3.1+
+            'tab'           => array(),
+        ),
+        'hidden'            => false,       // 3.3.1+
     );    
     
     /**
@@ -75,11 +84,18 @@ class AdminPageFramework_FormElement extends AdminPageFramework_FormElement_Util
         'help_aside'        => null, // [2.1.0+]
         'repeatable'        => null, // [2.1.3+]
         'sortable'          => null, // [2.1.3+]
-        'attributes'        => null, // [3.0.0+] - the array represents the attributes of input tag
         'show_title_column' => true, // [3.0.0+]
         'hidden'            => null, // [3.0.0+]
         '_fields_type'      => null, // [3.0.0+] - an internal key that indicates the fields type such as page, meta box for pages, meta box for posts, or taxonomy.
         '_section_index'    => null, // [3.0.0+] - internally set to indicate the section index for repeatable sections.
+    // @todo    Examine why an array is not set but null here for the attributes argument.
+        'attributes'        => null, // [3.0.0+] - the array represents the attributes of input tag
+        'class'             => array(   // 3.3.1+
+            'fieldrow'  =>  array(),
+            'fieldset'  =>  array(),
+            'fields'    =>  array(),
+            'field'     =>  array(),
+        ), 
     );    
     
     /**
@@ -308,8 +324,8 @@ class AdminPageFramework_FormElement extends AdminPageFramework_FormElement_Util
                 array( 
                     '_fields_type' => $sFieldsType,
                     'capability' => $sCapability,
-                )
-                + self::$_aStructure_Section
+                ),
+                self::$_aStructure_Section
             );
                 
             $aSection['order'] = is_numeric( $aSection['order'] ) ? $aSection['order'] : $iCountOfElements + 10;

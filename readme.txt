@@ -1,7 +1,7 @@
 === Admin Page Framework ===
 Contributors:       Michael Uno, miunosoft, pcraig3
 Donate link:        http://michaeluno.jp/en/donate
-Tags:               admin, administration, admin panel, admin page framework, option, options, setting, settings, Settings API, API, framework, library, class, classes, developers, developer tool, meta box, custom post type, custom post types, utility, utilities, field, fields, custom field, custom fields, tool, tools, widget, widgets, factory, form, forms
+Tags:               admin, administration, options, settings, API, framework, library, meta box, custom post type, custom post types, utility, fields, custom field, custom fields, tool, tools, widget, widgets, form, forms
 Requires at least:  3.3
 Tested up to:       4.0
 Stable tag:         3.3.0
@@ -27,7 +27,7 @@ with it easily create:
 - **Widgets and Fields** - to display modular outputs based on the user's settings in the front end.
 - **Network Admin Pages and Forms** - for WordPress multi-sites.
 - **Contact Form** - to let the user report issues or feedback via emails.
- 
+
 = What are useful about =
 - **Extensible** - the created admin pages will become highly extensible with the automatically created hooks. In other words, it empowers other developers to customize your plugin or theme. That will result on making your projects grow.
 - **Section Tabs** - form sections can be displayed in a tabbed box.
@@ -448,9 +448,21 @@ Check out [the issues](https://github.com/michaeluno/admin-page-framework/issues
 
 == Changelog ==
 
+= 3.3.1 - 2014/11/02 =
+- Added the `class` argument for fields.
+- Added the `class`, `attributes`, `hidden` arguments for sections.
+- Added the `submit_after_{...}` action hooks that are triggered when the submitted form data are saved.
+- Added the value length to be indicated in the log file created with the log method of the debug class.
+- Fixed an issue that resources of widgets registered by the framework were loaded in all admin pages.
+- Fixed a jQuery method conflict of the `sortable()` plugin.
+- Tweaked the styling of sortable fields in meta boxes.
+- Tweaked the styling of form fields in meta boxes.
+- Changed the `attributes` field definition argument to be able to override the system set attributes.
+- Changed the built-in field types to extend the same base class to custom field types.
+
 = 3.3.0 - 2014/10/22 =
-- Added the 'Select All' and 'Select None' buttons for check boxes.
-- Added the <code>[ace](https://github.com/soderlind/AceCustomFieldType)</code> custom field type.
+- Added the `Select All` and `Select None` buttons for check boxes.
+- Added the [ace](https://github.com/soderlind/AceCustomFieldType) custom field type.
 - Added the ability to have different menu title from the page title with the `page_title` and `menu_title` argument pass to the `addSubMenuItems()` method.
 - Added the ability for the `description` field/section definition argument to accept an array to process elements as multiple paragraphs.
 - Added the ability to set custom arguments to enqueuing resource(style/script) tags.
@@ -599,4 +611,4 @@ Check out [the issues](https://github.com/michaeluno/admin-page-framework/issues
 - Fixed a bug that the `autocomplete` custom field type's JavaScript script could not run when the prePopulate option is set and the value is saved without changing.
 - Fixed an issue in the class autoloader that caused a PHP fatal error in some non GNU OSes such as Solaris in the development version.
 
-<h4>[Old Change Log Items](https://raw.githubusercontent.com/michaeluno/admin-page-framework/master/changelog.md)</h4>
+[Old Change Log Items](https://raw.githubusercontent.com/michaeluno/admin-page-framework/master/changelog.md)
