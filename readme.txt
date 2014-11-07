@@ -448,6 +448,16 @@ Check out [the issues](https://github.com/michaeluno/admin-page-framework/issues
 
 == Changelog ==
 
+= 3.3.2 - 2014/11/07 =
+- Added the `label_no_term_found`, `label_list_title`, `query`, and `queries` arguments for the `taxonomy` field type.
+- Added the ability to compress CSS rules and JavaScript scripts defined in PHP variables for the minified version.
+- Tweaked the styling of the `taxonomy` field type to reflect the hierarchical depths.
+- Fixed a bug that resources of taxonomy fields added by the framework were loaded in other taxonomy pages that caused JavaScript errors.
+- Fixed a bug that meta box field values defined via the `field_definition_{...}` filter hooks were not saved.
+- Fixed a bug that setting sections for page meta box fields caused an error after submitting the form.
+- Fixed a bug that class selectors set in the top level of the `class` argument for fields got inserted in all type of field containers including `fieldrow`, `fieldset`, `fields`, `field`.
+- Fixed the `for` attribute value of label tags for fields to the focus input.
+
 = 3.3.1 - 2014/11/02 =
 - Added the `class` argument for fields.
 - Added the `class`, `attributes`, `hidden` arguments for sections.

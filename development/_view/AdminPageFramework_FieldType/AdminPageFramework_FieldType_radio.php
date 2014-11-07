@@ -38,20 +38,21 @@ class AdminPageFramework_FieldType_radio extends AdminPageFramework_FieldType {
      * @since       3.3.1       Changed from `_replyToGetStyles()`.
      */ 
     protected function getStyles() {
-        return "/* Radio Field Type */
-            .admin-page-framework-field input[type='radio'] {
-                margin-right: 0.5em;
-            }     
-            .admin-page-framework-field-radio .admin-page-framework-input-label-container {
-                padding-right: 1em;
-            }     
-            .admin-page-framework-field-radio .admin-page-framework-input-container {
-                display: inline;
-            }     
-            .admin-page-framework-field-radio .admin-page-framework-input-label-string  {
-                display: inline; /* radio labels should not fold(wrap) after the check box */
-            }     
-        ";
+        return <<<CSSRULES
+/* Radio Field Type */
+.admin-page-framework-field input[type='radio'] {
+    margin-right: 0.5em;
+}     
+.admin-page-framework-field-radio .admin-page-framework-input-label-container {
+    padding-right: 1em;
+}     
+.admin-page-framework-field-radio .admin-page-framework-input-container {
+    display: inline;
+}     
+.admin-page-framework-field-radio .admin-page-framework-input-label-string  {
+    display: inline; /* radio labels should not fold(wrap) after the check box */
+}
+CSSRULES;
     }
 
     /**
@@ -62,32 +63,33 @@ class AdminPageFramework_FieldType_radio extends AdminPageFramework_FieldType {
      */ 
     protected function getScripts() {
 
-        $aJSArray = json_encode( $this->aFieldTypeSlugs );
-        return "     
-            jQuery( document ).ready( function(){
-                jQuery().registerAPFCallback( {     
-                    added_repeatable_field: function( nodeField, sFieldType, sFieldTagID, sCallType ) {
-         
-                        /* If it is not the field type, do nothing. */
-                        if ( jQuery.inArray( sFieldType, {$aJSArray} ) <= -1 ) return;
-                                                    
-                        /* the checked state of radio buttons somehow lose their values so re-check them again */    
-                        nodeField.closest( '.admin-page-framework-fields' )
-                            .find( 'input[type=radio][checked=checked]' )
-                            .attr( 'checked', 'checked' );
-                            
-                        /* Rebind the checked attribute updater */
-                        nodeField.find( 'input[type=radio]' ).change( function() {
-                            jQuery( this ).closest( '.admin-page-framework-field' )
-                                .find( 'input[type=radio]' )
-                                .attr( 'checked', false );
-                            jQuery( this ).attr( 'checked', 'checked' );
-                        });
+        $_aJSArray = json_encode( $this->aFieldTypeSlugs );
+        return <<<JAVASCRIPTS
+jQuery( document ).ready( function(){
+    jQuery().registerAPFCallback( {     
+        added_repeatable_field: function( nodeField, sFieldType, sFieldTagID, sCallType ) {
 
-                    }
-                });
+            /* If it is not the field type, do nothing. */
+            if ( jQuery.inArray( sFieldType, $_aJSArray ) <= -1 ) return;
+                                        
+            /* the checked state of radio buttons somehow lose their values so re-check them again */    
+            nodeField.closest( '.admin-page-framework-fields' )
+                .find( 'input[type=radio][checked=checked]' )
+                .attr( 'checked', 'checked' );
+                
+            /* Rebind the checked attribute updater */
+            nodeField.find( 'input[type=radio]' ).change( function() {
+                jQuery( this ).closest( '.admin-page-framework-field' )
+                    .find( 'input[type=radio]' )
+                    .attr( 'checked', false );
+                jQuery( this ).attr( 'checked', 'checked' );
             });
-        ";     
+
+        }
+    });
+});
+JAVASCRIPTS;
+
     }     
     
     /**
@@ -148,15 +150,18 @@ class AdminPageFramework_FieldType_radio extends AdminPageFramework_FieldType {
          * @sinec       3.0.0
          */
         private function _getUpdateCheckedScript( $sFieldContainerID ) {
+            $_sScript = <<<JAVASCRIPTS
+jQuery( document ).ready( function(){
+    jQuery( '#{$sFieldContainerID} input[type=radio]' ).change( function() {
+        jQuery( this ).closest( '.admin-page-framework-field' ).find( 'input[type=radio]' ).attr( 'checked', false );
+        jQuery( this ).attr( 'checked', 'checked' );
+    });
+});                 
+JAVASCRIPTS;
             return 
-                "<script type='text/javascript' class='radio-button-checked-attribute-updater'>
-                    jQuery( document ).ready( function(){
-                        jQuery( '#{$sFieldContainerID} input[type=radio]' ).change( function() {
-                            jQuery( this ).closest( '.admin-page-framework-field' ).find( 'input[type=radio]' ).attr( 'checked', false );
-                            jQuery( this ).attr( 'checked', 'checked' );
-                        });
-                    });     
-                </script>";     
+                "<script type='text/javascript' class='radio-button-checked-attribute-updater'>"
+                    . $_sScript
+                . "</script>";
             
         }    
 }

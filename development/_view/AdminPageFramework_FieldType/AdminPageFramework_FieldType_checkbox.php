@@ -39,17 +39,18 @@ class AdminPageFramework_FieldType_checkbox extends AdminPageFramework_FieldType
      */ 
     protected function getScripts() {
         new AdminPageFramework_Script_CheckboxSelector;
-        return "     
-            jQuery( document ).ready( function(){
-                // Add the buttons.
-                jQuery( '.admin-page-framework-checkbox-container[data-select_all_button]' ).each( function(){
-                    jQuery( this ).before( '<div class=\"select_all_button_container\" onclick=\"jQuery( this ).selectALLAPFCheckboxes(); return false;\"><a class=\"select_all_button button button-small\">' + jQuery( this ).data( 'select_all_button' ) + '</a></div>' );
-                });            
-                jQuery( '.admin-page-framework-checkbox-container[data-select_none_button]' ).each( function(){
-                    jQuery( this ).before( '<div class=\"select_none_button_container\" onclick=\"jQuery( this ).deselectAllAPFCheckboxes(); return false;\"><a class=\"select_all_button button button-small\">' + jQuery( this ).data( 'select_none_button' ) + '</a></div>' );
-                });
-            });
-        ";       
+        return <<<JAVASCRIPTS
+jQuery( document ).ready( function(){
+    // Add the buttons.
+    jQuery( '.admin-page-framework-checkbox-container[data-select_all_button]' ).each( function(){
+        jQuery( this ).before( '<div class=\"select_all_button_container\" onclick=\"jQuery( this ).selectALLAPFCheckboxes(); return false;\"><a class=\"select_all_button button button-small\">' + jQuery( this ).data( 'select_all_button' ) + '</a></div>' );
+    });            
+    jQuery( '.admin-page-framework-checkbox-container[data-select_none_button]' ).each( function(){
+        jQuery( this ).before( '<div class=\"select_none_button_container\" onclick=\"jQuery( this ).deselectAllAPFCheckboxes(); return false;\"><a class=\"select_all_button button button-small\">' + jQuery( this ).data( 'select_none_button' ) + '</a></div>' );
+    });
+});
+JAVASCRIPTS;
+
     }    
 
     /**
@@ -59,26 +60,28 @@ class AdminPageFramework_FieldType_checkbox extends AdminPageFramework_FieldType
      * @since       3.3.1       Changed from `_replyToGetStyles()`.
      */ 
     protected function getStyles() {
-        return "/* Checkbox field type */
-            .select_all_button_container, 
-            .select_none_button_container
-            {
-                display: inline-block;
-                margin-bottom: 0.4em;
-            }
-            .admin-page-framework-checkbox-label {
-                margin-top: 0.1em;
-            }
-            .admin-page-framework-field input[type='checkbox'] {
-                margin-right: 0.5em;
-            }     
-            .admin-page-framework-field-checkbox .admin-page-framework-input-label-container {
-                padding-right: 1em;
-            }
-            .admin-page-framework-field-checkbox .admin-page-framework-input-label-string  {
-                display: inline; /* Checkbox labels should not fold(wrap) after the check box */
-            }
-        ";
+        return <<<CSSRULES
+/* Checkbox field type */
+.select_all_button_container, 
+.select_none_button_container
+{
+    display: inline-block;
+    margin-bottom: 0.4em;
+}
+.admin-page-framework-checkbox-label {
+    margin-top: 0.1em;
+}
+.admin-page-framework-field input[type='checkbox'] {
+    margin-right: 0.5em;
+}     
+.admin-page-framework-field-checkbox .admin-page-framework-input-label-container {
+    padding-right: 1em;
+}
+.admin-page-framework-field-checkbox .admin-page-framework-input-label-string  {
+    display: inline; /* Checkbox labels should not fold(wrap) after the check box */
+}
+CSSRULES;
+
     }
     
     /**

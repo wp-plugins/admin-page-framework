@@ -57,13 +57,15 @@ class AdminPageFramework_FormTable extends AdminPageFramework_FormTable_Base {
             
             if ( self::$_bLoadedTabEnablerScript ) { return ''; }
             self::$_bLoadedTabEnablerScript = true;
-            
-            return "<script type='text/javascript'>
-                jQuery( document ).ready( function() {
-                    jQuery( '.admin-page-framework-section-tabs-contents' ).createTabs(); // the parent element of the ul tag; The ul element holds li tags of titles.
-                    // jQuery( '.admin-page-framework-section-tabs-contents' ).tabs(); // the parent element of the ul tag; The ul element holds li tags of titles.
-                });
-            </script>";     
+            $_sScript = <<<JAVASCRIPTS
+jQuery( document ).ready( function() {
+    // the parent element of the ul tag; The ul element holds li tags of titles.
+    jQuery( '.admin-page-framework-section-tabs-contents' ).createTabs(); 
+});            
+JAVASCRIPTS;
+            return "<script type='text/javascript'>"
+                . $_sScript
+            . "</script>";
             
         }
         
@@ -255,15 +257,21 @@ class AdminPageFramework_FormTable extends AdminPageFramework_FormTable_Base {
                     . "<a class='repeatable-section-remove button-secondary repeatable-section-button button button-large' href='#' title='{$_sRemove}' {$_sVisibility} data-id='{$sContainerTagID}'>-</a>"
                     . "<a class='repeatable-section-add button-secondary repeatable-section-button button button-large' href='#' title='{$_sAdd}' data-id='{$sContainerTagID}'>+</a>"
                 . "</div>";
-            $aJSArray = json_encode( $aSettings );
+            $_sButtonsHTML  = '"' . $_sButtons . '"';
+            $_aJSArray      = json_encode( $aSettings );
+            $_sScript       = <<<JAVASCRIPTS
+jQuery( document ).ready( function() {
+    // Adds the buttons
+    jQuery( '#{$sContainerTagID} .admin-page-framework-section-caption' ).show().prepend( $_sButtonsHTML );
+    // Update the fields     
+    jQuery( '#{$sContainerTagID}' ).updateAPFRepeatableSections( $_aJSArray ); 
+});            
+JAVASCRIPTS;
             return
-                "<script type='text/javascript'>
-                    jQuery( document ).ready( function() {
-                        jQuery( '#{$sContainerTagID} .admin-page-framework-section-caption' ).show().prepend( \"{$_sButtons}\" ); // Adds the buttons
-                        jQuery( '#{$sContainerTagID}' ).updateAPFRepeatableSections( {$aJSArray} ); // Update the fields     
-                    });
-                </script>";     
-            
+                "<script type='text/javascript'>"
+                    . $_sScript
+                . "</script>";
+                
         }
         
     /**
@@ -395,7 +403,7 @@ class AdminPageFramework_FormTable extends AdminPageFramework_FormTable_Base {
             $_sAttributes_TR    = $this->_getFieldContainerAttributes( 
                 $_aField,
                 array( 
-                    'id'        => 'fieldrow-' . AdminPageFramework_FormField::_getInputTagID( $_aField ),
+                    'id'        => 'fieldrow-' . AdminPageFramework_FormField::_getInputTagBaseID( $_aField ),
                     'valign'    => 'top',
                     'class'     => 'admin-page-framework-fieldrow',
                 ),

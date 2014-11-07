@@ -106,6 +106,13 @@ All rights reserved.
 Licensed the New BSD License or the GNU General Public License (GPL) version 2 or 3.
 <http://apigen.org/>
 
+The tool component of the demo plugin incorporates work covered by the following copyright:
+
+JSMinPlus version 1.4  
+Tino Zijdel <crisp@tweakers.net>
+<http://crisp.tweakblogs.net/blog/cat/716>
+
+
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
                     GNU GENERAL PUBLIC LICENSE
