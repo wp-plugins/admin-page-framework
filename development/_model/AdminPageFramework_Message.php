@@ -133,6 +133,8 @@ class AdminPageFramework_Message {
             'allowed_minimum_number_of_sections'    => null,
             'add_section'                           => null,
             'remove_section'                        => null,
+            'toggle_all'                            => null,    // 3.4.0+
+            'toggle_all_collapsible_sections'       => null,    // 3.4.0+
             
             // AdminPageFramework_FieldType_reset   
             'reset'                                 => null,    // 3.3.0+
@@ -141,10 +143,21 @@ class AdminPageFramework_Message {
     }
     
     /**
+     * Returns the set text domain string.
+     * 
+     * This is used from field type and input classes to display deprecated admin errors/
+     * 
+     * @since       3.3.3
+     */
+    public function getTextDomain() {
+        return $this->_sTextDomain;
+    }
+    
+    /**
      * Returns the framework system message by key.
      * 
-     * @remark  An alias of the __() method.
-     * @since   3.2.0
+     * @remark      An alias of the __() method.
+     * @since       3.2.0
      */
     public function get( $sKey ) {
         
@@ -323,6 +336,10 @@ class AdminPageFramework_Message {
                     return __( 'Add Section', 'admin-page-framework' );
                 case 'remove_section':
                     return __( 'Remove Section', 'admin-page-framework' );
+                case 'toggle_all':
+                    return __( 'Toggle All', 'admin-page-framework' );
+                case 'toggle_all_collapsible_sections':
+                    return __( 'Toggle all collapsible sections', 'admin-page-framework' );
                     
                 // AdminPageFramework_FieldType_reset          
                 case 'reset':   // 3.3.0+

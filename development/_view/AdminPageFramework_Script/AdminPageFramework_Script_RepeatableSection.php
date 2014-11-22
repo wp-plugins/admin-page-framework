@@ -86,7 +86,7 @@ class AdminPageFramework_Script_RepeatableSection extends AdminPageFramework_Scr
         var nodeSectionsContainer = nodeSectionContainer.closest( '.admin-page-framework-sectionset' );
         var sSectionsContainerID = nodeSectionsContainer.attr( 'id' );
         var nodeTabsContainer = $( '#' + sSectionContainerID ).closest( '.admin-page-framework-sectionset' ).find( '.admin-page-framework-section-tabs' );
-        
+
         /* If the set maximum number of sections already exists, do not add */
         var sMaxNumberOfSections = $.fn.aAPFRepeatableSectionsOptions[ sSectionsContainerID ]['max'];
         if ( sMaxNumberOfSections != 0 && nodeSectionsContainer.find( '.admin-page-framework-section' ).length >= sMaxNumberOfSections ) {
@@ -107,10 +107,12 @@ class AdminPageFramework_Script_RepeatableSection extends AdminPageFramework_Scr
         /* If this is not for tabbed sections, do not show the title */
         var sSectionTabSlug = nodeNewSection.find( '.admin-page-framework-section-caption' ).first().attr( 'data-section_tab' );
         if ( ! sSectionTabSlug || sSectionTabSlug === '_default' ) {
-            nodeNewSection.find( '.admin-page-framework-section-title' ).hide();
+            nodeNewSection.find( '.admin-page-framework-section-title' ).not( '.admin-page-framework-collapsible-section-title' ).hide();
         }
+        // Bind the click event to the collapsible section(s) bar.
+        nodeNewSection.find( '.admin-page-framework-collapsible-sections-title, .admin-page-framework-collapsible-section-title' ).enableAPFCollapsibleButton();
                         
-        /* Add the cloned new field element */
+        /* Add the cloned new field element */        
         nodeNewSection.insertAfter( nodeSectionContainer );    
 
         /* It seems radio buttons of the original field need to be reassigned. Otherwise, the checked items will be gone. */
@@ -145,7 +147,7 @@ class AdminPageFramework_Script_RepeatableSection extends AdminPageFramework_Scr
         });
         
         /* For tabbed sections - add the title tab list */
-        if ( nodeTabsContainer.length > 0 ) {
+        if ( nodeTabsContainer.length > 0 && ! nodeSectionContainer.hasClass( 'is_subsection_collapsible' ) ) {
             
             /* The clicked(copy source) section tab */
             var nodeTab = nodeTabsContainer.find( '#section_tab-' + sSectionContainerID );
@@ -223,8 +225,9 @@ class AdminPageFramework_Script_RepeatableSection extends AdminPageFramework_Scr
          * @since 3.1.6 Changed it to do after removing the element.
          */                
         var oNextAllSections = nodeSectionContainer.nextAll();
+        var _bIsSubsectionCollapsible  = nodeSectionContainer.hasClass( 'is_subsection_collapsible' );
         
-        /* Remove the field */
+        /* Remove the section */
         nodeSectionContainer.remove();
         
         /* Decrement the names and ids of the next following siblings. */
@@ -240,7 +243,7 @@ class AdminPageFramework_Script_RepeatableSection extends AdminPageFramework_Scr
         });
         
         /* For tabbed sections - remove the title tab list */
-        if ( nodeTabsContainer.length > 0 && nodeTabs.length > 1 ) {
+        if ( nodeTabsContainer.length > 0 && nodeTabs.length > 1 && ! _bIsSubsectionCollapsible ) {
             nodeSelectionTab = nodeTabsContainer.find( '#section_tab-' + sSectionConteinrID );
             nodeSelectionTab.nextAll().each( function() {
                 $( this ).find( 'a.anchor' ).decrementIDAttribute( 'href' );
@@ -258,8 +261,7 @@ class AdminPageFramework_Script_RepeatableSection extends AdminPageFramework_Scr
         
         /* Count the remaining Remove buttons and if it is one, disable the visibility of it */
         var nodeRemoveButtons = nodeSectionsContainer.find( '.repeatable-section-remove' );
-        if ( nodeRemoveButtons.length == 1 ) {
-            
+        if ( 1 === nodeRemoveButtons.length ) {
             nodeRemoveButtons.css( 'display', 'none' );
             
             /* Also if this is not for tabbed sections, do show the title */

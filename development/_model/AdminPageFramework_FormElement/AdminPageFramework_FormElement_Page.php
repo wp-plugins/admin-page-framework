@@ -152,19 +152,14 @@ class AdminPageFramework_FormElement_Page extends AdminPageFramework_FormElement
      */
     protected function formatSection( array $aSection, $sFieldsType, $sCapability, $iCountOfElements ) {
         
-        $aSection = $this->uniteArrays(
-            $aSection,
-            array( 
-                '_fields_type' => $sFieldsType,
-                'capability' => $sCapability,
-                'page_slug' => $this->sDefaultPageSlug,
-            ),
-            self::$_aStructure_Section
+        $aSection = $aSection
+        + array( 
+            '_fields_type'  => $sFieldsType,
+            'capability'    => $sCapability,
+            'page_slug'     => $this->sDefaultPageSlug,
         );
-
-        $aSection['order'] = is_numeric( $aSection['order'] ) ? $aSection['order'] : $iCountOfElements + 10;
-        return $aSection;
-        
+        return parent::formatSection( $aSection, $sFieldsType, $sCapability, $iCountOfElements );
+                
     }
 
     /**
@@ -172,18 +167,19 @@ class AdminPageFramework_FormElement_Page extends AdminPageFramework_FormElement
      * 
      * Before calling this method, $sOptionKey and $sClassName properties must be set.
      * 
-     * @since 3.0.0
+     * @since       3.0.0
+     * @since       3.4.4       Aded the $oCallerObject parameter.
      */
-    protected function formatField( $aField, $sFieldsType, $sCapability, $iCountOfElements, $iSectionIndex, $bIsSectionRepeatable ) {
+    protected function formatField( $aField, $sFieldsType, $sCapability, $iCountOfElements, $iSectionIndex, $bIsSectionRepeatable, $oCallerObject ) {
         
-        $_aField = parent::formatField( $aField, $sFieldsType, $sCapability, $iCountOfElements, $iSectionIndex, $bIsSectionRepeatable );
+        $_aField = parent::formatField( $aField, $sFieldsType, $sCapability, $iCountOfElements, $iSectionIndex, $bIsSectionRepeatable, $oCallerObject );
         
-        if ( ! $_aField ) return;
-        $_aField['option_key'] = $this->sOptionKey;
-        $_aField['class_name'] = $this->sClassName;
-        $_aField['page_slug'] = isset( $this->aSections[ $_aField['section_id'] ]['page_slug'] ) ? $this->aSections[ $_aField['section_id'] ]['page_slug'] : null;
-        $_aField['tab_slug'] = isset( $this->aSections[ $_aField['section_id'] ]['tab_slug'] ) ? $this->aSections[ $_aField['section_id'] ]['tab_slug'] : null;
-        $_aField['section_title'] = isset( $this->aSections[ $_aField['section_id'] ]['title'] ) ? $this->aSections[ $_aField['section_id'] ]['title'] : null; // used for the contextual help pane.
+        if ( ! $_aField ) { return; }
+        $_aField['option_key']      = $this->sOptionKey;
+        $_aField['class_name']      = $this->sClassName;
+        $_aField['page_slug']       = isset( $this->aSections[ $_aField['section_id'] ]['page_slug'] ) ? $this->aSections[ $_aField['section_id'] ]['page_slug'] : null;
+        $_aField['tab_slug']        = isset( $this->aSections[ $_aField['section_id'] ]['tab_slug'] ) ? $this->aSections[ $_aField['section_id'] ]['tab_slug'] : null;
+        $_aField['section_title']   = isset( $this->aSections[ $_aField['section_id'] ]['title'] ) ? $this->aSections[ $_aField['section_id'] ]['title'] : null; // used for the contextual help pane.
         return $_aField;
         
     }
@@ -376,13 +372,13 @@ class AdminPageFramework_FormElement_Page extends AdminPageFramework_FormElement
      * 
      * @remark Note that this method will return the other pages' option elements as well.
      * 
-     * @since 2.0.0
-     * @since 3.0.0 The second parameter was changed to a tab slug. Moved from the settings class.
+     * @since       2.0.0
+     * @since       3.0.0       The second parameter was changed to a tab slug. Moved from the settings class.
 
-     * @param array     the options array. Note that the options array structure are very similar to the aFields array. However, it does not have the '_default' section key.
-     * @param string     the page slug to check
-     * @param string     the tab slug to check
-     * @return array     the stored options excluding the currently specified tab's sections and their fields.
+     * @param       array       $aOptions      the options array. Note that the options array structure are very similar to the aFields array. However, it does not have the '_default' section key.
+     * @param       string      $sPageSlug     the page slug to check
+     * @param       string      $sTabSlug      the tab slug to check
+     * @return      array       the stored options excluding the currently specified tab's sections and their fields.
      *      If not found, an empty array will be returned.
      */ 
     public function getOtherTabOptions( $aOptions, $sPageSlug, $sTabSlug ) {

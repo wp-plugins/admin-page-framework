@@ -24,6 +24,7 @@ class AdminPageFramework_CSS {
      * @internal
      */
     static public function getDefaultCSS() {
+
         $_sCSS = <<<CSSRULES
 /* Settings Notice */
 .wrap div.updated.admin-page-framework-settings-notice-container, 
@@ -51,14 +52,14 @@ class AdminPageFramework_CSS {
     width: 100%; /* This allows float:right elements to go to the very right end of the page. */
 }
 
-/* Heading - the meta box container element affects the styles of regular main content output. So it needs to be fixed. */
-#poststuff .admin-page-framework-content h3 {
+/* Regular Heading Titles - the meta box container element affects the styles of regular main content output. So it needs to be fixed. */
+.admin-page-framework-container #poststuff .admin-page-framework-content h3 {
     font-weight: bold;
     font-size: 1.3em;
     margin: 1em 0;
     padding: 0;
     font-family: 'Open Sans', sans-serif;
-}
+} 
 
 /* In-page tabs */ 
 .admin-page-framework-in-page-tab .nav-tab.nav-tab-active {
@@ -74,7 +75,9 @@ class AdminPageFramework_CSS {
 CSSRULES;
 
         return $_sCSS . PHP_EOL 
+            . self::_getFormSectionRules() . PHP_EOL
             . self::_getFormFieldRules() . PHP_EOL
+            . self::_getCollapsibleSectionsRules() . PHP_EOL
             . self::_getFieldErrorRules() . PHP_EOL
             . self::_getMetaBoxFormRules() . PHP_EOL
             . self::_getWidgetFormRules() . PHP_EOL
@@ -83,6 +86,24 @@ CSSRULES;
             
     }
 
+         /**
+         * Returns the CSS rules for form fields.
+         * 
+         * @since       3.4.0
+         * @internal
+         */    
+        static private function _getFormSectionRules() {
+            return <<<CSSRULES
+.admin-page-framework-section {
+    margin-bottom: 1em; /* gives a margin between sections. This helps for the debug info in each sectionset and collapsible sections. */
+}            
+.admin-page-framework-sectionset {
+    margin-bottom: 1em; 
+}            
+CSSRULES;
+            
+        }
+    
         /**
          * Returns the CSS rules for form fields.
          * 
@@ -161,9 +182,9 @@ td.admin-page-framework-field-td-no-title {
 }
 /* Section Title */
 .admin-page-framework-section .admin-page-framework-section-title {
-    background: none;
-    -webkit-box-shadow: none;
-    box-shadow: none;
+    /* background: none; */               /* @todo examine what this is for. @deprecated 3.4.0 for repeatable collapsible section titles */
+    /* -webkit-box-shadow: none; */       /* @todo examine what this is for. @deprecated 3.4.0 for repeatable collapsible section titles */
+    /* _box-shadow: none; */              /* @todo examine what this is for. @deprecated 3.4.0 for repeatable collapsible section titles */
 }
 
 /* Fields Container */
@@ -320,12 +341,147 @@ CSSRULES;
         }   
 
         /**
+         * Returns the collapsible sections specific CSS rules.
+         * 
+         * @since       3.4.0
+         * @internal
+         */
+        static private function _getCollapsibleSectionsRules() {
+
+            $_sCSSRules = <<<CSSRULES
+/* Collapsible Sections Title Block */            
+.admin-page-framework-collapsible-sections-title, 
+.admin-page-framework-collapsible-section-title
+{
+    font-size:13px;
+    background-color: #fff;
+    padding: 15px 18px;
+    margin-top: 1em; 
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+}
+
+.admin-page-framework-collapsible-sections-title.collapsed
+.admin-page-framework-collapsible-section-title.collapsed {
+    border-bottom: 1px solid #dfdfdf;
+    margin-bottom: 1em; /* gives a margin for the debug info at the bottom of the meta box */
+}
+.admin-page-framework-collapsible-section-title {
+    margin-top: 0;
+}
+.admin-page-framework-collapsible-section-title.collapsed {
+    margin-bottom: 0;
+}
+
+/* Collapsible Sections Title Block in Meta Boxes */            
+#poststuff .metabox-holder .admin-page-framework-collapsible-sections-title.admin-page-framework-section-title h3,
+#poststuff .metabox-holder .admin-page-framework-collapsible-section-title.admin-page-framework-section-title h3
+{
+    font-size: 1em;
+    margin: 0;
+}
+
+/* Collapsible Sections Title Dashicon */            
+.admin-page-framework-collapsible-sections-title.accordion-section-title:after,
+.admin-page-framework-collapsible-section-title.accordion-section-title:after 
+{
+    top: 12px;
+    right: 15px;
+}
+.admin-page-framework-collapsible-sections-title.accordion-section-title:after,
+.admin-page-framework-collapsible-section-title.accordion-section-title:after {
+    content: '\\f142';
+}
+.admin-page-framework-collapsible-sections-title.accordion-section-title.collapsed:after,
+.admin-page-framework-collapsible-section-title.accordion-section-title.collapsed:after 
+{
+    content: '\\f140';
+}
+
+/* Collapsible Sections Content Block */            
+.admin-page-framework-collapsible-sections-content, 
+.admin-page-framework-collapsible-section-content
+{
+    border: 1px solid #dfdfdf;
+    border-top: 0;
+    background-color: #fff;
+    /* margin-bottom: 1em; */  /* gives a margin for the debug info at the bottom of the meta box */
+}
+
+tbody.admin-page-framework-collapsible-content {
+    display: table-caption;     /* 'block' will be assigned in JavaScript if the browser is not Chrome */
+    padding: 10px 20px 15px 20px;
+}
+/* Collapsible section containers get this class selector in Google Chrome */
+tbody.admin-page-framework-collapsible-content.table-caption {
+    display: table-caption; /* For some reasons, this display mode gives smooth animation in Google Chrome */
+}
+/* The Toggle All button */
+.admin-page-framework-collapsible-toggle-all-button-container {
+    margin-top: 1em;
+    margin-bottom: 1em;
+    width: 100%;
+    display: table; /* if block, it gets hidden inside the section toggle bar */
+}
+.admin-page-framework-collapsible-toggle-all-button.button {
+
+    height: 36px;
+    line-height: 34px;
+    padding: 0 16px 6px;    
+    font-size: 20px;    /* Determines the dashicon size  */
+    width: auto;
+}
+
+/* Repeatable Section buttons inside the collapsible section title block */
+.admin-page-framework-collapsible-section-title .admin-page-framework-repeatable-section-buttons {
+    /* Collapsible section bar has an icon at the right end so the repeatable button needs to be placed before it */
+    margin: 0;
+    margin-right: 2em; 
+    margin-top: -0.32em;
+}
+/* When a section_title field is in the caption tag, do not set the margin-top to align vertically */
+.admin-page-framework-collapsible-section-title .admin-page-framework-repeatable-section-buttons.section_title_field_sibling {
+    margin-top: 0;
+}
+
+.admin-page-framework-collapsible-section-title .repeatable-section-button {
+    background: none;   /* for Wordpress v3.7.x or below, the background image need to be removed as well */
+}
+CSSRULES;
+            if ( version_compare( $GLOBALS['wp_version'], '3.8', '<' ) ) {
+                $_sCSSRules .= <<<CSSRULES
+.admin-page-framework-collapsible-sections-title.accordion-section-title:after,
+.admin-page-framework-collapsible-section-title.accordion-section-title:after 
+{
+    content: '';
+    top: 18px;
+}
+.admin-page-framework-collapsible-sections-title.accordion-section-title.collapsed:after,
+.admin-page-framework-collapsible-section-title.accordion-section-title.collapsed:after 
+{
+    content: '';
+}                 
+.admin-page-framework-collapsible-toggle-all-button.button {
+    font-size: 1em;
+}
+
+.admin-page-framework-collapsible-section-title .admin-page-framework-repeatable-section-buttons {
+    top: -8px;
+}
+CSSRULES;
+            }   
+            return $_sCSSRules;
+            
+        }
+            
+        /**
          * Returns the meta-box form specific CSS rules.
          * 
          * @since       3.3.0
          * @internal
          */
-        static private function _getMetaBoxFormRules() {            
+        static private function _getMetaBoxFormRules() {     
+
             return <<<CSSRULES
 /* Meta-box form fields */
 .postbox .title-colon {
@@ -337,6 +493,9 @@ CSSRULES;
     display: inline-block;
     width: 100%;
     padding: 0;
+    /* 3.4.0+ In IE inline-block does not take effect for td and th so make them float */
+    float: right;
+    clear: right; 
 }
 
 .postbox .admin-page-framework-field {
@@ -392,6 +551,9 @@ CSSRULES;
     display: inline-block;
     width: 100%;
     padding: 0;
+    /* 3.4.0+ In IE inline-block does not take effect for td and th so make them float */
+    float: right;
+    clear: right;     
 }
 
 .widget .admin-page-framework-field,
@@ -491,7 +653,7 @@ CSSRULES;
         static private function _getVersionSpecificRules( $sWPVersion ) {
             
             $_sCSSRules = '';
-            if ( version_compare( $sWPVersion, '3.8', '<' ) ) {        
+            if ( version_compare( $sWPVersion, '3.8', '<' ) ) {
 
                 $_sCSSRules .= <<<CSSRULES
 .admin-page-framework-field .remove_value.button.button-small {
@@ -548,7 +710,18 @@ CSSRULES;
      * @internal
      */
     static public function getDefaultCSSIE() {
-        return '';
+
+        return <<<CSSRULES
+/* Collapsible sections - in IE tbody and tr cannot set paddings */        
+tbody.admin-page-framework-collapsible-content > tr > th,
+tbody.admin-page-framework-collapsible-content > tr > td
+{
+    padding-right: 20px;
+    padding-left: 20px;
+}
+
+CSSRULES;
+
     }
     
 }
