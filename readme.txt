@@ -4,7 +4,7 @@ Donate link:        http://michaeluno.jp/en/donate
 Tags:               admin, administration, options, settings, API, framework, library, meta box, custom post type, custom post types, utility, fields, custom field, custom fields, tool, tools, widget, widgets, form, forms
 Requires at least:  3.3
 Tested up to:       4.0.1
-Stable tag:         3.4.0
+Stable tag:         3.4.1
 License:            GPLv2 or later
 License URI:        http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -448,6 +448,17 @@ See examples, https://gist.github.com/michaeluno/c30713fcfe0d9d45d89f, https://g
 Check out [the issues](https://github.com/michaeluno/admin-page-framework/issues?labels=enhancement&page=1&state=open) on GitHub labeled *enhancement*.
 
 == Changelog ==
+
+= 3.4.1 - 2014/12/21 =
+- Added the `options_update_status_{...}` and `validation_saved_options_without_dynamic_elements_` filters for the admin page factory class.
+- Added the `field_definition_{...}` filters for the page meta box class.
+- Added the `validate()` and `content()` methods for the meta box and page meta box factory classes.
+- Changed the timing of `field_definition_{...}` filters of the admin page class.
+- Changed not to lose the input data when a form validation error occurs for the meta box, page meta box, and page classes.
+- Fixed an issue that github buttons of the `github` field type did not load in some sites.
+- Fixed a bug that repeatable sections could not be repeated when there is no collapsible section in the page.
+- Fixed a bug that the old options of the second parameter passed in a validation callback method of the page meta box class did not hold dynamic elements.
+- Fixed a bug that the action hooks and their predefined callbacks `submit_{instantiated class name}_{page slug}` and `submit_after_{instantiated class name}_{page slug}` did not work.
 
 = 3.4.0 - 2014/11/23 =
 - Added the ability of collapsing and expanding section containers with the `collapsible` section definition argument.

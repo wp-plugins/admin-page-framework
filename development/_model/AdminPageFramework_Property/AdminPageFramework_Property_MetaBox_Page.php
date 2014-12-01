@@ -22,8 +22,8 @@ class AdminPageFramework_Property_MetaBox_Page extends AdminPageFramework_Proper
 
     /**
      * Defines the property type.
-     * @remark Setting the property type helps to check whether some components are loaded such as scripts that can be reused per a class type basis.
-     * @since 3.0.0
+     * @remark      Setting the property type helps to check whether some components are loaded such as scripts that can be reused per a class type basis.
+     * @since       3.0.0
      * @internal
      */
     public $_sPropertyType = 'page_meta_box';
@@ -64,15 +64,15 @@ class AdminPageFramework_Property_MetaBox_Page extends AdminPageFramework_Proper
     
     /**
      * Determines the current page and sets the appropriate properties.
-     * @since 3.0.0
+     * @since       3.0.0
      * @internal
      */
     public function _replyToSetUpProperties() {
         
-        if ( ! isset( $_GET['page'] ) ) return;     
+        if ( ! isset( $_GET['page'] ) ) { return; }
                 
-        $this->oAdminPage = $this->_getOwnerClass( $_GET['page'] );
-        if ( ! $this->oAdminPage ) return;
+        $this->oAdminPage = $this->_getOwnerObjectOfPage( $_GET['page'] );
+        if ( ! $this->oAdminPage ) { return; }
         
         $this->aHelpTabs = $this->oAdminPage->oProp->aHelpTabs; // the $this->oHelpPane object access it.
         
@@ -84,12 +84,12 @@ class AdminPageFramework_Property_MetaBox_Page extends AdminPageFramework_Proper
         
     /**
      * Retrieves the screen ID (hook suffix) of the given page slug.
-     * @since 3.0.0
+     * @since       3.0.0
      * @internal
      */
     public function _getScreenIDOfPage( $sPageSlug ) {
 
-        return ( $_oAdminPage = $this->_getOwnerClass( $sPageSlug ) )
+        return ( $_oAdminPage = $this->_getOwnerObjectOfPage( $sPageSlug ) )
             ? $_oAdminPage->oProp->aPages[ $sPageSlug ]['_page_hook'] . ( is_network_admin() ? '-network' : '' )
             : '';
         
@@ -98,12 +98,12 @@ class AdminPageFramework_Property_MetaBox_Page extends AdminPageFramework_Proper
     /**
      * Checks if the given page slug is one of the pages added by the framework.
      * 
-     * @sicne 3.0.0
-     * @return boolean Returns true if it is of framework's added page; otherwise, false.
+     * @since       3.0.0
+     * @return      boolean     Returns true if it is of framework's added page; otherwise, false.
      */
     public function isPageAdded( $sPageSlug='' ) {    
         
-        return ( $_oAdminPage = $this->_getOwnerClass( $sPageSlug ) )
+        return ( $_oAdminPage = $this->_getOwnerObjectOfPage( $sPageSlug ) )
             ? $_oAdminPage->oProp->isPageAdded( $sPageSlug )
             : false;
 
@@ -112,34 +112,34 @@ class AdminPageFramework_Property_MetaBox_Page extends AdminPageFramework_Proper
     /**
      * Checks if the current loading page is in the given page tab.
      * 
-     * @remark If the user is in the default tab page, it's possible that the $_GET['tab'] key is not set.
-     * @since 3.0.0
-     * return boolean
+     * @remark      If the user is in the default tab page, it's possible that the $_GET['tab'] key is not set.
+     * @since       3.0.0
+     * return       boolean
      */
     public function isCurrentTab( $sTabSlug ) {
         
-        $sCurrentPageSlug = isset( $_GET['page'] ) ? $_GET['page'] : '';
-        if ( ! $sCurrentPageSlug ) return false;
+        $_sCurrentPageSlug = isset( $_GET['page'] ) ? $_GET['page'] : '';
+        if ( ! $_sCurrentPageSlug ) { return false; }
         
-        $sCurrentTabSlug = isset( $_GET['tab'] ) 
+        $_sCurrentTabSlug = isset( $_GET['tab'] ) 
             ? $_GET['tab']
-            : $this->getDefaultInPageTab( $sCurrentPageSlug );
+            : $this->getDefaultInPageTab( $_sCurrentPageSlug );
             
-        return ( $sTabSlug == $sCurrentTabSlug );
+        return ( $sTabSlug == $_sCurrentTabSlug );
 
     }
     
     /**
      * Retrieves the default in-page tab from the given tab slug.
      * 
-     * @since 3.0.0
-     * @remark Used in the __call() method in the main class.
-     * @return string The default in-page tab slug if found; otherwise, an empty string.
+     * @since       3.0.0
+     * @remark      Used in the `__call()` method in the main class.
+     * @return      string      The default in-page tab slug if found; otherwise, an empty string.
      */         
     public function getDefaultInPageTab( $sPageSlug ) {
     
-        if ( ! $sPageSlug ) return '';     
-        return ( $_oAdminPage = $this->_getOwnerClass( $sPageSlug ) )
+        if ( ! $sPageSlug ) { return ''; }
+        return ( $_oAdminPage = $this->_getOwnerObjectOfPage( $sPageSlug ) )
             ? $_oAdminPage->oProp->getDefaultInPageTab( $sPageSlug )
             : '';    
 
@@ -147,29 +147,38 @@ class AdminPageFramework_Property_MetaBox_Page extends AdminPageFramework_Proper
     
     /**
      * Returns the option key for the given page slug that is supposed to be one of the added page by the framework.
-     * @since 3.0.0
+     * @since       3.0.0
      */
     public function getOptionKey( $sPageSlug ) {
         
-        if ( ! $sPageSlug ) return '';     
-        return ( $_oAdminPage = $this->_getOwnerClass( $sPageSlug ) )
+        if ( ! $sPageSlug ) { return ''; }
+        return ( $_oAdminPage = $this->_getOwnerObjectOfPage( $sPageSlug ) )
             ? $_oAdminPage->oProp->sOptionKey
             : '';     
         
     }
     /**
      * Returns the class object that owns the page of the given page slug.
-     * @since 3.0.0
+     * 
+     * The owner class object is not the caller object of this property class object. 
+     * It is the page factory class of the framework that creates the page of the given page slug.
+     * The property object of the owner class has some methods to determine whether the currently loading page 
+     * has been added or not. So this class will use those methods by accessing the owner class object.
+     * 
+     * @since       3.0.0
+     * @since       3.4.1       Changed the name from `_getOwneerClass`.
      * @internal
      */
-    private function _getOwnerClass( $sPageSlug ) {
+    private function _getOwnerObjectOfPage( $sPageSlug ) {
         
-        if ( ! isset( $GLOBALS['aAdminPageFramework']['aPageClasses'] ) ) return null;
-        if ( ! is_array( $GLOBALS['aAdminPageFramework']['aPageClasses'] ) ) return null;
+        if ( ! isset( $GLOBALS['aAdminPageFramework']['aPageClasses'] ) ) { return null; }
+        if ( ! is_array( $GLOBALS['aAdminPageFramework']['aPageClasses'] ) ) { return null; }
                  
-        foreach( $GLOBALS['aAdminPageFramework']['aPageClasses'] as $__oClass )
-            if ( $__oClass->oProp->isPageAdded( $sPageSlug ) )
+        foreach( $GLOBALS['aAdminPageFramework']['aPageClasses'] as $__oClass ) {
+            if ( $__oClass->oProp->isPageAdded( $sPageSlug ) ) {
                 return $__oClass;
+            }
+        }
         return null;
         
     }

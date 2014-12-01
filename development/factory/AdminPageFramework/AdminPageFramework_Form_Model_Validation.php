@@ -50,7 +50,7 @@ abstract class AdminPageFramework_Form_Model_Validation extends AdminPageFramewo
         if ( ! $this->_verifyFormSubmit() ) {
             return;
         }
-        
+
         // 2. Apply user validation callbacks to the submitted data.
         // If only page-meta-boxes are used, it's possible that the option key element does not exist.
         
@@ -112,7 +112,7 @@ abstract class AdminPageFramework_Form_Model_Validation extends AdminPageFramewo
                 isset( $_POST['tab_slug'] ) 
                     ? "submit_{$this->oProp->sClassName}_{$_sPageSlug}_{$_sTabSlug}"
                     : null, // if null given, the method will ignore it
-                "submit_{$this->oProp->sClassName}_{sPageSlug}",
+                "submit_{$this->oProp->sClassName}_{$_sPageSlug}",
                 "submit_{$this->oProp->sClassName}",
             ),
             // 3.3.1+ Added parameters to be passed
@@ -150,7 +150,7 @@ abstract class AdminPageFramework_Form_Model_Validation extends AdminPageFramewo
                 isset( $_POST['tab_slug'] ) 
                     ? "submit_after_{$this->oProp->sClassName}_{$_sPageSlug}_{$_sTabSlug}" 
                     : null, 
-                "submit_after_{$this->oProp->sClassName}_{sPageSlug}",
+                "submit_after_{$this->oProp->sClassName}_{$_sPageSlug}",
                 "submit_after_{$this->oProp->sClassName}",
             ),
             // 3.3.1+ Added parameters to be passed
@@ -158,12 +158,40 @@ abstract class AdminPageFramework_Form_Model_Validation extends AdminPageFramewo
             $_aOptions,
             $this
         );           
-        
+       
         // 7. Reload the page with the update notice.
-        exit( wp_redirect( add_query_arg( $_aStatus ) ) );
+        exit( wp_redirect( $this->_getSettingUpdateURL( $_aStatus, $_sPageSlug, $_sTabSlug ) ) );
         
     }
-        
+        /**
+         * Returns the url to reload.
+         * 
+         * Sanitizes the $_GET query key-values.
+         * 
+         * @since       3.4.1
+         */
+        private function _getSettingUpdateURL( array $aStatus, $sPageSlug, $sTabSlug ) {
+            
+            // Apply filters. This allows page-meta-box classes to insert the 'field_errors' key when they have validation errors.
+            $aStatus = $this->oUtil->addAndApplyFilters(    // 3.4.1+
+                $this, 
+                array( 
+                    "options_update_status_{$sPageSlug}_{$sTabSlug}",
+                    "options_update_status_{$sPageSlug}", 
+                    "options_update_status_{$this->oProp->sClassName}", 
+                ), 
+                $aStatus
+            ); 
+            
+            // Drop the 'field_errors' key.
+            $_aRemoveQueries = array();
+            if ( ! isset( $aStatus[ 'field_errors' ] ) || ! $aStatus[ 'field_errors' ] ) {
+                unset( $aStatus[ 'field_errors' ] );
+                $_aRemoveQueries[] = 'field_errors';
+            }        
+            return $this->oUtil->getQueryURL( $aStatus, $_aRemoveQueries, $_SERVER['REQUEST_URI'] );            
+            
+        }
         /**
          * Verifies the form submit.
          * 
@@ -184,8 +212,8 @@ abstract class AdminPageFramework_Form_Model_Validation extends AdminPageFramewo
             ) {     
                 return false;
             }
-            $_sRequestURI   = remove_query_arg( array( 'settings-updated', 'confirmation' ), wp_unslash( $_SERVER['REQUEST_URI'] ) );
-            $_sReffererURI  = remove_query_arg( array( 'settings-updated', 'confirmation' ), $_POST['_wp_http_referer'] );
+            $_sRequestURI   = remove_query_arg( array( 'settings-updated', 'confirmation', 'field_errors' ), wp_unslash( $_SERVER['REQUEST_URI'] ) );
+            $_sReffererURI  = remove_query_arg( array( 'settings-updated', 'confirmation', 'field_errors' ), $_POST['_wp_http_referer'] );
             if ( $_sRequestURI != $_sReffererURI ) { // see the function definition of wp_referer_field() in functions.php.
                 return false;
             }
@@ -271,7 +299,12 @@ abstract class AdminPageFramework_Form_Model_Validation extends AdminPageFramewo
         }
     
         // 3. Validate the submitted input data 
-        $aInput = $this->_getFilteredOptions( $aInput, $aInputRaw, $aOptions, $_sPageSlug, $_sTabSlug );
+        $aInput           = $this->_getFilteredOptions( $aInput, $aInputRaw, $aOptions, $_sPageSlug, $_sTabSlug );
+        $_bHasFieldErrors = $this->hasFieldError();
+        if ( $_bHasFieldErrors ) {
+            $this->_setLastInput( $aInputRaw );
+            $aStatus = $aStatus + array( 'field_errors' => $_bHasFieldErrors );  // 3.4.1+
+        } 
    
         /* 4. Custom submit actions [part 2] - these should be done after applying the filters. */
         
@@ -279,10 +312,10 @@ abstract class AdminPageFramework_Form_Model_Validation extends AdminPageFramewo
         if ( $_sKeyToReset ) {
             $aInput = $this->_resetOptions( $_sKeyToReset, $aInput );
         }
-        
+                
         // Email
-        if ( ! $this->hasFieldError() && $_bConfirmingToSendEmail ) {
-            $this->oUtil->setTransient( 'apf_tfd' . md5( 'temporary_form_data_' . $this->oProp->sClassName . get_current_user_id() ), $aInput, 60*60 );
+        if ( ! $_bHasFieldErrors && $_bConfirmingToSendEmail ) {
+            $this->_setLastInput( $aInput );
             $this->oProp->_bDisableSavingOptions = true;
             $aStatus    = $aStatus + array( 'confirmation' => 'email' );
             return $this->_confirmSubmitButtonAction( $_sPressedInputName, $_sSubmitSectionID, 'email' );            
@@ -474,7 +507,7 @@ abstract class AdminPageFramework_Form_Model_Validation extends AdminPageFramewo
             }
             
             // The key to reset is specified.
-            // @todo: make it possiblt to specify a dimentilnal key.
+            // @todo: make it possible to specify a dimensional key.
             unset( $this->oProp->aOptions[ trim( $sKeyToReset ) ], $aInput[ trim( $sKeyToReset ) ] );
             update_option( $this->oProp->sOptionKey, $this->oProp->aOptions );
             $this->setSettingNotice( $this->oMsg->get( 'specified_option_been_deleted' ) );
@@ -550,8 +583,13 @@ abstract class AdminPageFramework_Form_Model_Validation extends AdminPageFramewo
          * @return      array       The filtered input array.
          */
         private function _getFilteredOptions( $aInput, $aInputRaw, $aOptions, $sPageSlug, $sTabSlug ) {
-                 
-            $_aOptionsWODynamicElements     = $this->oForm->dropRepeatableElements( $aOptions );
+               
+            $_aOptionsWODynamicElements = $this->oUtil->addAndApplyFilter( 
+                $this, 
+                "validation_saved_options_without_dynamic_elements_{$this->oProp->sClassName}", 
+                $this->oForm->dropRepeatableElements( $aOptions ),
+                $this
+            ); // 3.4.1+ 
 
             // For each submitted element
             $aInput         = $this->_validateEachField( 
@@ -672,9 +710,7 @@ abstract class AdminPageFramework_Form_Model_Validation extends AdminPageFramewo
              */
             private function _validateTabFields( array $aInput, array $aOptions, array $aOptionsWODynamicElements, & $aTabOptions, $sPageSlug, $sTabSlug ) {
                 
-                if ( ! ( $sTabSlug && $sPageSlug ) ) {
-                    return $aInput;
-                }
+                if ( ! ( $sTabSlug && $sPageSlug ) ) { return $aInput; }
                                 
                 $_aTabOnlyOptions   = $this->oForm->getTabOnlyOptions( $aOptions, $sPageSlug, $sTabSlug ); // does not respect page meta box fields
                 $aTabOptions        = $this->oForm->getTabOptions( $aOptions, $sPageSlug, $sTabSlug ); // respects page meta box fields
@@ -684,10 +720,18 @@ abstract class AdminPageFramework_Form_Model_Validation extends AdminPageFramewo
                 // which causes data loss when a lower capability user submits the form but it was stored by a higher capability user.
                 // So merge the submitted array with the old stored array only for the first level.     
                 $_aTabOnlyOptionsWODynamicElements = $this->oForm->getTabOnlyOptions( $aOptionsWODynamicElements, $sPageSlug, $sTabSlug ); // this method excludes injected elements such as page-meta-box fields
+                $_aTabOnlyOptionsWODynamicElements = $this->oUtil->addAndApplyFilter( $this, "validation_saved_options_without_dynamic_elements_{$sPageSlug}_{$sTabSlug}", $_aTabOnlyOptionsWODynamicElements, $this );    // 3.4.1+
                 $aInput = $aInput + $this->oForm->getTabOptions( $_aTabOnlyOptionsWODynamicElements, $sPageSlug, $sTabSlug );
-
+                
+                $aInput = $this->oUtil->addAndApplyFilter( 
+                    $this, 
+                    "validation_{$sPageSlug}_{$sTabSlug}",
+                    $aInput,
+                    $aTabOptions,
+                    $this 
+                );
                 return $this->oUtil->uniteArrays( 
-                    $this->oUtil->addAndApplyFilter( $this, "validation_{$sPageSlug}_{$sTabSlug}", $aInput, $aTabOptions, $this ), 
+                    $aInput, 
                     $this->oUtil->invertCastArrayContents( $aTabOptions, $_aTabOnlyOptions ), // will only consist of page meta box fields
                     $this->oForm->getOtherTabOptions( $aOptions, $sPageSlug, $sTabSlug )
                 );
@@ -711,9 +755,16 @@ abstract class AdminPageFramework_Form_Model_Validation extends AdminPageFramewo
                 // which causes data loss when a lower capability user submits the form but it was stored by a higher capability user.
                 // So merge the submitted array with the old stored array only for the first level.     
                 $_aPageOnlyOptionsWODynamicElements = $this->oForm->getPageOnlyOptions( $aOptionsWODynamicElements, $sPageSlug ); // this method excludes injected elements
+                $_aPageOnlyOptionsWODynamicElements = $this->oUtil->addAndApplyFilter( $this, "validation_saved_options_without_dynamic_elements_{$sPageSlug}", $_aPageOnlyOptionsWODynamicElements, $this );    // 3.4.1+
                 $aInput = $aInput + $this->oForm->getPageOptions( $_aPageOnlyOptionsWODynamicElements, $sPageSlug );
                 
-                $aInput = $this->oUtil->addAndApplyFilter( $this, "validation_{$sPageSlug}", $aInput, $_aPageOptions, $this ); // $aInput: new values, $aStoredPageOptions: old values    
+                $aInput = $this->oUtil->addAndApplyFilter(
+                    $this, 
+                    "validation_{$sPageSlug}", 
+                    $aInput,            // new values
+                    $_aPageOptions,     // stored page options
+                    $this 
+                );
 
                 // If it's in a tab-page, drop the elements which belong to the tab so that arrayed-options will not be merged such as multiple select options.
                 $_aPageOptions = $sTabSlug && ! empty( $aTabOptions ) 

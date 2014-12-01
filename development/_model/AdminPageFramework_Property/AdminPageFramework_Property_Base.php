@@ -22,20 +22,20 @@ abstract class AdminPageFramework_Property_Base {
     /**
      * Represents the structure of the script info array.
      * @internal
-     * @since 2.0.0
-     * @since 3.0.0 Moved from the link class.
+     * @since       2.0.0
+     * @since       3.0.0     Moved from the link class.
      */ 
     private static $_aStructure_CallerInfo = array(
-        'sPath' => null,
-        'sType' => null,
-        'sName' => null,     
-        'sURI' => null,
-        'sVersion' => null,
-        'sThemeURI' => null,
-        'sScriptURI' => null,
-        'sAuthorURI' => null,
-        'sAuthor' => null,
-        'sDescription' => null,
+        'sPath'         => null,
+        'sType'         => null,
+        'sName'         => null,     
+        'sURI'          => null,
+        'sVersion'      => null,
+        'sThemeURI'     => null,
+        'sScriptURI'    => null,
+        'sAuthorURI'    => null,
+        'sAuthor'       => null,
+        'sDescription'  => null,
     );    
     
     /**
@@ -360,26 +360,26 @@ abstract class AdminPageFramework_Property_Base {
      */  
     protected function getCallerInfo( $sCallerPath=null ) {
         
-        $aCallerInfo = self::$_aStructure_CallerInfo;
-        $aCallerInfo['sPath'] = $sCallerPath;
-        $aCallerInfo['sType'] = $this->_getCallerType( $aCallerInfo['sPath'] );
+        $_aCallerInfo          = self::$_aStructure_CallerInfo;
+        $_aCallerInfo['sPath'] = $sCallerPath;
+        $_aCallerInfo['sType'] = $this->_getCallerType( $_aCallerInfo['sPath'] );
 
-        if ( 'unknown' == $aCallerInfo['sType'] ) {
-            return $aCallerInfo;
+        if ( 'unknown' == $_aCallerInfo['sType'] ) {
+            return $_aCallerInfo;
         }
-        if ( 'plugin' == $aCallerInfo['sType'] ) {
-            return AdminPageFramework_WPUtility::getScriptData( $aCallerInfo['sPath'], $aCallerInfo['sType'] ) + $aCallerInfo;
+        if ( 'plugin' == $_aCallerInfo['sType'] ) {
+            return AdminPageFramework_WPUtility::getScriptData( $_aCallerInfo['sPath'], $_aCallerInfo['sType'] ) + $_aCallerInfo;
         }
-        if ( 'theme' == $aCallerInfo['sType'] ) {
-            $oTheme = wp_get_theme(); // stores the theme info object
+        if ( 'theme' == $_aCallerInfo['sType'] ) {
+            $_oTheme = wp_get_theme(); // stores the theme info object
             return array(
-                'sName' => $oTheme->Name,
-                'sVersion'         => $oTheme->Version,
-                'sThemeURI' => $oTheme->get( 'ThemeURI' ),
-                'sURI' => $oTheme->get( 'ThemeURI' ),
-                'sAuthorURI' => $oTheme->get( 'AuthorURI' ),
-                'sAuthor' => $oTheme->get( 'Author' ),     
-            ) + $aCallerInfo;    
+                'sName'         => $_oTheme->Name,
+                'sVersion'      => $_oTheme->Version,
+                'sThemeURI'     => $_oTheme->get( 'ThemeURI' ),
+                'sURI'          => $_oTheme->get( 'ThemeURI' ),
+                'sAuthorURI'    => $_oTheme->get( 'AuthorURI' ),
+                'sAuthor'       => $_oTheme->get( 'Author' ),     
+            ) + $_aCallerInfo;    
         }
         return array();
     }    
@@ -389,10 +389,10 @@ abstract class AdminPageFramework_Property_Base {
      * 
      * It tries to find what kind of script this is, theme, plugin or something else from the given path.
      * 
-     * @since   2.0.0
-     * @since   3.0.0 Moved from the link class.
-     * @since   3.1.5   Changed the scope to protected as the post type property class access it.
-     * @return  string Returns either 'theme', 'plugin', or 'unknown'
+     * @since       2.0.0
+     * @since       3.0.0       Moved from the link class.
+     * @since       3.1.5       Changed the scope to protected as the post type property class access it.
+     * @return      string      Returns either 'theme', 'plugin', or 'unknown'
      */ 
     protected function _getCallerType( $sScriptPath ) {
         
@@ -458,11 +458,30 @@ abstract class AdminPageFramework_Property_Base {
      * 
      * This method should be extended in the extended class.
      * 
-     * @since 3.1.0
+     * @since       3.1.0
      * @internal
      */
     protected function _getOptions() { return array(); }
 
+    /**
+     * Returns the last user form input array.
+     * 
+     * @remark      This temporary data is not always set. This is only set when the form needs to show a confirmation message to the user such as for sending an email.
+     * @since       3.3.0
+     * @since       3.4.1       Moved from `AdminPageFramework_Property_Page`.
+     * @internal
+     * @return      array   The last input array.
+     */
+    protected function _getLastInput() {
+        
+        $_vValue = AdminPageFramework_WPUtility::getTransient( 'apf_tfd' . md5( 'temporary_form_data_' . $this->sClassName . get_current_user_id() ) );
+        if ( is_array( $_vValue ) ) {
+            return $_vValue;
+        }
+        return array();
+        
+    }
+    
     /*
      * Magic methods
      * */
@@ -477,6 +496,21 @@ abstract class AdminPageFramework_Property_Base {
             $this->aScriptInfo = $this->getCallerInfo( $this->sCallerPath );
             return $this->aScriptInfo;    
         }
+        
+        // 3.4.1+ Moved from `AdminPageFramework_Property_Page` as meta box classes also access it.
+        // If $this->aOptions is called for the first time, retrieve the option data from the database and assign them to the property.
+        // Once this is done, calling $this->aOptions will not trigger the __get() magic method any more.
+        if ( 'aOptions' === $sName ) {
+            $this->aOptions = $this->_getOptions();
+            return $this->aOptions;    
+        }        
+        
+        // 3.3.0+   Sets and returns the last user form input data as an array.
+        // 3.4.1+   Moved from `AdminPageFramework_Property_Page` as meta box classes also access it.
+        if ( 'aLastInput' === $sName ) {
+            $this->aLastInput = $this->_getLastInput();
+            return $this->aLastInput;
+        }        
         
         // For regular undefined items, 
         // return 'undefined';
