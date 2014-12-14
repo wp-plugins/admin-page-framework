@@ -363,7 +363,7 @@ In addition, you can change the attributes of the following container elements b
 - `fields` - the `div` tag element containing the sub-fields and the main field.
 - `field` - the `div` tag element containing each field.
 
-This submit button will float on the right.
+This submit button will float right.
 `
 array(    
     'field_id'          => 'submit',
@@ -376,6 +376,21 @@ array(
         ),
     ),                    
 )    
+`
+
+For meta boxe and widget form fields (as they have a sligtly different styling than generic admin pages),
+`
+array(
+    'field_id'          => 'submit_in_meta_box',
+    'type'              => 'submit',
+    'show_title_column' => false,
+    'label_min_width'   => 0,
+    'attributes'        => array(
+        'field' => array(
+            'style' => 'float:right; width:auto;',
+        ),                   
+    ),
+),
 `
 
 <h4>Change Preview Image Size of the 'image' Field Type</h4>
@@ -450,6 +465,13 @@ See examples, https://gist.github.com/michaeluno/c30713fcfe0d9d45d89f, https://g
 Check out [the issues](https://github.com/michaeluno/admin-page-framework/issues?labels=enhancement&page=1&state=open) on GitHub labeled *enhancement*.
 
 == Changelog ==
+
+= 3.4.3 - 2014/12/15 =
+- Added CSS rules for debug output container elements.
+- Changed the format of ID of section container elements.
+- Fixed a bug that repeated fields could not be removed in page meta boxes started in v3.4.1.
+- Fixed a bug that in page meta boxes, the `select` field type with the `is_multiple` argument enabled could not store the submitted data properly.
+- Fixed a bug that page meta boxes could not be added by in-page tab slug.
 
 = 3.4.2 - 2014/12/08 =
 - Added the ability to automatically update the preview element of an image field when an image URL is manually typed without using the upload window.

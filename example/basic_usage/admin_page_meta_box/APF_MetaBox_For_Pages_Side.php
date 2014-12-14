@@ -32,14 +32,14 @@ class APF_MetaBox_For_Pages_Side extends AdminPageFramework_MetaBox_Page {
                 'default' => array( 'size' => 5, 'unit' => '%' ),
             ),
             array(
-                'field_id' => 'submit_in_meta_box',
-                'type' => 'submit',
+                'field_id'          => 'submit_in_meta_box',
+                'type'              => 'submit',
                 'show_title_column' => false,
-                'label_min_width' => 0,
-                'attributes' => array(
-                    'fieldset' => array(
-                        'style' => 'float:right;',
-                    ),
+                'label_min_width'   => 0,
+                'attributes'        => array(
+                    'field' => array(
+                        'style' => 'float:right; width:auto;',
+                    ),                   
                 ),
             ),
             array()
@@ -54,11 +54,15 @@ class APF_MetaBox_For_Pages_Side extends AdminPageFramework_MetaBox_Page {
         
     }
 
-    public function validation_APF_MetaBox_For_Pages_Side( $aNewOptions, $aOldOptions ) { // validation_{instantiated class name}
-
-        // Do something with the submitted values.
+    
+    /**
+     * Validates the submitted form data.
+     * 
+     * Alternatively you can use `validation_{class name}()` predefined callback method.
+     */
+    public function validate( $aNewOptions, $aOldOptions, $oAdminPage ) {
         return $aNewOptions;
-        
-    }
+    }    
+    
     
 }
