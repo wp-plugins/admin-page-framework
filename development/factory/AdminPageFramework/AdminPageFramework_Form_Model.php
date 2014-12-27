@@ -80,6 +80,9 @@ abstract class AdminPageFramework_Form_Model extends AdminPageFramework_Form_Mod
         // Form emails.
         if ( isset( $_GET['apf_action'], $_GET['transient'] ) && 'email' === $_GET['apf_action'] ) {
             
+            // Set the server not to abort even the client browser terminates.
+            ignore_user_abort( true );
+            
             // wp_mail() will be loaded by the time 'plugins_loaded' is loaded.
             $this->oUtil->registerAction( 'plugins_loaded', array( $this, '_replyToSendFormEmail' ) );
 
@@ -88,7 +91,7 @@ abstract class AdminPageFramework_Form_Model extends AdminPageFramework_Form_Mod
     }
         
         /**
-         * Indicates whether the email method is triggred or not.
+         * Indicates whether the email method is triggered or not.
          * 
          * Since multiple factory instances can load the constructor, it is possible that the method is called multiple times.
          * 
@@ -327,6 +330,11 @@ abstract class AdminPageFramework_Form_Model extends AdminPageFramework_Form_Mod
     /**
      * Returns the saved options.
      * 
+     * This method was introduced to be used from inside field classes especially for the 'revealer' custom field type that needs to create a field object
+     * while processing the revealer field output. For that, the saved option array needs to be passed and accessing the property object was somewhat indirect 
+     * so there needs to be a direct method to retrieve the options. 
+     * 
+     * @remark      When the confirmation URL query key is set, it will merger the saved options with the last form input array, used for contact forms.
      * @since   3.3.0
      * @since   3.3.1       Moved from `AdminPageFramework_Setting_Base`. Changed the scope to `protected` as the caller method has moved to the view class.
      * @since   3.4.1       Changed the name from '_getSavedOptions()'.

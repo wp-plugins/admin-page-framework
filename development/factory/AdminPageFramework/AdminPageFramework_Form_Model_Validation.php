@@ -189,8 +189,16 @@ abstract class AdminPageFramework_Form_Model_Validation extends AdminPageFramewo
                 unset( $aStatus[ 'field_errors' ] );
                 $_aRemoveQueries[] = 'field_errors';
             }        
-            return $this->oUtil->getQueryURL( $aStatus, $_aRemoveQueries, $_SERVER['REQUEST_URI'] );            
-            
+            // return $this->oUtil->getQueryURL( $aStatus, $_aRemoveQueries, $_SERVER['REQUEST_URI'] );            
+         
+            return $this->oUtil->addAndApplyFilters(    // 3.4.4+
+                $this, 
+                array( 
+                    "setting_update_url_{$this->oProp->sClassName}", 
+                ), 
+                $this->oUtil->getQueryURL( $aStatus, $_aRemoveQueries, $_SERVER['REQUEST_URI'] )
+            ); 
+         
         }
         /**
          * Verifies the form submit.
@@ -269,6 +277,8 @@ abstract class AdminPageFramework_Form_Model_Validation extends AdminPageFramewo
             $this->_sendEmailInBackground( $aInputRaw, $_sPressedInputName, $_sSubmitSectionID );
             $this->oProp->_bDisableSavingOptions = true;
             $this->oUtil->deleteTransient( 'apf_tfd' . md5( 'temporary_form_data_' . $this->oProp->sClassName . get_current_user_id() ) );
+            // Schedule to remove the confirmation url query key.
+            add_action( "setting_update_url_{$this->oProp->sClassName}", array( $this, '_replyToRemoveConfirmationQueryKey' ) );
             return $aInputRaw;
         }                
         
@@ -339,6 +349,15 @@ abstract class AdminPageFramework_Form_Model_Validation extends AdminPageFramewo
     }
     
         /**
+         * Removes the 'confirmation' key in the query url.
+         * 
+         * @since   3.4.5
+         */
+        public function _replyToRemoveConfirmationQueryKey( $sSettingUpdateURL ) {
+            return remove_query_arg( array( 'confirmation', ), $sSettingUpdateURL );
+        }
+    
+        /**
          * Sends an email set via the form.
          * 
          * The email contents should be set with the form fields. 
@@ -350,6 +369,7 @@ abstract class AdminPageFramework_Form_Model_Validation extends AdminPageFramewo
             $_sTranskentKey = 'apf_em_' . md5( $sPressedInputNameFlat . get_current_user_id() );
             $_aEmailOptions = $this->oUtil->getTransient( $_sTranskentKey );
             $this->oUtil->deleteTransient( $_sTranskentKey );
+
             $_aEmailOptions = $this->oUtil->getAsArray( $_aEmailOptions ) + array(
                 'to'            => '',
                 'subject'       => '',
@@ -370,7 +390,7 @@ abstract class AdminPageFramework_Form_Model_Validation extends AdminPageFramewo
             $_bIsSet = $this->oUtil->setTransient( $_sTransientKey,  $_aFormEmailData, 100 );
             
             // Send the email in the background.
-            $_oaResponse = wp_remote_get( 
+            $_aoResponse = wp_remote_get( 
                 add_query_arg( 
                     array( 
                         'apf_action' => 'email',
@@ -389,14 +409,13 @@ abstract class AdminPageFramework_Form_Model_Validation extends AdminPageFramewo
             $this->setSettingNotice( 
                 $this->oMsg->get( 
                     $_bSent 
-                        ? 'email_sent' 
+                        ? 'email_scheduled' 
                         : 'email_could_not_send'
                 ),
                 $_bSent ? 'updated' : 'error'
             );
         
         }   
- 
             
         /**
          * Confirms the given submit button action and sets a confirmation message as a field error message and admin notice.
@@ -438,7 +457,7 @@ abstract class AdminPageFramework_Form_Model_Validation extends AdminPageFramewo
             $this->oUtil->setTransient( $_sTransientKey, $sPressedInputName, 60*2 );
             
             // Set the admin notice
-            $this->setSettingNotice( $this->oMsg->get( 'confirm_perform_task' ) );            
+            $this->setSettingNotice( $this->oMsg->get( 'confirm_perform_task' ), 'error confirmation' );
             
             // Their returned options will be saved so returned the saved options not to change anything.
             return $this->oProp->aOptions;

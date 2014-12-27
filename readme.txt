@@ -97,6 +97,11 @@ The HTML documentation is included in the distribution package and can be access
 6. [Use Section Tabs and Repeatable Sections](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/06-use-section-tabs-and-repeatable-sections/)
 7. [Validate Submitted Form Data of a Single Field](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/07-validate-submitted-form-data-of-a-single-field/)
 8. [Validate Submitted Form Data of Multiple Fields](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/08-validate-submitted-form-data-of-multiple-fields/)
+9. [Add a Meta Box in an Admin Page](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/09-add-a-meta-box-in-an-admin-page/)
+10. [Add a Page Meta Box Specific to an In-page Tab](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/10-add-a-page-meta-box-specific-to-an-in-page-tab/)
+11. [Add a Meta Box for Posts](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/11-add-a-meta-box-for-posts/)
+12. [Create a Custom Post Type and Custom Taxonomy](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/12-create-a-custom-post-type-and-custom-taxonomy/)
+13. [Add a Meta Box to a Custom Post Type](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/13-add-a-meta-box-for-a-custom-post-type/)
 
 == Screenshots ==
 1. **Text Fields**
@@ -122,7 +127,7 @@ You need to include the library file in your PHP script. The file is located in 
 
 `
 if ( ! class_exists( 'AdminPageFramework' ) ) {
-    include_once( dirname( __FILE__ ) . '/library/admin-page-framework.min.php' );
+    include( dirname( __FILE__ ) . '/library/admin-page-framework.min.php' );
 }
 `
     
@@ -171,7 +176,7 @@ new APF;
 /* Plugin Name: Admin Page Framework - Getting Started */ 
 
 if ( ! class_exists( 'AdminPageFramework' ) ) {
-    include_once( dirname( __FILE__ ) . '/library/admin-page-framework.min.php' );
+    include( dirname( __FILE__ ) . '/library/admin-page-framework.min.php' );
 }
     
 class APF extends AdminPageFramework {
@@ -205,7 +210,7 @@ new APF;
 /* Plugin Name: Admin Page Framework - My First Form */ 
 
 if ( ! class_exists( 'AdminPageFramework' ) ) {
-    include_once( dirname( __FILE__ ) . '/library/admin-page-framework.min.php' );
+    include( dirname( __FILE__ ) . '/library/admin-page-framework.min.php' );
 }
     
 class APF_MyFirstFrom extends AdminPageFramework {
@@ -315,6 +320,23 @@ Yes, See the demo.
 
 <h4>More FAQ Items</h4>
 Check out the [questions tagged as FAQ](https://github.com/michaeluno/admin-page-framework/issues?q=is%3Aissue+label%3AFAQ) on GitHub.
+
+<h4>Tutorials</h4>
+[Index](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/)
+
+1. [Create an Admin Page](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/01-create-an-admin-page/)
+2. [Create a Form](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/02-create-a-form/)
+3. [Create a Page Group](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/03-create-a-page-group/)
+4. [Create In-page Tabs](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/04-create-inpage-tabs/)
+5. [Organize a Form with Sections](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/05-organize-a-form-with-sections/)
+6. [Use Section Tabs and Repeatable Sections](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/06-use-section-tabs-and-repeatable-sections/)
+7. [Validate Submitted Form Data of a Single Field](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/07-validate-submitted-form-data-of-a-single-field/)
+8. [Validate Submitted Form Data of Multiple Fields](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/08-validate-submitted-form-data-of-multiple-fields/)
+9. [Add a Meta Box in an Admin Page](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/09-add-a-meta-box-in-an-admin-page/)
+10. [Add a Page Meta Box Specific to an In-page Tab](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/10-add-a-page-meta-box-specific-to-an-in-page-tab/)
+11. [Add a Meta Box for Posts](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/11-add-a-meta-box-for-posts/)
+12. [Create a Custom Post Type and Custom Taxonomy](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/12-create-a-custom-post-type-and-custom-taxonomy/)
+13. [Add a Meta Box to a Custom Post Type](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/13-add-a-meta-box-for-a-custom-post-type/)
 
 == Other Notes ==
 
@@ -465,6 +487,14 @@ See examples, https://gist.github.com/michaeluno/c30713fcfe0d9d45d89f, https://g
 Check out [the issues](https://github.com/michaeluno/admin-page-framework/issues?labels=enhancement&page=1&state=open) on GitHub labeled *enhancement*.
 
 == Changelog ==
+
+= 3.4.5 - 2014/12/27 =
+- Added the `setting_update_url_{instantiated class name}` filter hook and the pre-defined callback method.
+- CHanged the `getValue()` method of the admin page factory class to respect last input arrays.
+- Fixed a bug that caused a PHP warning that prevented a contact form from being sent on servers with some error reporting settings.
+- Fixed an issue on some servers that the script got aborted while sending an email of the contact form.
+- Fixed a url query key after submitting a contact form.
+- Tweaked the styling of the form confirmation message container element.
 
 = 3.4.4 - 2014/12/17 =
 - Fixed a bug that in in-page tabs saving form values of page meta box fields caused data loss of other in-page tabs, introduced in v3.4.3.
