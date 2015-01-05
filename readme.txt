@@ -4,14 +4,14 @@ Donate link:        http://michaeluno.jp/en/donate
 Tags:               admin, administration, options, settings, API, framework, library, meta box, custom post type, custom post types, utility, fields, custom field, custom fields, tool, tools, widget, widgets, form, forms
 Requires at least:  3.3
 Tested up to:       4.1.0
-Stable tag:         3.4.5.1
+Stable tag:         3.4.6
 License:            GPLv2 or later
 License URI:        http://www.gnu.org/licenses/gpl-2.0.html
 
-Provides simpler means of building administration pages for plugin and theme developers. 
+Facilitates WordPress plugin and theme development.
 
 == Description ==
-It provides plugin and theme developers with easier means of creating option pages. Extend the library class and pass your arrays that define the form elements to the predefined class methods. The library handles all the complex coding behind the scene and creates the pages and the forms for you. The package includes a demo plugin which helps you walk through necessary features.
+It provides plugin and theme developers with easier means of building option pages. Extend the library class and pass your arrays that define the form elements to the predefined class methods. The library handles all the complex coding behind the scene and creates the pages and the forms for you. The package includes a demo plugin which helps you walk through necessary features.
 
 **Notes:** this framework does not do anything by itself. If you are not a developer, you do not need this.
 
@@ -79,10 +79,8 @@ You can include your own custom field types when they are necessary. The reason 
 - `ace` - a rich code editor.
 
 = Necessary Files =
-- **`admin-page-framework.min.php`** is in the *library* folder. Alternatively you may use **`admin-page-framework.php`** located in the *development* folder. In that case, all the class files in the sub-folders need to be copied.
-
-= Notes = 
-- the minified version has been remvoed in 3.4.5.1 for an issue with wordpress.org. The file is still available [here](https://raw.githubusercontent.com/michaeluno/admin-page-framework/3.4.5/library/admin-page-framework.min.php).
+- **`admin-page-framework.min.php`** is in the *library* folder. Or you can get it from `Dashboard` -> `Admin Page Framework` -> `Tool` -> `Minifier.`
+- Alternatively you may use **`admin-page-framework.php`** located in the *development* folder. In that case, all the class files in the sub-folders need to be copied.
 
 = Documentation =
 The HTML documentation is included in the distribution package and can be accessed via the sidebar menu that the demo plugin creates.
@@ -261,6 +259,12 @@ new APF_MyFirstFrom;
 <h4>About the Project</h4>
 <h5><strong>What is this for?</strong></h5>
 This is a PHP class library that helps to create option pages and form fields in the administration panel. In addition, it helps to manage to save, export, and import options.
+
+<h5><strong>Who needs it??</strong></h5>
+- WordPress plugin/theme developers who want to speed up creating setting forms, widgets, contact form etc. and don't want to require their users to install extra dependencies. 
+
+<h5><strong>Do my plugin/theme users have to install Admin Page Framework??</strong></h5>
+No. Include the minified version of the framework in your distribution package.
 
 <h5><strong>I've written a useful class, functions, and even custom field types that will be useful for others! Do you want to include it?</strong></h5>
 The [GitHub repository](https://github.com/michaeluno/admin-page-framework "Admin Page Framework") is available. Raise an [issue](https://github.com/michaeluno/admin-page-framework/issues) first and we'll see if changes can be made. 
@@ -490,6 +494,15 @@ See examples, https://gist.github.com/michaeluno/c30713fcfe0d9d45d89f, https://g
 Check out [the issues](https://github.com/michaeluno/admin-page-framework/issues?labels=enhancement&page=1&state=open) on GitHub labeled *enhancement*.
 
 == Changelog ==
+
+= 3.4.6 - 2014/01/06 =
+- Added a page that let the user download the minified version of the framework.
+- Added a utility class that checks requirements of servers such as PHP and MySQL versions etc.
+- Added the `print_type` argument to the `system` field type.
+- Added more information for the `system` field type.
+- Added (revived) the minified version and now it is be human readable.
+- Fixed an issue that the form fields were not registered in pages except the first added page.
+- Changed the timing of importing and exporting of the `import` and `export` field types to be done after performing validation callbacks.
 
 = 3.4.5.1 - 2014/01/01 =
 - Removed the minified version as the WordPress plugin team demanded to do so.

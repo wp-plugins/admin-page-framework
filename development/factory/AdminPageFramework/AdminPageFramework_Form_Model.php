@@ -6,7 +6,7 @@
  * Copyright (c) 2013-2014 Michael Uno; Licensed MIT
  * 
  */
-if ( ! class_exists( 'AdminPageFramework_Form_Model' ) ) :
+
 /**
  * Interact with the database for the forms.
  *
@@ -86,6 +86,11 @@ abstract class AdminPageFramework_Form_Model extends AdminPageFramework_Form_Mod
             // wp_mail() will be loaded by the time 'plugins_loaded' is loaded.
             $this->oUtil->registerAction( 'plugins_loaded', array( $this, '_replyToSendFormEmail' ) );
 
+        }
+        
+        // Get and post method checking.
+        if ( isset( $_REQUEST['apf_remote_request_test'] ) && '_testing' === $_REQUEST['apf_remote_request_test'] ) {
+            exit( 'OK' );
         }
         
     }
@@ -349,7 +354,5 @@ abstract class AdminPageFramework_Form_Model extends AdminPageFramework_Form_Mod
 
         return $_aLastInput + $this->oProp->aOptions;
     }
-
-            
+         
 }
-endif;

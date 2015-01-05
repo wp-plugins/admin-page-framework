@@ -2,16 +2,16 @@
 /**
  * Admin Page Framework
  * 
- * Provides plugin and theme developers with simpler means of creating option pages, custom post types, meta boxes, and widgets..
+ * Facilitates WordPress plugin and theme development.
  * 
  * @author      Michael Uno <michael@michaeluno.jp>
  * @copyright   2013-2014 (c) Michael Uno
  * @license     MIT <http://opensource.org/licenses/MIT>
  * @package     AdminPageFramework
  */
-if ( ! class_exists( 'AdminPageFramework_Registry_Base' ) ) :
+
 /**
- * Provides plugin and theme developers with simpler means of creating option pages, custom post types, meta boxes, and widgets..
+ * Facilitates WordPress plugin and theme development.
  * 
  * @heading             Admin Page Framework
  * @author              Michael Uno <michael@michaeluno.jp>
@@ -29,13 +29,13 @@ if ( ! class_exists( 'AdminPageFramework_Registry_Base' ) ) :
  * @download_latest     https://github.com/michaeluno/admin-page-framework/archive/master.zip
  * @download_stable     http://downloads.wordpress.org/plugin/admin-page-framework.latest-stable.zip
  * @catchcopy           The framework for all WordPress developers.
- * @version             3.4.5.1
+ * @version             3.4.6
  */
 abstract class AdminPageFramework_Registry_Base {
     
-    const Version       = '3.4.5.1'; // <--- DON'T FORGET TO CHANGE THIS AS WELL!!
+    const Version       = '3.4.6'; // <--- DON'T FORGET TO CHANGE THIS AS WELL!!
     const Name          = 'Admin Page Framework';
-    const Description   = 'Provides plugin and theme developers with simpler means of creating option pages, custom post types, meta boxes, and widgets.';
+    const Description   = 'Facilitates WordPress plugin and theme development.';
     const URI           = 'http://en.michaeluno.jp/admin-page-framework';
     const Author        = 'Michael Uno';
     const AuthorURI     = 'http://en.michaeluno.jp/';
@@ -44,8 +44,7 @@ abstract class AdminPageFramework_Registry_Base {
     const Contributors  = '';    
     
 }
-endif;
-if ( ! class_exists( 'AdminPageFramework_Registry' ) ) :
+
 /**
  * Defines the framework common information.
  * 
@@ -96,7 +95,7 @@ final class AdminPageFramework_Registry extends AdminPageFramework_Registry_Base
     static function getVersion() {
         
         if ( ! isset( self::$sAutoLoaderPath ) ) {
-            trigger_error( 'Admin Page Framework: ' . ' : ' . sprintf( __( 'The method is called too early. Perform <code>%2$s</code> earlier.', 'admin-page-framework' ), __METHOD__, 'setUp()' ), E_USER_NOTICE );
+            trigger_error( 'Admin Page Framework: ' . ' : ' . sprintf( __( 'The method is called too early. Perform <code>%2$s</code> earlier.', 'admin-page-framework' ), __METHOD__, 'setUp()' ), E_USER_WARNING );
             return self::Version;
         }
         return self::Version 
@@ -104,10 +103,20 @@ final class AdminPageFramework_Registry extends AdminPageFramework_Registry_Base
             
     }
     
+    /**
+     * Returns the information of this class.
+     * 
+     * @since       3.4.6
+     */
+    static public function getInfo() {
+        $_oReflection = new ReflectionClass( __CLASS__ );
+        return $_oReflection->getConstants()
+            + $_oReflection->getStaticProperties()
+        ;
+    }     
+    
 }
-endif;
 
-if ( ! class_exists( 'AdminPageFramework_Bootstrap' ) ) :
 /**
  * Loads the Admin Page Framework library.
  * 
@@ -131,9 +140,10 @@ final class AdminPageFramework_Bootstrap {
         }
         
         // If the autoloader class exists, it means the framework has been loaded somewhere else.
-        if ( class_exists( 'AdminPageFramework_RegisterClasses' ) ) {
-            return;
-        }
+        // [3.4.6+] Deprecated as the minified version does not have if ( class_exists( )  checks any more so all the classes get loaded.
+        // if ( class_exists( 'AdminPageFramework_RegisterClasses' ) ) {
+            // return;
+        // }
         
         // Sets up registry properties.
         AdminPageFramework_Registry::setUp( $sLibraryPath );
@@ -153,4 +163,3 @@ final class AdminPageFramework_Bootstrap {
     
 }
 new AdminPageFramework_Bootstrap( __FILE__ ); // do it now
-endif;

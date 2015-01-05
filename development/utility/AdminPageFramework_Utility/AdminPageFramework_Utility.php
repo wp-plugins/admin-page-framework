@@ -6,17 +6,17 @@
  * Copyright (c) 2013-2014 Michael Uno; Licensed MIT
  * 
  */
-if ( ! class_exists( 'AdminPageFramework_Utility' ) ) :
+
 /**
  * Provides utility methods which do not use WordPress functions.
  *
- * @since 2.0.0
- * @extends AdminPageFramework_Utility_Array
- * @package AdminPageFramework
- * @subpackage Utility
+ * @since       2.0.0
+ * @extends     AdminPageFramework_Utility_Array
+ * @package     AdminPageFramework
+ * @subpackage  Utility
  * @internal
  */
-abstract class AdminPageFramework_Utility extends AdminPageFramework_Utility_URL {
+abstract class AdminPageFramework_Utility extends AdminPageFramework_Utility_SystemInformation {
         
     /**
      * Returns the width for HTML attributes.
@@ -190,4 +190,3 @@ abstract class AdminPageFramework_Utility extends AdminPageFramework_Utility_URL
     }
     
 }
-endif;
