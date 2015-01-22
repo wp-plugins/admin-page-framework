@@ -65,9 +65,7 @@ easily create:
 - `system` - displays the site system information.
 
 <h4>Bundled Custom Field Types</h4>
-With custom field types, you can create more detailed customized field outputs. 
-
-The demo component includes the following example custom field types.
+With custom field types, you can create more detailed customized field outputs. The demo component includes the following example custom field types.
 
 - `ace` - a rich code editor.
 - `sample` - a sample custom field type with a JavaScript script.
@@ -90,20 +88,6 @@ Activate the demo pages to see the possible features of the framework. To activa
 
 <h4>Tutorials</h4>
 [Index](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/)
-
-1. [Create an Admin Page](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/01-create-an-admin-page/)
-2. [Create a Form](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/02-create-a-form/)
-3. [Create a Page Group](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/03-create-a-page-group/)
-4. [Create In-page Tabs](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/04-create-inpage-tabs/)
-5. [Organize a Form with Sections](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/05-organize-a-form-with-sections/)
-6. [Use Section Tabs and Repeatable Sections](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/06-use-section-tabs-and-repeatable-sections/)
-7. [Validate Submitted Form Data of a Single Field](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/07-validate-submitted-form-data-of-a-single-field/)
-8. [Validate Submitted Form Data of Multiple Fields](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/08-validate-submitted-form-data-of-multiple-fields/)
-9. [Add a Meta Box in an Admin Page](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/09-add-a-meta-box-in-an-admin-page/)
-10. [Add a Page Meta Box Specific to an In-page Tab](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/10-add-a-page-meta-box-specific-to-an-in-page-tab/)
-11. [Add a Meta Box for Posts](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/11-add-a-meta-box-for-posts/)
-12. [Create a Custom Post Type and Custom Taxonomy](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/12-create-a-custom-post-type-and-custom-taxonomy/)
-13. [Add a Meta Box to a Custom Post Type](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/13-add-a-meta-box-for-a-custom-post-type/)
 
 == Screenshots ==
 1. **Text Fields**
@@ -215,20 +199,6 @@ Check out the [questions tagged as FAQ](https://github.com/michaeluno/admin-page
 
 <h4>Tutorials</h4>
 [Index](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/)
-
-1. [Create an Admin Page](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/01-create-an-admin-page/)
-2. [Create a Form](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/02-create-a-form/)
-3. [Create a Page Group](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/03-create-a-page-group/)
-4. [Create In-page Tabs](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/04-create-inpage-tabs/)
-5. [Organize a Form with Sections](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/05-organize-a-form-with-sections/)
-6. [Use Section Tabs and Repeatable Sections](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/06-use-section-tabs-and-repeatable-sections/)
-7. [Validate Submitted Form Data of a Single Field](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/07-validate-submitted-form-data-of-a-single-field/)
-8. [Validate Submitted Form Data of Multiple Fields](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/08-validate-submitted-form-data-of-multiple-fields/)
-9. [Add a Meta Box in an Admin Page](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/09-add-a-meta-box-in-an-admin-page/)
-10. [Add a Page Meta Box Specific to an In-page Tab](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/10-add-a-page-meta-box-specific-to-an-in-page-tab/)
-11. [Add a Meta Box for Posts](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/11-add-a-meta-box-for-posts/)
-12. [Create a Custom Post Type and Custom Taxonomy](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/12-create-a-custom-post-type-and-custom-taxonomy/)
-13. [Add a Meta Box to a Custom Post Type](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/13-add-a-meta-box-for-a-custom-post-type/)
 
 == Other Notes ==
 
@@ -399,7 +369,7 @@ Check out [the issues](https://github.com/michaeluno/admin-page-framework/issues
 
 == Changelog ==
 
-= 3.5.0 =
+= 3.5.0 - 2015/01/22=
 - Added the forth parameter of submit information to the validation filter callbacks so that callback methods can know which framework field submit button is pressed etc.
 - Added the a method to the field type class that is triggered when a field of the field type is registered.
 - Added the `field_types_admin_page_framework` filter that allows you to register field types sitewide.
@@ -414,7 +384,7 @@ Check out [the issues](https://github.com/michaeluno/admin-page-framework/issues
 - Changed the demo plugin to be a loader plugin that loads Admin Page Framework.
 - Tweaked the styling of admin page container elements.
 
-= 3.4.6 - 2014/01/06 =
+= 3.4.6 - 2015/01/06 =
 - Added a page that lets the user download the minified version of the framework in the demo examples.
 - Added a utility class that checks requirements of servers such as PHP and MySQL versions etc.
 - Added the `print_type` argument to the `system` field type.
@@ -423,7 +393,7 @@ Check out [the issues](https://github.com/michaeluno/admin-page-framework/issues
 - Fixed an issue that form fields without setting a section were not registered in pages except first added ones.
 - Changed the timing of importing and exporting of the `import` and `export` field types to be done after performing validation callbacks.
 
-= 3.4.5.1 - 2014/01/01 =
+= 3.4.5.1 - 2015/01/01 =
 - Removed the minified version as the WordPress plugin team demanded to do so.
 
 = 3.4.5 - 2014/12/27 =
