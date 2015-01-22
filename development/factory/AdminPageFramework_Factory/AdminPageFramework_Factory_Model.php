@@ -49,9 +49,11 @@ abstract class AdminPageFramework_Factory_Model extends AdminPageFramework_Facto
      * Loads the default field type definition.
      * 
      * @since       2.1.5
+     * @since       3.5.0       Changed the scope to protected as it is internal. 
+     * Changed the name from `_loadDefaultFieldTypeDefinitions()` as it applies filters so custom field types also get registered here.
      * @internal
      */
-    public function _loadDefaultFieldTypeDefinitions() {
+    protected function _loadFieldTypeDefinitions() {
         
         if ( empty( self::$_aFieldTypeDefinitions ) ) {
             
@@ -64,9 +66,12 @@ abstract class AdminPageFramework_Factory_Model extends AdminPageFramework_Facto
             
         } 
                 
-        $this->oProp->aFieldTypeDefinitions = $this->oUtil->addAndApplyFilter( // Parameters: $oCallerObject, $sFilter, $vInput, $vArgs...
+        $this->oProp->aFieldTypeDefinitions = $this->oUtil->addAndApplyFilters( 
             $this,
-            'field_types_' . $this->oProp->sClassName, // 'field_types_' . {extended class name}
+            array( 
+                'field_types_admin_page_framework',         // 3.5.0+ Allows sitewide field type registration.
+                "field_types_{$this->oProp->sClassName}",
+            ),
             self::$_aFieldTypeDefinitions
         );     
         
@@ -76,6 +81,7 @@ abstract class AdminPageFramework_Factory_Model extends AdminPageFramework_Facto
      * Registers the given fields.
      * 
      * @remark      $oHelpPane and $oHeadTab need to be set in the extended class.
+     * @remark      This method should be called after the `_loadFieldTypeDefinitions()` emthod.
      * @since       3.0.0
      * @internal
      */
@@ -108,17 +114,26 @@ abstract class AdminPageFramework_Factory_Model extends AdminPageFramework_Facto
         /**
          * Registers a field.
          * 
-         * @since 3.0.4
+         * @since       3.0.4
+         * @since       3.5.0       Changed the scope to protected as the admin page factory class overrides it.
          * @internal
          */
-        private function _registerField( array $aField ) {
+        protected function _registerField( array $aField ) {
             
-            // Load head tag elements for fields.
-            AdminPageFramework_FieldTypeRegistration::_setFieldResources( $aField, $this->oProp, $this->oResource ); // Set relevant scripts and styles for the input field.
+            // Set relevant scripts and styles for the field.
+            AdminPageFramework_FieldTypeRegistration::_setFieldResources( $aField, $this->oProp, $this->oResource ); 
 
             // For the contextual help pane,
             if ( $aField['help'] ) {
                 $this->oHelpPane->_addHelpTextForFormFields( $aField['title'], $aField['help'], $aField['help_aside'] );     
+            }
+            
+            // Call the field type callback method to let it know the field type is registered.
+            if ( 
+                isset( $this->oProp->aFieldTypeDefinitions[ $aField['type'] ][ 'hfDoOnRegistration' ] ) 
+                && is_callable( $this->oProp->aFieldTypeDefinitions[ $aField['type'] ][ 'hfDoOnRegistration' ] )
+            ) {
+                call_user_func_array( $this->oProp->aFieldTypeDefinitions[ $aField['type'] ][ 'hfDoOnRegistration' ], array( $aField ) );
             }
             
         }    
@@ -132,8 +147,10 @@ abstract class AdminPageFramework_Factory_Model extends AdminPageFramework_Facto
      * @since       3.4.0
      */
     public function getSavedOptions() {
-// @todo: implement the last input data that is available for the page factory using $aLastInput for ther factory fields.
+        
+        // @todo: implement the last input data that is available for the page factory using $aLastInput for their factory fields.
         return $this->oProp->aOptions;
+        
     }
 
     /**

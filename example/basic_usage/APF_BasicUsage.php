@@ -17,7 +17,7 @@ class APF_BasicUsage extends AdminPageFramework {
     public function setUp() {
         
         $this->setRootMenuPage( 
-            'Admin Page Framework',
+            'Demo',
             version_compare( $GLOBALS['wp_version'], '3.8', '>=' ) ? 'dashicons-format-audio' : null // dash-icons are supported since WordPress v3.8
         );
         
@@ -33,7 +33,10 @@ class APF_BasicUsage extends AdminPageFramework {
         );
         
         $this->setPageHeadingTabsVisibility( true ); // disables the page heading tabs by passing false.
-
+        
+        // Disable it
+        $this->setPluginSettingsLinkLabel( '' ); 
+        
     }    
 
     /**

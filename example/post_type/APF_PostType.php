@@ -28,9 +28,9 @@ class APF_PostType extends AdminPageFramework_PostType {
         $this->setArguments(
             array( // argument - for the array structure, refer to http://codex.wordpress.org/Function_Reference/register_post_type#Arguments
                 'labels' => array(
-                    'name'               => 'Admin Page Framework',
+                    'name'               => 'Demo',
                     'all_items'          => __( 'Sample Posts', 'admin-page-framework-demo' ),
-                    'singular_name'      => 'Admin Page Framework',
+                    'singular_name'      => 'Demo',
                     'add_new'            => __( 'Add New', 'admin-page-framework-demo' ),
                     'add_new_item'       => __( 'Add New APF Post', 'admin-page-framework-demo' ),
                     'edit'               => __( 'Edit', 'admin-page-framework-demo' ),
@@ -42,7 +42,8 @@ class APF_PostType extends AdminPageFramework_PostType {
                     'not_found'          => __( 'No APF Post found', 'admin-page-framework-demo' ),
                     'not_found_in_trash' => __( 'No APF Post found in Trash', 'admin-page-framework-demo' ),
                     'parent'             => __( 'Parent APF Post', 'admin-page-framework-demo' ),
-                    'plugin_listing_table_title_cell_link' => __( 'APF Posts', 'admin-page-framework-demo' ), // framework specific key. [3.0.6+]
+                    // 'plugin_listing_table_title_cell_link' => __( 'APF Posts', 'admin-page-framework-demo' ), // framework specific key. [3.0.6+]
+                    'plugin_listing_table_title_cell_link' => '', // framework specific key. [3.0.6+]
                 ),
                 'public'            => true,
                 'menu_position'     => 110,

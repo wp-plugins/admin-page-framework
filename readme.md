@@ -68,10 +68,14 @@ Admin Page Framework is an OOP based open source WordPress library that facilita
 
 ## Installation ##
 
-- The latest development version can be found [here](https://github.com/michaeluno/admin-page-framework/branches). 
-- The latest stable version can be downloaded [here](http://downloads.wordpress.org/plugin/admin-page-framework.latest-stable.zip).
+There are mainly two ways to include the framework.
 
-The distribution package includes the demo plugin which uses the framework and is ready to be installed as a WordPress plugin. Just upload the unpacked folder to the `...\wp-content\plugins` folder then activate it. The sample pages will be created.
+- Use the framework loader plugin. 
+    - The latest development version can be found [here](https://github.com/michaeluno/admin-page-framework/branches). 
+    - The latest stable version can be downloaded [here](http://downloads.wordpress.org/plugin/admin-page-framework.latest-stable.zip).
+
+- Copy and include the minified version in your distribution package. The file is located in the `library` directory.
+
 
 ## Example ##
 
@@ -177,10 +181,11 @@ class APF_MyFirstFrom extends AdminPageFramework {
 }
 new APF_MyFirstFrom;
 ```
+
+See more code examples in `Dashboard` -> `AdminPageFramework` -> `Help` -> `Examples`.
+
 ## Documentation ##
 [Online documentation](http://admin-page-framework.michaeluno.jp/en/v3/)
-
-The documentation is already included in the demo plugin and it is likely up-to-date than the online version. Navigate from the sidebar menu of the admin panel, `Dashboard` > `Admin Page Framework` > `Documentation`.
 
 ### Tutorials ###
 [Online tutorials](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/)
@@ -226,9 +231,9 @@ If you like the library, please rate and review it in the [WordPress Plugin Dire
 
 ## Copyright and License ##
 
-### Admin Page Framework ###
+### Admin Page Framework (Framework Files)###
 Released under the [MIT license](./development/MIT-LICENSE.txt).
-Copyright © 2014 Michael Uno
+Copyright © 2013-2015 Michael Uno
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
@@ -253,9 +258,9 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 [http://opensource.org/licenses/MIT](http://opensource.org/licenses/MIT)
 
-### Admin Page Framework - Demo ###
+### Admin Page Framework - Loader (WordPress Plugin) ###
 Released under the [GPL v2](./LICENSE.txt) or later.
-Copyright © 2014 Michael Uno
+Copyright © 2013-2015 Michael Uno
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

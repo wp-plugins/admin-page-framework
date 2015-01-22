@@ -1,7 +1,7 @@
 === Admin Page Framework ===
 Contributors:       Michael Uno, miunosoft, pcraig3
 Donate link:        http://michaeluno.jp/en/donate
-Tags:               admin, administration, options, settings, API, framework, library, meta box, custom post type, custom post types, utility, fields, custom field, custom fields, tool, tools, widget, widgets, form, forms
+Tags:               admin, administration, options, settings, API, framework, library, meta box, custom post type, custom post types, utility, fields, custom field, custom fields, tool, tools, widget, widgets, form, forms, plugin, plugins, theme
 Requires at least:  3.3
 Tested up to:       4.1.0
 Stable tag:         3.4.6
@@ -11,13 +11,15 @@ License URI:        http://www.gnu.org/licenses/gpl-2.0.html
 Facilitates WordPress plugin and theme development.
 
 == Description ==
-It provides plugin and theme developers with easier means of building option pages. Extend the library class and pass your arrays that define the form elements to the predefined class methods. The library handles all the complex coding behind the scene and creates the pages and the forms for you. The package includes a demo plugin which helps you walk through necessary features.
+One of the time-consuming part of developing WordPress plugins and themes is creating setting pages. As you more and more write plugins and themes, you'll soon realize major part of code can be reused. Admin Page Framework aims to provide reusable code that eliminates the necessity of writing repeated code over and over again.
+
+Admin Page Framework provides plugin and theme developers with easier means of building option pages. Extend the library class and pass your arrays that define the form elements to the predefined class methods. The library handles all the complex coding behind the scene and creates the pages and the forms for you.
 
 **Notes:** this framework does not do anything by itself. If you are not a developer, you do not need this.
 
 = What you can do =
 
-with it easily create:
+easily create:
 
 - **Top-level Page, Sub Pages, and In-page Tabs** - where your users will access to operate your plugin or theme.
 - **Forms** - to let your users store their options.
@@ -41,7 +43,7 @@ with it easily create:
 - **Custom Field Types** - your own field type can be registered. This allows you to design own fields such as a combination of a checkbox with a text field. 
 - **Portable** - use the framework as a library and include the minified version and your plugin or theme does not require an extra plugin to be installed. Therefore, your product will be perfectly portable.
 
-= Built-in Field Types =
+<h4>Built-in Field Types</h4>
 - `text` - a normal field to enter text input.
 - `password` - a masked text input field.
 - `textarea` - a text input field with multiple lines. It supports TinyMCE rich text editor.
@@ -62,32 +64,31 @@ with it easily create:
 - `section_title` - a text field type that will be placed in the section title so that it lets the user set the section title.
 - `system` - displays the site system information.
 
-= Bundled Custom Field Types = 
-You can include your own custom field types when they are necessary. The reason that they are not built-in is to keep the library size as small as possible. The followings are example custom field types.
+<h4>Bundled Custom Field Types</h4>
+With custom field types, you can create more detailed customized field outputs. 
 
-- `geometry` - a location selector with the Google map.
-- `date`, `time`, `date_time`, `date_range`, `time_range`, `date_time_range` - date and time fields with the date picker.
-- `dial` - a dial input field.
-- `font` - a font uploader and its preview.
-- `revealer` - a selector field that displays a hidden HTML element.
-- `grid` - a drag and drop grid composer.
-- `autocomplete` - a custom text field that shows a predefined pop-up autocomplete list.
-- `link` - it lets pick a post and set the url.
-- `github` - displays GitHub buttons.
-- `image_checkbox`, `image_radio` - displays images instead of text labels to be selected.
-- `reset` - a custom submit button that initialize the text form inputs.
+The demo component includes the following example custom field types.
+
 - `ace` - a rich code editor.
+- `sample` - a sample custom field type with a JavaScript script.
+- `github` - displays GitHub buttons.
 
-= Necessary Files =
-- **`admin-page-framework.min.php`** is in the *library* folder. Or you can get it from `Dashboard` -> `Admin Page Framework` -> `Tool` -> `Minifier.`
+If you want a field type that are not listed here, you can check the [field type pack](http://en.michaeluno.jp/admin-page-framework/field-type-pack) or request a new one in the forum.
+
+<h4>Getting Started</h4>
+Go to **Dashboard** -> **Admin Page Framework** -> **About** -> **Getting Started**.
+
+<h4>Demo</h4>
+Activate the demo pages to see the possible features of the framework. To activate it, go to **Dashboard** -> **Admin Page Framework** -> **Add Ons** -> **Demo**.
+
+<h4>Necessary Files</h4>
+- **`admin-page-framework.min.php`** is in the *library* folder. Or you can get it from **Dashboard** -> **Admin Page Framework** -> **Tool** -> **Minifier**.
 - Alternatively you may use **`admin-page-framework.php`** located in the *development* folder. In that case, all the class files in the sub-folders need to be copied.
 
-= Documentation =
-The HTML documentation is included in the distribution package and can be accessed via the sidebar menu that the demo plugin creates.
-
+<h4>Documentation</h4>
 - [Online Documentation](http://admin-page-framework.michaeluno.jp/en/v3/class-AdminPageFramework.html)
 
-= Tutorials =
+<h4>Tutorials</h4>
 [Index](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/)
 
 1. [Create an Admin Page](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/01-create-an-admin-page/)
@@ -118,141 +119,14 @@ The HTML documentation is included in the distribution package and can be access
 11. **Meta Boxes in Pages Added by Framework**
 12. **Repeatable Sections, Section Tabs and Section Title Field**
 13. **Widget Form**
-
+14. **User Meta Fields**
+ 
 == Installation ==
 
-= Getting Started =
+1. Upload [admin-page-framework.zip](http://downloads.wordpress.org/plugin/admin-page-framework.latest-stable.zip) via **Dashboard** -> **Plugins** -> **Add New** -> **Upload Plugin**.
+2. Activate it.
 
-<h5><strong>Step 1</strong> - Include <em><strong>admin-page-framework.min.php</strong></em></h5>
-You need to include the library file in your PHP script. The file is located in the `library` folder of the uncompressed plugin file.
-
-`
-if ( ! class_exists( 'AdminPageFramework' ) ) {
-    include( dirname( __FILE__ ) . '/library/admin-page-framework.min.php' );
-}
-`
-    
-<h5><strong>Step 2</strong> - Extend the Library Class</h5>
-
-`
-class APF_GettingStarted extends AdminPageFramework {
-}
-`
-
-<h5><strong>Step 3</strong> - Define the <em>setUp()</em> Method</h5>
-
-`
-public function setUp() {
-    $this->setRootMenuPage( 'Settings' );    // specifies to which parent menu to belong.
-    $this->addSubMenuItem(
-        array(
-            'title'     => 'My First Page',
-            'page_slug' => 'myfirstpage',
-        )
-    ); 
-}
-`
-
-<h5><strong>Step 4</strong> - Define the Methods for Hooks</h5>
-
-`
-public function do_myfirstpage() {  // do_{page slug}    
-    ?>
-    <h3>Say Something</h3>
-    <p>This is my first admin page!</p>
-    <?php
-}
-`
-
-<h5><strong>Step 5</strong> - Instantiate the Class</h5>
-
-`
-new APF;
-`
-
-<h5><strong>Example Code</strong> - Getting Started</h5>
-
-`
-<?php
-/* Plugin Name: Admin Page Framework - Getting Started */ 
-
-if ( ! class_exists( 'AdminPageFramework' ) ) {
-    include( dirname( __FILE__ ) . '/library/admin-page-framework.min.php' );
-}
-    
-class APF extends AdminPageFramework {
-
-    public function setUp() {
-        
-        $this->setRootMenuPage( 'Settings' );    // where to belong
-        $this->addSubMenuItem(
-            array(
-                'title'     => 'My First Page',
-                'page_slug' => 'myfirstpage'
-            )
-        );
-            
-    }
-
-    public function do_myfirstpage() {  // do_{page slug}
-        ?>
-        <h3>Say Something</h3>
-        <p>This is my first admin page!</p>
-        <?php   
-    }
-    
-}
-new APF;
-`
-
-= Create a Form =
-
-`<?php
-/* Plugin Name: Admin Page Framework - My First Form */ 
-
-if ( ! class_exists( 'AdminPageFramework' ) ) {
-    include( dirname( __FILE__ ) . '/library/admin-page-framework.min.php' );
-}
-    
-class APF_MyFirstFrom extends AdminPageFramework {
-
-    public function setUp() {
-        
-        $this->setRootMenuPage( 'My Settings' );    // create a root page 
-        $this->addSubMenuItem(
-            array(
-                'title'     => 'My First Form',
-                'page_slug' => 'my_first_form'
-            )
-        );
-                            
-    }
-    
-    /**
-     * The pre-defined callback method that is triggered when the page loads.
-     */
-    public function load_my_first_form( $oAdminPage ) {    // load_{page slug}
-    
-        $this->addSettingFields(
-            array(    
-                'field_id'      => 'text',
-                'section_id'    => 'my_first_text_section',
-                'title'         => 'Text',
-                'type'          => 'text',
-                'default'       => 123456,
-            ),                     
-            array(                 
-                'field_id'      => 'submit',
-                'type'          => 'submit',
-            )
-        );    
-    
-    }
-    
-    
-}
-new APF_MyFirstFrom;
-`
+For usage instructions to get started, go to **Dashboard** -> **Admin Page Framework** -> **About** -> **Getting Started** and create your first plugin.
 
 == Frequently asked questions ==
 
@@ -260,19 +134,14 @@ new APF_MyFirstFrom;
 <h5><strong>What is this for?</strong></h5>
 This is a PHP class library that helps to create option pages and form fields in the administration panel. In addition, it helps to manage to save, export, and import options.
 
-<h5><strong>Who needs it??</strong></h5>
-- WordPress plugin/theme developers who want to speed up creating setting forms, widgets, contact form etc. and don't want to require their users to install extra dependencies. 
+<h5><strong>Who needs it?</strong></h5>
+WordPress plugin/theme developers who want to speed up creating setting forms, widgets, contact form etc. and don't want to require their users to install extra dependencies. 
 
-<h5><strong>Do my plugin/theme users have to install Admin Page Framework??</strong></h5>
+<h5><strong>Do my plugin/theme users have to install Admin Page Framework?</strong></h5>
 No. Include the minified version of the framework in your distribution package.
 
-<h5><strong>I've written a useful class, functions, and even custom field types that will be useful for others! Do you want to include it?</strong></h5>
-The [GitHub repository](https://github.com/michaeluno/admin-page-framework "Admin Page Framework") is available. Raise an [issue](https://github.com/michaeluno/admin-page-framework/issues) first and we'll see if changes can be made. 
-
-<h5><strong>How can I contribute to improving the documentation?</strong></h5>
-You are welcome to submit documentation. Please follow the [Documentation Guideline](https://github.com/michaeluno/admin-page-framework/blob/master/documentation_guideline.md). 
-
-In addition, your tutorials and snippets for the framework can be listed in the manual. Let us know it [here](https://github.com/michaeluno/admin-page-framework/issues?direction=desc&labels=Documentation&page=1&sort=created&state=open).
+<h5>Where can I get the minified version of the framework?</h5>
+It is in the `library` directory of the plugin. Or go to **Dashboard** -> **Admin Page Framework** -> **Tool** -> **Minifier** and press **Download**.
 
 <h5><strong>Does my commercial product incorporating your framework library have to be released under GPL2v+?</strong></h5>
 No. The demo plugin is released under GPLv2 or later but the library itself is released under MIT. Make sure to include only the library file.
@@ -284,7 +153,9 @@ Yes, it works with [WordPress MU](https://codex.wordpress.org/WordPress_MU).
 <h5><strong>Can I set a custom post type as a root page?</strong></h5>
 Yes. For built-in root menu items or create your own ones, you need to use the `setRootMenuPage()` method. For root pages of custom post types, use `setRootMenuPageBySlug()`.
 
-`$this->setRootMenuPageBySlug( 'edit.php?post_type=apf_posts' );    `
+`
+$this->setRootMenuPageBySlug( 'edit.php?post_type=apf_posts' );
+`
 
 <h5><strong>How do I retrieve the stored options?</strong></h5>
 The framework stores them as an organized multidimensional array in the options table in a single row. So use the `get_option()` function and pass the instantiated class name as the key or the custom key if you specify one in the constructor. 
@@ -325,6 +196,20 @@ $this->setRootMenuPageBySlug( 'MyAdminPageClassA' );
 <h5><strong>Can I create pages in the network admin area?</strong></h5>
 Yes, See the demo.
 
+<h5><strong>I cannot find what I'd like to do in tutorials and documentation. Where else should I look for more information?</strong></h5>
+
+- You may directly read the code of the demo plugin. The demo plugin code is located in the `example` directory.
+- Ask questions in the [support forum](https://wordpress.org/support/plugin/admin-page-framework).
+
+<h4>Supporting the Project</h4>
+<h5><strong>I've written a useful class, functions, and even custom field types that will be useful for others! Do you want to include it?</strong></h5>
+The [GitHub repository](https://github.com/michaeluno/admin-page-framework "Admin Page Framework") is available. Raise an [issue](https://github.com/michaeluno/admin-page-framework/issues) first and we'll see if changes can be made. 
+
+<h5><strong>How can I contribute to improving the documentation?</strong></h5>
+You are welcome to submit documentation. Please follow the [Documentation Guideline](https://github.com/michaeluno/admin-page-framework/blob/master/documentation_guideline.md). 
+
+In addition, your tutorials and snippets for the framework can be listed in the manual. Let us know it [here](https://github.com/michaeluno/admin-page-framework/issues?direction=desc&labels=Documentation&page=1&sort=created&state=open).
+
 <h4>More FAQ Items</h4>
 Check out the [questions tagged as FAQ](https://github.com/michaeluno/admin-page-framework/issues?q=is%3Aissue+label%3AFAQ) on GitHub.
 
@@ -354,12 +239,31 @@ This means if you choose a very simple page slug such as <code>about</code> for 
 
 To avoid this, make sure to use a unique page slug. One way to do that is to add a prefix like <code>apf_about</code>. 
 
-<h4>Change PHP Class Names</h4>
-When you include the framework, change the class names that the framework uses. This is because if there is a plugin that uses a lesser version of the framework and it is loaded earlier than yours, your script may not work properly.
+<h4>Change Framework PHP Class Names</h4>
+There is one thing you need to be careful when you include the framework: the framework version conflicts. Imagine you publish a plugin using the framework v3.4.6 and your plugin user installs a plugin using the framework v3.0.0 which is below your framework version. If the other plugin loads earlier than yours, your plugin may not work properly and vice versa.
 
-All the class names have the prefix <code>AdminPageFramework</code> so just change it to something like <code>MyPlugin_AdminPageFramework</code>. 
+There is a way to avoid such a conflict: change the PHP class names of the framework you include. All the class names have the prefix <code>AdminPageFramework</code> so just change it to something like <code>MyPlugin_AdminPageFramework</code>. 
 
-Most text editors supports the *Replace All* command so just use that. By the time WordPress's minimum required PHP version becomes 5.3 or higher, we can use namespaces then this problem will be solved.
+- Option A. Open the minified version in your code editor and replace all the strings of `AdminPageFramework` to something like `MyPugin_AdminPageFramewok` where `MyPlugin_` is your desired string. Most text editors supports the *Replace All* command so just use that.
+- Option B. Activate the demo plugin and go to **Dashboard** -> **Admin Page Framework** -> **Tool** -> **Minifier**. Set the prefix in the option field and download the file.
+
+If you do not modify the framework class names, you are supposed to extend the `AdminPageFramework` factory class.
+
+`
+class MyAdminPage extends AdminPageFramework {
+    ...
+}
+`
+
+When you modify the framework class names, make sure you extend the class with the modified name.
+
+`
+class MyAdminPage extends MyPlugin_AdminPageFramework {
+    ...
+}
+`
+
+By the time WordPress's minimum required PHP version becomes 5.3 or higher, we can use name spaces then this problem will be solved.
 
 <h4>Change Framework's System Messages</h4>
 The default messages defined by the framework can be changed. For example, when you import a setting with the framework, the setting notice "The options have been updated." will be displayed. 
@@ -495,6 +399,21 @@ Check out [the issues](https://github.com/michaeluno/admin-page-framework/issues
 
 == Changelog ==
 
+= 3.5.0 =
+- Added the forth parameter of submit information to the validation filter callbacks so that callback methods can know which framework field submit button is pressed etc.
+- Added the a method to the field type class that is triggered when a field of the field type is registered.
+- Added the `field_types_admin_page_framework` filter that allows you to register field types sitewide.
+- Added the `url` argument for in-page tab definition arrays that allows the user to add link navigation tab.
+- Added a utility class for WordPres Readme parser and the markdown syntax.
+- Added a utility class for plugin bootstraps.
+- Added user meta factory class for adding fields in the user profile page.
+- Fixed the network admin factory class could not add plugin action links via the `addLinkToPluginTitle()` method.
+- Fixed an issue that empty strings could be inserted with the `addLinkToPluginTitle()` and `addLinkToPluginDescription()` method.
+- Fixed a bug that `style_{...}` and `script_{...}` filters were triggered twice in generic admin pages.
+- Fixed a bug that `style_{page slug}_{tab slug}`, `style_{page_slug}`, `script_{page slug}_{tab slug}`, and `script_{page slug}_{tab slug}` were not available.
+- Changed the demo plugin to be a loader plugin that loads Admin Page Framework.
+- Tweaked the styling of admin page container elements.
+
 = 3.4.6 - 2014/01/06 =
 - Added a page that lets the user download the minified version of the framework in the demo examples.
 - Added a utility class that checks requirements of servers such as PHP and MySQL versions etc.
@@ -605,127 +524,5 @@ Check out [the issues](https://github.com/michaeluno/admin-page-framework/issues
 - Changed the metabox factory class to accept an empty ID to be passed to let the factory class automatically generates an ID from the class name.
 - Changed the timing of finalizing in-page tabs.
 - Changed the positions of the + and - repeatable buttons.
-
-= 3.2.1 - 2014/09/29 =
-- Added an example of using the `content_top_{...}` and the `style_common_admin_page_framework` filters.
-- Added the `style_common_admin_page_framework` hook.
-- Added support for a file path to be passed for image submit buttons.
-- Added support for custom queries for the `posttype` field type.
-- Added the `radio_checkbox` custom field type.
-- Added the `image_checkbox` custom field type.
-- Tweaked the styling of field error messages.
-- Fixed an issue that sortable fields could not be rendered properly when being dragged in browser screen widths of less than 782px in Chrome in WordPress above v3.8.
-- Fixed the `content_top_{...}` hooks and the methods were not available.
-
-= 3.2.0 - 2014/09/25 =
-- Added an example of using an image for a submit button.
-- Added the option to set custom button labels via the `data-label` attribute for the `image`, `media`, and `font` field types.
-- Added the remove button for the `image`, `media`, and `font` field types.
-- Added the default and Japanese translation files.
-- Added the `show_post_count` argument for the `taxonomy` field type and made it enabled by default.
-- Added the widget factory class and the examples of creating widgets with the framework in the demo plugin.
-- Fixed an issue that registering multiple taxonomies after the `init` hook failed registering second or later items.
-- Fixed a bug that a last item did not set when selecting multiple items in the fields of the `image`, `media`, `font` field types.
-- Fixed a bug in the `autocomplete` custom field type that the default post type slug was not set properly when the page that the field is displayed contains the `post_type` query key in the url.
-
-= 3.1.7 - 2014/09/12 =
-- Added the `github` custom field type that displays GitHub buttons.
-- Fixed an incompatibility issue of the `grid` custom field type with Internet Explorer.
-- Fixed an incompatibility issue of the `link` custom field type with WordPress 3.8.x or below and Internet Explorer.
-- Fixed a bug that the `checkbox` field type could not be repeated and sorted.
-- Fixed an incompatibility issue of the `autocomplete` field type with WordPress 4.0 when `WP_DEBUG` is enabled.
-
-= 3.1.6 - 2014/09/08 =
-- Added the `stopped_sorting_fields` JavaScript hook for field type that supports sortable fields.
-- Added support of repeatable and sortable rich text editor of the `textarea` field type except quick tags.
-- Added an example of a download button in the demo plugin.
-- Added the `system` custom field type.
-- Changed the timing of the `removed_repeatable_field` callback for sections from before removing the section to after removing it.
-- Tweaked the styling of switchable tabs of tabbed sections to remove dotted outlines when focused or activated which occur in FireFox.
-- Fixed an incompatibility issue with WordPress 4.0 for the media modal frame.
-
-= 3.1.5 - 2014/08/31 =
-- Added the `content_{instantiated class name}` hook and the default `content()` callback method that filters the post type post content for the post type class.
-- Added the ability to flush rewrite rules automatically upon plugin de/activation and theme activation.
-- Changed the post type class to perform the set-ups including post type and taxonomy registration immediately if the class is instantiated after the `init` hook.
-- Fixed an issue that then the user opens multiple pages created by the framework in the browser and submit one of the forms, the other forms failed nonce verification.
-- Fixed a bug that caused JavaScript errors in `post.php` when adding meta box fields with the framework, which caused the media button not to function in the page.
-
-= 3.1.4 - 2014/08/29 =
-- Added the ability to search users for the `autocomplete` custom field type.
-- Fixed an issue that field error transients and admin notice transients were not handled properly when multiple WordPress users on the site are working on admin pages created by the framework.
-- Fixed an issue that options did not save when the site enables object caching.
-
-= 3.1.3 - 2014/08/13 =
-- Added the `load_after_{instantiated class name}` hook that is triggered right after the `load_{...}` hooks are triggered.
-- Added the `set_up_{instantiated class name}` hook that is triggered right after the `setUp()` method is called.
-- Added the footer link in the custom taxonomy pages created by the framework (`tags.php`, `edit-tags.php`).
-- Added the ability for the `autocomplete` custom field type to support multiple post types and post statues.
-- Added the `link` custom field type in the demo plugin.
-- Changed the timing of finalizing in-page tabs so that in-page tabs now can be added in `load_{...}` hook callbacks.
-- Changed the `start_{instantiated class name}`, `do_{...}`, `do_before_{...}`, `do_after_{...}`, and `do_form_{...}` action hook to pass the class object instance in the first parameter of the callback methods.
-- Tweaked the process of post type registration to improve performance.
-- Tweaked the performance by eliminating unnecessary function calls.
-- Tweaked the styling of media select buttons.
-- Fixed bugs that in the network admin area, transients were not handled properly.
-- Fixed a bug that admin notices were not displayed in the network admin pages.
-- Fixed a bug that the `load_{...}` hooks are triggered more than once per page.
-- Fixed a bug that the same setting notice message got displayed the number of times of the framework object instances when another framework page with a form is loaded while saving the form data in the page.
-
-= 3.1.2 - 2014/08/09 =
-- Added the `validation_saved_options_{instantiated class name}` filter hook.
-- Changed the timing of loading field type definitions in the taxonomy and meta box classes to allow define custom field types in the `setUp()` method.
-- Changed the `load_{...}` hook callbacks to be able to add form elements.
-- Fixed an issue that nonce verification failed when there is an output of `WP_List_Table` in the framework page with the framework form elements.
-- Fixed a bug that meta boxes for the `post` post type created with the framework meta box class did not appear in `post-new.php` page.
-
-= 3.1.1 - 2014/08/01 =
-- Added the `before_fieldset` and `after_fieldset` arguments for the field definition array.
-- Added the third parameter to the `addTaxonomy()` method to accept multiple object types in the post type class.
-- Changed the `label_min_width` argument to accept non pixel values.
-- Changed the default value of the `order` argument of in-page tabs to 10.
-- Changed the field definition arrays to be formatted after applying filters of the `field_definition_{instantiated class name}` hook.
-- Changed the timing of `field_definition_{instantiated class name}` filter hook to be triggered after all `field_definition_{instantiated class name}_{section id}_{field_id}` and `field_definition_{instantiated class name}_{field_id}` filter hooks.
-- Fixed a bug that the `show_in_menu` argument of the `addSubMenuItems()` method did not take effect.
-- Fixed an issue that the `order` argument of in-page tabs did not take effect when in-page tabs are added via the `tabs_{instantiated class name}` filter.
-- Fixed an issue that the `label_min_width` argument of a field definition array was no longer effective as of v3.1.0.
-- Fixed a bug that the stored values of repeatable fields with a custom capability got lost when a lower capability user submits the form.
-- Fixed a bug that items of repeatable fields of page-meta-boxes could not be removed.
-
-= 3.1.0 - 2014/07/18 =
-- Added the `options_{instantiated class name}` filter hook to suppress the data used to display the form values.
-- Added the `AdminPageFramework_Debug::log()` method.
-- Added the ability not to set the default link to the custom post type post listing table's page in the plugin listing table page by passing an empty string to the 'plugin_listing_table_title_cell_link` key of the 'label' argument option.
-- Added the `date_range`, `date_time_range`, `time_range` custom field type.
-- Added the ability to set options for the `date`, `date_time`, and `time` custom field types.
-- Added the `hasSettingNotice()` method that checks if at least one setting notice has been set or not.
-- Added the `admin-page-framework-subfield` class selector to the div element's class attribute of field containers of sub-fields. 
-- Added the `field_definition_{instantiated class name}` filter hook that applies to all the defined field arrays.
-- Added the `disableSavingOptions()` method that disables the functionality to save submitted form data into the options table.
-- Added the `setPluginSettingsLinkLabel()` method which enables to set the text label to the automatically embedded link to the plugin listing table of the plugin title cell in addition to disabling the functionality.
-- Added the `start()` method which is automatically called at the end of the constructor, which can be used when the instantiated class name cannot be determined. 
-- Added the ability to disable settings notices by passing false to the `$_GET{'settings-notice']` key.
-- Added the `AdminPageFramework_NetworkAdmin` abstract class that enables to add pages in the network admin area.
-- Tweaked the styling of the `number` input type to align the text on the right.
-- Tweaked the styling of the `checkbox` field type not to wrap the label after the checkbox.
-- Tweaked the styling of field td element when the `show_title_column` option is set to false to disable the title.
-- Changed the `removed_repeatable_field` callback to be triggered after the element is removed.
-- Changed the target form action url not to contain the `settings-updated` key.
-- Changed the demo plugin to be separated into smaller components.
-- Changed the `validation_{...}` callback methods to receive a third parameter of the class object so that third party scripts can access object members inside from the validation method.
-- Changed the `AdminPageFramework` class to accept an empty string value to be passed to the first parameter of the constructor, to be used to disable saving options.
-- Changed the scope of `oUtil`, `oDebug`, and `oMsg` objects to public from protected to be accessed from an instantiated object.
-- Changed the `section_head` filter hook to be triggered even when the section description is not set.
-- Changed not to redirect to options.php when a form created by the framework is submitted in the pages created by the framework.
-- Fixed a bug that a value of `0` did not get displayed but and empty string instead.
-- Fixed a bug that sub-fields could not properly have the default key-values of the field definition of the type.
-- Fixed a bug that in PHP v5.2.x, setting a section error message caused a string "A" to be inserted in each belonging field.
-- Fixed a bug that previously set field error arrays were lost if the `setFieldErrors()` method is performed multiple times in a page load.
-- Fixed a bug that page load info was not inserted when multiple admin page objects were instantiated.
-- Fixed a bug that duplicated setting notices were displayed.
-- Fixed a bug that the redirect transient remained when a field error is set and caused unexpected redirects when the 'href' argument is set for the submit field type.
-- Fixed an issue that `textarea` input field was placed in the wrong position when the browser turned off JavaScript.
-- Fixed a bug that the `autocomplete` custom field type's JavaScript script could not run when the prePopulate option is set and the value is saved without changing.
-- Fixed an issue in the class autoloader that caused a PHP fatal error in some non GNU OSes such as Solaris in the development version.
 
 [Old Change Log Items](https://raw.githubusercontent.com/michaeluno/admin-page-framework/master/changelog.md)

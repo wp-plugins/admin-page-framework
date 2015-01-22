@@ -6,7 +6,7 @@
  * Copyright (c) 2013-2014 Michael Uno; Licensed MIT
  * 
  */
-if ( ! class_exists( 'AdminPageFramework_Factory_Router' ) ) :
+
 /**
  * Provides routing functionality to the Admin Page Framework factory object based on the fields type.
  * 
@@ -31,7 +31,7 @@ abstract class AdminPageFramework_Factory_Router {
     /**
      * The object that provides the debug methods. 
      * @internal
-     * @remark Do not even declare the variable to allow to trigger the getter method.
+     * @remark Do not even declare the property to allow it to trigger the getter method.
      * @access public
      * @since 2.0.0
      * @since 3.1.0 Changed the scope to public from protected.
@@ -40,7 +40,7 @@ abstract class AdminPageFramework_Factory_Router {
     /**
      * Provides the utility methods. 
      * @internal
-     * @remark Do not even declare the variable to allow to trigger the getter method.
+     * @remark Do not even declare the property to allow ti to be trigger the getter method.
      * @since 2.0.0
      * @since 3.1.0 Changed the scope to public from protected.
      */         
@@ -50,7 +50,7 @@ abstract class AdminPageFramework_Factory_Router {
      * @since 2.0.0
      * @access public
      * @internal
-     * @remark Do not even declare the variable to allow to trigger the getter method.
+     * @remark Do not even declare the property to allow it to trigger the getter method.
      * @since 3.1.0 Changed the scope to public from protected.
      */         
     // public $oMsg;    
@@ -58,21 +58,21 @@ abstract class AdminPageFramework_Factory_Router {
     /**
      * @internal
      * @since 3.0.0
-     * @remark Do not even declare the variable to allow to trigger the getter method.
+     * @remark Do not even declare the property to allow it to trigger the getter method.
      */     
      // protected $oForm = null;    
     
     /**
      * Inserts page load information into the footer area of the page. 
      * 
-     * @remark Do not even declare the variable to allow to trigger the getter method.
+     * @remark Do not even declare the property to allow it to trigger the getter method.
      */
     // protected $oPageLoadInfo;
     
     /**
      * Provides the methods to insert head tag elements.
      * 
-     * @remark Do not even declare the variable to allow to trigger the getter method.
+     * @remark Do not even declare the property to allow it to trigger the getter method.
      * @since   3.3.0   Changed the name from $oResource as it has become to deal with footer elements.
      */
     // protected $oResource;
@@ -80,14 +80,14 @@ abstract class AdminPageFramework_Factory_Router {
     /**
      * Provides methods to manipulate contextual help pane.
      * 
-     * @remark Do not even declare the variable to allow to trigger the getter method.
+     * @remark Do not even declare the property to allow it to trigger the getter method.
      */
     // protected $oHelpPane;
     
     /**
      * Provides the methods for creating HTML link elements. 
      * 
-     * @remark Do not even declare the variable to allow to trigger the getter method.
+     * @remark Do not even declare the property to allow it to trigger the getter method.
      */    
     // protected $oLink;
     
@@ -188,6 +188,7 @@ abstract class AdminPageFramework_Factory_Router {
                 return new AdminPageFramework_FormElement( $oProp->sFieldsType, $oProp->sCapability, $this );
             case 'taxonomy':
             case 'widget':      // 3.2.0+
+            case 'user_meta':        // 3.5.0+
                 return new AdminPageFramework_FormElement( $oProp->sFieldsType, $oProp->sCapability, $this );
             
         }     
@@ -216,7 +217,8 @@ abstract class AdminPageFramework_Factory_Router {
                 return new AdminPageFramework_Resource_TaxonomyField( $oProp );
             case 'widget':  // 3.2.0+
                 return new AdminPageFramework_Resource_Widget( $oProp );
-    
+            case 'user_meta':    // 3.5.0+
+                return new AdminPageFramework_Resource_UserMeta( $oProp );
         }
 
     }
@@ -243,6 +245,8 @@ abstract class AdminPageFramework_Factory_Router {
                 return new AdminPageFramework_HelpPane_TaxonomyField( $oProp );
             case 'widget':  // 3.2.0+
                 return new AdminPageFramework_HelpPane_Widget( $oProp );                
+            case 'user_meta':    // 3.5.0+
+                return new AdminPageFramework_HelpPane_UserMeta( $oProp );                
         }     
     }
     
@@ -253,19 +257,22 @@ abstract class AdminPageFramework_Factory_Router {
      * @internal
      */
     protected function _getLinkInstancce( $oProp, $oMsg ) {
-        
+
         switch ( $oProp->sFieldsType ) {
             case 'page':
-            case 'network_admin_page':
                 return new AdminPageFramework_Link_Page( $oProp, $oMsg );
+            case 'network_admin_page':            
+                return new AdminPageFramework_Link_NetworkAdmin( $oProp, $oMsg );
             case 'post_meta_box':
                 return null;
             case 'page_meta_box':
                 return null;
             case 'post_type':
                 return new AdminPageFramework_Link_PostType( $oProp, $oMsg );
+            default:
             case 'taxonomy':
             case 'widget':  // 3.2.0+
+            case 'user_meta':
                 return null;
         }     
         
@@ -290,6 +297,7 @@ abstract class AdminPageFramework_Factory_Router {
                 return null;
             case 'post_type':
                 return AdminPageFramework_PageLoadInfo_PostType::instantiate( $oProp, $oMsg );
+            default:
             case 'taxonomy':
             case 'widget':  // 3.2.0+
                 return null;
@@ -318,11 +326,11 @@ abstract class AdminPageFramework_Factory_Router {
             case 'oForm':
                 $this->oForm = $this->_getFormInstance( $this->oProp );
                 return $this->oForm;
-            case 'oHeadTag':    // 3.3.0+ for backward compatibility
-                return $this->oResource;
             case 'oResource':   // 3.3.0+
                 $this->oResource = $this->_getResourceInstance( $this->oProp );
                 return $this->oResource;
+                case 'oHeadTag':    // 3.3.0+ for backward compatibility
+                    return $this->oResource;                
             case 'oHelpPane':
                 $this->oHelpPange = $this->_getHelpPaneInstance( $this->oProp );
                 return $this->oHelpPange;
@@ -347,15 +355,15 @@ abstract class AdminPageFramework_Factory_Router {
             return isset( $aArgs[ 0 ] ) ? $aArgs[ 0 ] : null;
         }
         
-        trigger_error( 'Admin Page Framework: ' . ' : ' . sprintf( __( 'The method is not defined: %1$s', $this->oProp->sTextDomain ), $sMethodName ), E_USER_ERROR );
+        trigger_error( 'Admin Page Framework: ' . ' : ' . sprintf( __( 'The method is not defined: %1$s', $this->oProp->sTextDomain ), $sMethodName ), E_USER_WARNING );
         
     }     
     
     /**
      * Called when the object is called as a string.
      *
-     * Field definition arrays contain the object reference and when the debug log method tries to dump it, the output gets too long.
-     * So shorten the it here.
+     * Field definition arrays contain the factory object reference and when the debug log method tries to dump it, the output gets too long.
+     * So shorten it here.
      * 
      * @since       3.4.4
      */   
@@ -368,4 +376,3 @@ abstract class AdminPageFramework_Factory_Router {
     }
  
 }
-endif;

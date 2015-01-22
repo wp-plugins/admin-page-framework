@@ -50,6 +50,7 @@ class APF_Widget extends AdminPageFramework_Widget {
                 'field_id'      => 'title',
                 'type'          => 'text',
                 'title'         => __( 'Title', 'admin-page-framework-demo' ),
+                'default'       => 'Hi there!',
             ),
             array(
                 'field_id'      => 'repeatable_text',
@@ -61,7 +62,7 @@ class APF_Widget extends AdminPageFramework_Widget {
             array(
                 'field_id'      => 'textarea',
                 'type'          => 'textarea',
-                'title'         => __( 'TextArea', 'admin-page-framework-demo' ),
+                'title'         => __( 'Text Area', 'admin-page-framework-demo' ),
                 // 'rich'          => true,
             ),
             array(

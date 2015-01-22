@@ -20,7 +20,7 @@ class APF_Demo extends AdminPageFramework {
         $this->setCapability( 'read' );
         
         /* ( required ) Set the root page */
-        $this->setRootMenuPageBySlug( 'edit.php?post_type=apf_posts' );    
+        $this->setRootMenuPageBySlug( 'edit.php?post_type=' . AdminPageFrameworkLoader_Registry::$aPostTypes['demo'] );    
         
         /* ( required ) Add sub-menu items (pages or links) */
         $this->addSubMenuItems(    
@@ -67,37 +67,38 @@ class APF_Demo extends AdminPageFramework {
         /*
          * ( optional ) Add links in the plugin listing table. ( .../wp-admin/plugins.php )
          */
-         $this->addLinkToPluginDescription( 
+        /* 
+        $this->addLinkToPluginDescription( 
             "<a href='http://en.michaeluno.jp/donate'>Donate</a>",
             "<a href='https://github.com/michaeluno/admin-page-framework' title='Contribute to the GitHub repository!' >Repository</a>"
         );
         $this->addLinkToPluginTitle(
             "<a href='http://en.michaeluno.jp'>miunosoft</a>"
         );
+        */
+       
+        // Disable the action link in the plugin listing table.
+        $this->setPluginSettingsLinkLabel( '' );    
+        // $this->setPluginSettingsLinkLabel( __( 'Built-in Field Types', 'admin-page-framework-demo' ) );
         
-        $this->setPluginSettingsLinkLabel( __( 'Built-in Field Types', 'admin-page-framework-demo' ) );
-
+        // Add pages       
+        new APF_Demo_CustomFieldType(
+            $this,
+            'custom_field_type',
+            __( 'Custom Field Type', 'admin-page-framework-demo' )
+        );
+        
         // Include files that define in-page tabs and form elements.
         $_sClassName = get_class( $this );
-        include( APFDEMO_DIRNAME . '/example/admin_page/builtin_field_type/APF_Demo_BuiltinFieldTypes_Text.php' );
         new APF_Demo_BuiltinFieldTypes_Text;
-        include( APFDEMO_DIRNAME . '/example/admin_page/builtin_field_type/APF_Demo_BuiltinFieldTypes_Selector.php' );
         new APF_Demo_BuiltinFieldTypes_Selector;
-        include( APFDEMO_DIRNAME . '/example/admin_page/builtin_field_type/APF_Demo_BuiltinFieldTypes_File.php' );
         new APF_Demo_BuiltinFieldTypes_File( $_sClassName );
-        include( APFDEMO_DIRNAME . '/example/admin_page/builtin_field_type/APF_Demo_BuiltinFieldTypes_Checklist.php' );
         new APF_Demo_BuiltinFieldTypes_Checklist;
-        include( APFDEMO_DIRNAME . '/example/admin_page/builtin_field_type/APF_Demo_BuiltinFieldTypes_MISC.php' );
         new APF_Demo_BuiltinFieldTypes_MISC;
-        include( APFDEMO_DIRNAME . '/example/admin_page/builtin_field_type/APF_Demo_BuiltinFieldTypes_Verification.php' );
         new APF_Demo_BuiltinFieldTypes_Verification( $_sClassName );
-        include( APFDEMO_DIRNAME . '/example/admin_page/builtin_field_type/APF_Demo_BuiltinFieldTypes_Mixed.php' );
         new APF_Demo_BuiltinFieldTypes_Mixed;
-        include( APFDEMO_DIRNAME . '/example/admin_page/builtin_field_type/APF_Demo_BuiltinFieldTypes_Sections.php' );
         new APF_Demo_BuiltinFieldTypes_Sections;
-        include( APFDEMO_DIRNAME . '/example/admin_page/builtin_field_type/APF_Demo_BuiltinFieldTypes_Callbacks.php' );
         new APF_Demo_BuiltinFieldTypes_Callbacks;
-        include( APFDEMO_DIRNAME . '/example/admin_page/builtin_field_type/APF_Demo_BuiltinFieldTypes_System.php' );
         new APF_Demo_BuiltinFieldTypes_System;
         
     }
