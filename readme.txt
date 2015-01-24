@@ -85,7 +85,9 @@ Activate the demo pages to see the possible features of the framework. To activa
 
 <h4>Documentation</h4>
 - [Online Documentation](http://admin-page-framework.michaeluno.jp/en/v3/class-AdminPageFramework.html)
-- [Tutorials](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/)
+
+<h4>Tutorials</h4>
+[Index](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/)
 
 == Screenshots ==
 1. **Text Fields**
@@ -366,6 +368,9 @@ See examples, https://gist.github.com/michaeluno/c30713fcfe0d9d45d89f, https://g
 Check out [the issues](https://github.com/michaeluno/admin-page-framework/issues?labels=enhancement&page=1&state=open) on GitHub labeled *enhancement*.
 
 == Changelog ==
+
+= 3.5.1.1 - 2015/01/24 = 
+- Fixed a bug that caused non-object type PHP error in the post type factory class introduced in v3.5.1.
 
 = 3.5.1 - 2015/01/23 =
 - Fixed a bug in the `enqueueScripts()` method of the admin page factory class.
