@@ -3,7 +3,7 @@
  * Admin Page Framework
  * 
  * http://en.michaeluno.jp/admin-page-framework/
- * Copyright (c) 2013-2014 Michael Uno; Licensed MIT
+ * Copyright (c) 2013-2015 Michael Uno; Licensed MIT
  * 
  */
 
@@ -11,9 +11,8 @@
  * Provides methods for text messages.
  *
  * @since       2.0.0
- * @since       2.1.6   Multiple instances of this class are disallowed.
- * @since       3.2.0   Multiple instances of this class are allowed but the instantiation is restricted to per text domain basis.
- * @extends     n/a
+ * @since       2.1.6       Multiple instances of this class are disallowed.
+ * @since       3.2.0       Multiple instances of this class are allowed but the instantiation is restricted to per text domain basis.
  * @package     AdminPageFramework
  * @subpackage  Property
  * @internal
@@ -26,6 +25,13 @@ class AdminPageFramework_Message {
      * @remark     The user may modify this property directly.
      */ 
     public $aMessages = array();
+    
+    /**
+     * Stores the text domain.
+     * @since       3.x
+     * @since       3.5.0       Declared as a default property.
+     */
+    protected $_sTextDomain = 'admin-page-framework';
     
     /**
      * Stores the self instance by text domain.
@@ -43,11 +49,11 @@ class AdminPageFramework_Message {
      */
     public static function getInstance( $sTextDomain='admin-page-framework' ) {
         
-        $_oInstance = isset( $_aInstancesByTextDomain[ $sTextDomain ] ) && ( $_aInstancesByTextDomain[ $sTextDomain ] instanceof AdminPageFramework_Message )
-            ? $_aInstancesByTextDomain[ $sTextDomain ]
+        $_oInstance = isset( self::$_aInstancesByTextDomain[ $sTextDomain ] ) && ( self::$_aInstancesByTextDomain[ $sTextDomain ] instanceof AdminPageFramework_Message )
+            ? self::$_aInstancesByTextDomain[ $sTextDomain ]
             : new AdminPageFramework_Message( $sTextDomain );
-        $_aInstancesByTextDomain[ $sTextDomain ] = $_oInstance;
-        return $_aInstancesByTextDomain[ $sTextDomain ];
+        self::$_aInstancesByTextDomain[ $sTextDomain ] = $_oInstance;
+        return self::$_aInstancesByTextDomain[ $sTextDomain ];
         
     }    
         /**
@@ -55,7 +61,7 @@ class AdminPageFramework_Message {
          * @deprecated  3.2.0
          */
         public static function instantiate( $sTextDomain='admin-page-framework' ) {
-            return self::getInstantiate( $sTextDomain );
+            return self::getInstance( $sTextDomain );
         }
         
     public function __construct( $sTextDomain='admin-page-framework' ) {
@@ -181,13 +187,7 @@ class AdminPageFramework_Message {
      * @since   3.2.0
      */    
     public function output( $sKey ) {
-        
-        if ( isset( $this->aMessages[ $sKey ] ) ) {
-            _e( $this->aMessages[ $sKey ], $this->_sTextDomain );
-        } else {
-            _e( $this->{$sKey}, $this->_sTextDomain );
-        }
-        
+        echo $this->get( $sKey );
     }   
         
         /**

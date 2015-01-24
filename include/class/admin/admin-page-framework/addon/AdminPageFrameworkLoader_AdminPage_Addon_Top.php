@@ -13,6 +13,7 @@
  * Adds the Contact page to the demo plugin.
  * 
  * @since       3.5.0       Moved from the demo.
+ * @filter      apply       admin_page_framework_loader_filter_admin_add_ons        Receives an array holding add-on information to list.
  */
 class AdminPageFrameworkLoader_AdminPage_Addon_Top {
     
@@ -36,12 +37,9 @@ class AdminPageFrameworkLoader_AdminPage_Addon_Top {
         $this->_addTab();
         
         // Enable this to renew caches of the feed.
-        // add_filter( 'wp_feed_cache_transient_lifetime', array( $this, '_replyToSetFeedLifespan' ) );
+        // add_filter( 'wp_feed_cache_transient_lifetime', '__return_zero' );
         
     }
-        public function _replyToSetFeedLifespan( $iSeconds ) {
-            return 0;            
-        }
     
     private function _addTab() {
         
@@ -73,55 +71,89 @@ class AdminPageFrameworkLoader_AdminPage_Addon_Top {
         $this->oFactory->setInPageTabsVisibility( false );
         
     }
-        
+    
+    /**
+     * Called when the tab is being rendered.
+     */
     public function replyToDoTab() {
         
-        echo $this->_getAddOnList();
+        $_oFeedList  = new AdminPageFrameworkLoader_FeedList( $this->sRSSURL );
+        $_aFeedItems = apply_filters( AdminPageFrameworkLoader_Registry::HookSlug . '_filter_admin_add_ons', $this->_getDemo() + $_oFeedList->get() );
+        if ( empty( $_aFeedItems ) ) {
+            echo "<p>" . __( 'No add-on could be found.', 'admin-page-framework-loader' ) . "</p>";
+            return;
+        }        
+        
+        echo $this->_getList( $_aFeedItems );
         
     }
     
-        private $_aColumnOption = array (
-            'sClassAttr'         => 'apfl_columns',
-            'sClassAttrGroup'    => 'apfl_columns_box',
-            'sClassAttrRow'      => 'apfl_columns_row',
-            'sClassAttrCol'      => 'apfl_columns_col',
-            'sClassAttrFirstCol' => 'apfl_columns_first_col',
-        );    
-    
-        private function _getAddOnList() {
+        /**
+         * Generates an output of a list of boxes from the given array.
+         * 
+         * @since       3.5.0
+         * @since       3.5.1       Removed the part that fetches a RSS feed.
+         */
+        private function _getList( array $aFeedItems ) {
 
-            $_oFeedList  = new AdminPageFrameworkLoader_FeedList( $this->sRSSURL );
-            $_aFeedItems = $this->_getDemo() + $_oFeedList->get();
-            if ( empty( $_aFeedItems ) ) {
-                echo "<p>" . __( 'No add-on could be found.', 'admin-page-framework-loader' ) . "</p>";
-                return;
-            }
-            
+            // Local variables
             $_aOutput       = array();
-            $_iMaxCols      = 3;
             $_aColumnInfo   = array (    // this will be modified as the items get rendered
-                'bRowTagOpened'    => false,
-                'bRowTagClosed'    => false,
-                'iCurrRowPos'      => 0,
-                'iCurrColPos'      => 0,
-            );
-            
-            $_sSiteURL          = get_bloginfo( 'url' );
-            $_sSiteURLWPQuery   = preg_replace( '/\?.*/', '', $_sSiteURL );
-            
-            foreach( $_aFeedItems as $_sTitle => $_aItem ) {
+                'bRowTagOpened'      => false,
+                'bRowTagClosed'      => false,
+                'iCurrRowPos'        => 0,
+                'iCurrColPos'        => 0,
+            );            
+            $_aColumnOption = array (
+                'iMaxCols'           => 3,
+                'sClassAttr'         => 'apfl_columns',
+                'sClassAttrGroup'    => 'apfl_columns_box',
+                'sClassAttrRow'      => 'apfl_columns_row',
+                'sClassAttrCol'      => 'apfl_columns_col',
+                'sClassAttrFirstCol' => 'apfl_columns_first_col',
+            );                
                 
+            $_sSiteURLWOQuery   = preg_replace( '/\?.*/', '', get_bloginfo( 'url' ) );
+            foreach( $aFeedItems as $_aItem ) {
+
                 if ( ! is_array( $_aItem ) ) {
                     continue;
-                }
-                if ( ! isset( $_aItem['title'] ) ) { 
-                    continue; 
-                }
-
-                // Increment the position
-                $_aColumnInfo['iCurrColPos']++;
+                }            
+                $_aOutput[] = $this->_getFeedListItem( 
+                    $_aItem, 
+                    $_aColumnInfo, 
+                    $_aColumnOption, 
+                    $_sSiteURLWOQuery 
+                );
+            
+            }
+            
+            // If the section (row) tag is not closed, close it.
+            if ( $_aColumnInfo['bRowTagOpened'] && ! $_aColumnInfo['bRowTagClosed'] ) { 
+                $_aOutput[] .= '</div>';    
+            }
+            $_aColumnInfo['bRowTagClosed'] = true;
+            
+            // Enclose the output in the group tag
+            return '<div class="apfl_addon_list_container">' 
+                    . '<div class="' . $_aColumnOption['sClassAttr'] . ' ' . $_aColumnOption['sClassAttrGroup'] . '">'
+                        . implode( '', $_aOutput )
+                    . '</div>'
+                . '</div>';
+                        
+        }
+            /**
+             * Returns an HTML output from the given feed item array.
+             */
+            private function _getFeedListItem( array $aItem, array &$aColumnInfo, array $aColumnOption, $sSiteURLWOQuery='' ) {
                 
-                $_aItem = $_aItem + array(
+                // Initial checks
+                if ( ! isset( $aItem['title'] ) ) { 
+                    return ''; 
+                }
+                
+                // Format
+                $aItem = $aItem + array(
                     'label'         => __( 'Get it Now', 'admin-page-framework-loader' ),
                     'content'       => null,
                     'description'   => null,
@@ -129,67 +161,54 @@ class AdminPageFrameworkLoader_AdminPage_Addon_Top {
                     'date'          => null,
                     'author'        => null,
                     'link'          => null,
-                );
-
-                $_sLinkURLWPQuery   = preg_replace( '/\?.*/', '', $_aItem['link'] );
-                $_sTarget           =  false === strpos( $_sLinkURLWPQuery , $_sSiteURLWPQuery ) 
+                ); 
+                
+                // Increment the position
+                $aColumnInfo['iCurrColPos']++;
+                
+                $_sLinkURLWOQuery   = preg_replace( '/\?.*/', '', $aItem['link'] );
+                $_sTarget           = false === strpos( $_sLinkURLWOQuery , $sSiteURLWOQuery )
                     ? '_blank'
                     : '';
                 
                 // Enclose the item buffer into the item container
-                $_sItem = '<div class="' . $this->_aColumnOption['sClassAttrCol'] 
-                    . ' apfl_col_element_of_' . $_iMaxCols . ' '
+                $_sItem = '<div class="' . $aColumnOption['sClassAttrCol'] 
+                    . ' apfl_col_element_of_' . $aColumnOption['iMaxCols'] . ' '
                     . ' apfl_extension '
-                    . ( ( $_aColumnInfo['iCurrColPos'] == 1 ) ?  $this->_aColumnOption['sClassAttrFirstCol']  : '' )
+                    . ( ( 1 == $aColumnInfo['iCurrColPos'] ) ?  $aColumnOption['sClassAttrFirstCol']  : '' )
                     . '"'
                     . '>' 
                         . '<div class="apfl_addon_item">' 
-                            . "<h4 class='apfl_feed_item_title'>{$_aItem['title']}</h4>"
+                            . "<h4 class='apfl_feed_item_title'>{$aItem['title']}</h4>"
                             . "<div class='apfl_feed_item_description'>"
-                                . $_aItem['description'] 
+                                . $aItem['description'] 
                             . "</div>"
                             . "<div class='get-now apfl_feed_item_link_button'>"
-                                . "<a href='{$_aItem['link']}' target='{$_sTarget}' rel='nofollow' class='button button-secondary'>" 
-                                    . $_aItem['label']
+                                . "<a href='{$aItem['link']}' target='{$_sTarget}' rel='nofollow' class='button button-secondary'>" 
+                                    . $aItem['label']
                                 . "</a>"
                             . "</div>"
                         . '</div>'
-                    . '</div>';    
-                    
+                    . '</div>';                        
+                
                 // If it's the first item in the row, add the class attribute. 
                 // Be aware that at this point, the tag will be unclosed. Therefore, it must be closed later at some point. 
-                if ( 1 == $_aColumnInfo['iCurrColPos'] ) {
-                    $_aColumnInfo['bRowTagOpened'] = true;
-                    $_sItem = '<div class="' . $this->_aColumnOption['sClassAttrRow']  . '">' 
+                if ( 1 == $aColumnInfo['iCurrColPos'] ) {
+                    $aColumnInfo['bRowTagOpened'] = true;
+                    $_sItem = '<div class="' . $aColumnOption['sClassAttrRow']  . '">' 
                         . $_sItem;
                 }
             
                 // If the current column position reached the set max column, increment the current position of row
-                if ( 0 === ( $_aColumnInfo['iCurrColPos'] % $_iMaxCols ) ) {
-                    $_aColumnInfo['iCurrRowPos']++;          // increment the row number
-                    $_aColumnInfo['iCurrColPos'] = 0;        // reset the current column position
+                if ( 0 === ( $aColumnInfo['iCurrColPos'] % $aColumnOption['iMaxCols'] ) ) {
+                    $aColumnInfo['iCurrRowPos']++;          // increment the row number
+                    $aColumnInfo['iCurrColPos'] = 0;        // reset the current column position
                     $_sItem .= '</div>';  // close the section(row) div tag
-                    $_aColumnInfo['bRowTagClosed'] = true;
+                    $aColumnInfo['bRowTagClosed'] = true;
                 }        
+                return $_sItem;
                 
-                $_aOutput[] = $_sItem;
-            
-            }
-            
-            // if the section(row) tag is not closed, close it
-            if ( $_aColumnInfo['bRowTagOpened'] && ! $_aColumnInfo['bRowTagClosed'] ) { 
-                $_aOutput[] .= '</div>';    
-            }
-            $_aColumnInfo['bRowTagClosed'] = true;
-            
-            // enclose the output in the group tag
-            return '<div class="apfl_addon_list_container">' 
-                    . '<div class="' . $this->_aColumnOption['sClassAttr'] . ' ' . $this->_aColumnOption['sClassAttrGroup'] . '">'
-                        . implode( '', $_aOutput )
-                    . '</div>'
-                . '</div>';
-                        
-        }
+            }        
         
         /**
          * 
@@ -221,9 +240,7 @@ class AdminPageFrameworkLoader_AdminPage_Addon_Top {
                         : __( 'Activate', 'admin-page-framework-loader' ),
                 )
             );
-            
-            return array();
-            
+                        
         }
     
 }

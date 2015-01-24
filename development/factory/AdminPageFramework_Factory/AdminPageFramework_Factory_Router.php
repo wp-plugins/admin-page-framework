@@ -17,6 +17,7 @@
  * @package     AdminPageFramework
  * @subpackage  Factory
  * @internal
+ * @method      void    start()   User constructor. Defined in `AdminPageFramework_Factory_Controller`.
  */
 abstract class AdminPageFramework_Factory_Router {
     
@@ -30,76 +31,89 @@ abstract class AdminPageFramework_Factory_Router {
     
     /**
      * The object that provides the debug methods. 
+     * 
      * @internal
-     * @remark Do not even declare the property to allow it to trigger the getter method.
-     * @access public
-     * @since 2.0.0
-     * @since 3.1.0 Changed the scope to public from protected.
+     * @access      public
+     * @since       2.0.0
+     * @since       3.1.0   Changed the scope to public from protected.
      */     
-    // public $oDebug;
+    public $oDebug;
     /**
      * Provides the utility methods. 
+     * 
      * @internal
-     * @remark Do not even declare the property to allow ti to be trigger the getter method.
-     * @since 2.0.0
-     * @since 3.1.0 Changed the scope to public from protected.
+     * @since       2.0.0
+     * @since       3.1.0     Changed the scope to public from protected.
      */         
-    // public $oUtil;
+    public $oUtil;
     /**
      * Provides the methods for text messages of the framework. 
-     * @since 2.0.0
-     * @access public
+     * 
+     * @since       2.0.0
+     * @since       3.1.0     Changed the scope to public from protected.
+     * @access      public
      * @internal
-     * @remark Do not even declare the property to allow it to trigger the getter method.
-     * @since 3.1.0 Changed the scope to public from protected.
      */         
-    // public $oMsg;    
+    public $oMsg;
     
     /**
      * @internal
-     * @since 3.0.0
-     * @remark Do not even declare the property to allow it to trigger the getter method.
+     * @since       3.0.0
      */     
-     // protected $oForm = null;    
+    protected $oForm;
     
     /**
      * Inserts page load information into the footer area of the page. 
      * 
-     * @remark Do not even declare the property to allow it to trigger the getter method.
      */
-    // protected $oPageLoadInfo;
+    protected $oPageLoadInfo;
     
     /**
      * Provides the methods to insert head tag elements.
      * 
-     * @remark Do not even declare the property to allow it to trigger the getter method.
-     * @since   3.3.0   Changed the name from $oResource as it has become to deal with footer elements.
+     * @since   3.3.0   Changed the name from $oHeadTag as it has become to deal with footer elements.
      */
-    // protected $oResource;
+    protected $oResource;
+    
+    /**
+     * Provides the methods to insert head tag elements.
+     * @deprecated
+     */
+    protected $oHeadTag;
     
     /**
      * Provides methods to manipulate contextual help pane.
-     * 
-     * @remark Do not even declare the property to allow it to trigger the getter method.
      */
-    // protected $oHelpPane;
+    protected $oHelpPane;
     
     /**
      * Provides the methods for creating HTML link elements. 
      * 
-     * @remark Do not even declare the property to allow it to trigger the getter method.
      */    
-    // protected $oLink;
+    protected $oLink;
     
     /**
      * Sets up built-in objects.
      */
     function __construct( $oProp ) {
 
+        // Let them overload.
+        unset( 
+            $this->oDebug, 
+            $this->oUtil, 
+            $this->oMsg, 
+            $this->oForm, 
+            $this->oPageLoadInfo,
+            $this->oResource,
+            $this->oHelpPane,
+            $this->oLink
+        );
+        
+        // Property object
         $this->oProp = $oProp;
     
         if ( $this->oProp->bIsAdmin && ! $this->oProp->bIsAdminAjax ) {
-            add_action( 'current_screen', array( $this, '_replyToLoadComponents' ) ); // set a higher priority
+            add_action( 'current_screen', array( $this, '_replyToLoadComponents' ) );
         }
         
         // Call the start method - defined in the controller class.
@@ -111,10 +125,11 @@ abstract class AdminPageFramework_Factory_Router {
          * Determines whether the class component classes should be instantiated or not.
          * @internal
          */
-        public function _replyToLoadComponents( $oScreen ) {
+        public function _replyToLoadComponents( /* $oScreen */ ) {
 
             if ( 'plugins.php' === $this->oProp->sPageNow ) {
-                $this->oLink = isset( $this->oLink ) // the user may have already accessed it
+                // the user may have already accessed it
+                $this->oLink = isset( $this->oLink ) 
                     ? $this->oLink
                     : $this->_getLinkInstancce( $this->oProp, $this->oMsg );
             }
@@ -126,15 +141,19 @@ abstract class AdminPageFramework_Factory_Router {
                 return;
             }
             
-            $this->oResource        = isset( $this->oResource ) // the user may have already accessed it
+            // the user may have already accessed it
+            $this->oResource        = isset( $this->oResource ) 
                 ? $this->oResource
                 : $this->_getResourceInstance( $this->oProp );
             $this->oHeadTag         = $this->oResource; // backward compatibility
             
-            $this->oLink            = isset( $this->oLink ) // the user may have already accessed it
+            // the user may have already accessed it
+            $this->oLink            = isset( $this->oLink ) 
                 ? $this->oLink
                 : $this->_getLinkInstancce( $this->oProp, $this->oMsg );     
-            $this->oPageLoadInfo    = isset( $this->oPageLoadInfo ) // the user may have already accessed it
+                
+            // the user may have already accessed it
+            $this->oPageLoadInfo    = isset( $this->oPageLoadInfo ) 
                 ? $this->oPageLoadInfo
                 : $this->_getPageLoadInfoInstance( $this->oProp, $this->oMsg );
             
@@ -188,7 +207,7 @@ abstract class AdminPageFramework_Factory_Router {
                 return new AdminPageFramework_FormElement( $oProp->sFieldsType, $oProp->sCapability, $this );
             case 'taxonomy':
             case 'widget':      // 3.2.0+
-            case 'user_meta':        // 3.5.0+
+            case 'user_meta':   // 3.5.0+
                 return new AdminPageFramework_FormElement( $oProp->sFieldsType, $oProp->sCapability, $this );
             
         }     
@@ -269,10 +288,10 @@ abstract class AdminPageFramework_Factory_Router {
                 return null;
             case 'post_type':
                 return new AdminPageFramework_Link_PostType( $oProp, $oMsg );
-            default:
             case 'taxonomy':
             case 'widget':  // 3.2.0+
             case 'user_meta':
+            default:
                 return null;
         }     
         
@@ -297,9 +316,9 @@ abstract class AdminPageFramework_Factory_Router {
                 return null;
             case 'post_type':
                 return AdminPageFramework_PageLoadInfo_PostType::instantiate( $oProp, $oMsg );
-            default:
             case 'taxonomy':
             case 'widget':  // 3.2.0+
+            default:
                 return null;
         }     
         
@@ -332,8 +351,8 @@ abstract class AdminPageFramework_Factory_Router {
                 case 'oHeadTag':    // 3.3.0+ for backward compatibility
                     return $this->oResource;                
             case 'oHelpPane':
-                $this->oHelpPange = $this->_getHelpPaneInstance( $this->oProp );
-                return $this->oHelpPange;
+                $this->oHelpPane = $this->_getHelpPaneInstance( $this->oProp );
+                return $this->oHelpPane;
             case 'oLink':
                 $this->oLink = $this->_getLinkInstancce( $this->oProp, $this->oMsg );
                 return $this->oLink;
@@ -355,7 +374,13 @@ abstract class AdminPageFramework_Factory_Router {
             return isset( $aArgs[ 0 ] ) ? $aArgs[ 0 ] : null;
         }
         
-        trigger_error( 'Admin Page Framework: ' . ' : ' . sprintf( __( 'The method is not defined: %1$s', $this->oProp->sTextDomain ), $sMethodName ), E_USER_WARNING );
+        trigger_error( 
+            'Admin Page Framework: ' . ' : ' . sprintf( 
+                __( 'The method is not defined: %1$s', $this->oProp->sTextDomain ),
+                $sMethodName 
+            ), 
+            E_USER_WARNING 
+        );
         
     }     
     

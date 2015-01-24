@@ -85,9 +85,7 @@ Activate the demo pages to see the possible features of the framework. To activa
 
 <h4>Documentation</h4>
 - [Online Documentation](http://admin-page-framework.michaeluno.jp/en/v3/class-AdminPageFramework.html)
-
-<h4>Tutorials</h4>
-[Index](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/)
+- [Tutorials](http://en.michaeluno.jp/admin-page-framework/tutorials-v3/)
 
 == Screenshots ==
 1. **Text Fields**
@@ -128,7 +126,7 @@ No. Include the minified version of the framework in your distribution package.
 It is in the `library` directory of the plugin. Or go to **Dashboard** -> **Admin Page Framework** -> **Tool** -> **Minifier** and press **Download**.
 
 <h5><strong>Does my commercial product incorporating your framework library have to be released under GPL2v+?</strong></h5>
-No. The demo plugin is released under GPLv2 or later but the library itself is released under MIT. Make sure to include only the library file.
+No. The loader plugin is released under GPLv2 or later but the library itself is released under MIT. Make sure to include only the library file.
 
 <h5><strong>Does the framework work with WordPress Multi-site?</strong></h5>
 Yes, it works with [WordPress MU](https://codex.wordpress.org/WordPress_MU).
@@ -369,7 +367,12 @@ Check out [the issues](https://github.com/michaeluno/admin-page-framework/issues
 
 == Changelog ==
 
-= 3.5.0 - 2015/01/22=
+= 3.5.1 - 2015/01/23 =
+- Fixed a bug in the `enqueueScripts()` method of the admin page factory class.
+- Fixed a bug that message objects were not properly instantiated. 
+- Fixed PHP strict standard warnings.
+
+= 3.5.0 - 2015/01/22 =
 - Added the forth parameter of submit information to the validation filter callbacks so that callback methods can know which framework field submit button is pressed etc.
 - Added the a method to the field type class that is triggered when a field of the field type is registered.
 - Added the `field_types_admin_page_framework` filter that allows you to register field types sitewide.
