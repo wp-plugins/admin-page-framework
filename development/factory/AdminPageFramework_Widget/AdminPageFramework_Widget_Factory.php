@@ -3,7 +3,7 @@
  * Admin Page Framework
  * 
  * http://en.michaeluno.jp/admin-page-framework/
- * Copyright (c) 2013-2014 Michael Uno; Licensed MIT
+ * Copyright (c) 2013-2015 Michael Uno; Licensed MIT
  * 
  */
 
@@ -20,6 +20,9 @@ class AdminPageFramework_Widget_Factory extends WP_Widget {
     
     /**
      * Sets up internal properties.
+     * 
+     * @since       3.2.0
+     * @return      void
      */
 	public function __construct( $oCaller, $sWidgetTitle, array $aArguments=array() ) {
 		
@@ -39,6 +42,9 @@ class AdminPageFramework_Widget_Factory extends WP_Widget {
     
     /**
      * Displays the widget contents in the front end.
+     * 
+     * @since       3.2.0
+     * @return      void
      */
 	public function widget( $aArguments, $aFormData ) {
 
@@ -67,6 +73,9 @@ class AdminPageFramework_Widget_Factory extends WP_Widget {
     
     /**
      * Validates the submitted form data.
+     * 
+     * @since       3.2.0
+     * @return      mixed       The validated form data. The type should be an array but it is dealt by the framework user it will be unknown.
      */
 	public function update( $aSubmittedFormData, $aSavedFormData ) {
                 
@@ -77,11 +86,14 @@ class AdminPageFramework_Widget_Factory extends WP_Widget {
             $aSavedFormData,
             $this->oCaller
         );
+
         
 	}
     
     /**
      * Constructs the widget form.
+     * 
+     * @return      void
      */
 	public function form( $aFormData ) {
 
@@ -100,13 +112,24 @@ class AdminPageFramework_Widget_Factory extends WP_Widget {
         $this->oCaller->oProp->aFieldCallbacks = array( 
             'hfID'          => array( $this, 'get_field_id' ),    // defined in the WP_Widget class.  
             'hfTagID'       => array( $this, 'get_field_id' ),    // defined in the WP_Widget class.  
-            'hfName'        => array( $this, 'get_field_name' ),  // defined in the WP_Widget class.
+            'hfName'        => array( $this, 'get_field_name' ),  // defined in the WP_Widget class.  
             // 'hfClass'       => array( $this, '_replyToAddClassSelector' ),
             // 'hfNameFlat'    => array( $this, '' ),
         );              
       
         // Render the form. 
         $this->oCaller->_printWidgetForm();
+       
+        /** 
+         * Initialize the form object that stores registered sections and fields
+         * because this class gets called multiple times to render the form including added widgets and the initial widget that gets listed on the lsft hand side of the page.
+         * @since       3.5.2
+         */
+        $this->oCaller->oForm = new AdminPageFramework_FormElement( 
+            $this->oCaller->oProp->sFieldsType, 
+            $this->oCaller->oProp->sCapability, 
+            $this->oCaller
+        );   
        
 	}
     
@@ -118,8 +141,8 @@ class AdminPageFramework_Widget_Factory extends WP_Widget {
     public function _replyToAddClassSelector( $sClassSelectors ) {
         
         $sClassSelectors .= ' widefat';
-        return trim ( $sClassSelectors );
+        return trim( $sClassSelectors );
         
     }
-
+    
 }
