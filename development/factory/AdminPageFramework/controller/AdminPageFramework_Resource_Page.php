@@ -38,18 +38,10 @@ class AdminPageFramework_Resource_Page extends AdminPageFramework_Resource_Base 
             return;
         }        
         $_bLoaded   = true;
-        
+     
         $_oCaller   = $this->oProp->_getCallerObject();     
-        
-        // Check if it is an added page and tab.
-        $_sPageSlug = isset( $_GET['page'] ) ? $_GET['page'] : '';
-        $_sPageSlug = $this->oProp->isPageAdded( $_sPageSlug )
-            ? $_sPageSlug
-            : '';
-        $_sTabSlug  = $this->oProp->getCurrentTab( $_sPageSlug ); 
-        $_sTabSlug  = isset( $this->oProp->aInPageTabs[ $_sPageSlug ][ $_sTabSlug ] )
-            ? $_sTabSlug
-            : '';
+        $_sPageSlug = $this->_getCurrentPageSlugForFilter();
+        $_sTabSlug  = $this->_getCurrentTabSlugForFilter( $_sPageSlug );
         
         // tab 
         if ( $_sPageSlug && $_sTabSlug ) {
@@ -73,7 +65,35 @@ class AdminPageFramework_Resource_Page extends AdminPageFramework_Resource_Base 
         parent::_printClassSpecificStyles( $sIDPrefix );
         
     }
-    
+        /**
+         * Returns the currently loaded page slug to apply resource filters.
+         * 
+         * If the page has not been added, an empty value will be returned.
+         * 
+         * @since       3.5.3
+         * @return      string      The page slug if the page has been added.
+         */
+        private function _getCurrentPageSlugForFilter() {
+            $_sPageSlug = $this->oProp->getCurrentPageSlug();
+            return $this->oProp->isPageAdded( $_sPageSlug )
+                ? $_sPageSlug
+                : '';            
+        }
+        /**
+         * Returns the currently loaded tab slug to apply resource filters.
+         * 
+         * If the tab has not been added, an empty value will be returned.
+         * 
+         * @since       3.5.3
+         * @return      string      The tab slug if the tab has been added.
+         */
+        private function _getCurrentTabSlugForFilter( $sPageSlug ) {
+            $_sTabSlug  = $this->oProp->getCurrentTabSlug( $sPageSlug ); 
+            return isset( $this->oProp->aInPageTabs[ $sPageSlug ][ $_sTabSlug ] )
+                ? $_sTabSlug
+                : '';          
+        }
+        
     /**
      * Applies page and tab specific filters to inline JaveScript scirpts.
      * 
@@ -91,8 +111,8 @@ class AdminPageFramework_Resource_Page extends AdminPageFramework_Resource_Base 
         $_bLoaded   = true;
        
         $_oCaller   = $this->oProp->_getCallerObject();     
-        $_sPageSlug = isset( $_GET['page'] ) ? $_GET['page'] : '';
-        $_sTabSlug  = $this->oProp->getCurrentTab( $_sPageSlug );
+        $_sPageSlug = $this->_getCurrentPageSlugForFilter();
+        $_sTabSlug  = $this->_getCurrentTabSlugForFilter( $_sPageSlug );
         
         // tab 
         if ( $_sPageSlug && $_sTabSlug ) {
@@ -154,32 +174,7 @@ class AdminPageFramework_Resource_Page extends AdminPageFramework_Resource_Base 
      * @internal
      */    
     public function _enqueueStyle( $sSRC, $sPageSlug='', $sTabSlug='', $aCustomArgs=array() ) {
-        
-        $sSRC = trim( $sSRC );
-        if ( empty( $sSRC ) ) { return ''; }
-        $sSRC       = $this->oUtil->resolveSRC( $sSRC );
-        
-        // Setting the key based on the url prevents duplicate items
-        $_sSRCHash  = md5( $sSRC ); 
-        if ( isset( $this->oProp->aEnqueuingStyles[ $_sSRCHash ] ) ) { return ''; } 
-
-        $this->oProp->aEnqueuingStyles[ $_sSRCHash ] = $this->oUtil->uniteArrays( 
-            ( array ) $aCustomArgs,
-            array(     
-                'sSRC'      => $sSRC,
-                'sPageSlug' => $sPageSlug,
-                'sTabSlug'  => $sTabSlug,
-                'sType'     => 'style',
-                'handle_id' => 'style_' . $this->oProp->sClassName . '_' .  ( ++$this->oProp->iEnqueuedStyleIndex ),
-            ),
-            self::$_aStructure_EnqueuingResources
-        );
-        
-        // Store the attributes in another container by url.
-        $this->oProp->aResourceAttributes[ $this->oProp->aEnqueuingStyles[ $_sSRCHash ]['handle_id'] ] = $this->oProp->aEnqueuingStyles[ $_sSRCHash ]['attributes'];
-        
-        return $this->oProp->aEnqueuingStyles[ $_sSRCHash ][ 'handle_id' ];
-        
+        return $this->_enqueueResourceByType( $sSRC, $sPageSlug, $sTabSlug, $aCustomArgs, 'style' );        
     }
     
     /**
@@ -219,34 +214,80 @@ class AdminPageFramework_Resource_Page extends AdminPageFramework_Resource_Base 
      * @internal
      */
     public function _enqueueScript( $sSRC, $sPageSlug='', $sTabSlug='', $aCustomArgs=array() ) {
-        
-        $sSRC       = trim( $sSRC );
-        if ( empty( $sSRC ) ) { return ''; }
-        $sSRC       = $this->oUtil->resolveSRC( $sSRC );
-
-        // setting the key based on the url prevents duplicate items
-        $_sSRCHash  = md5( $sSRC );
-        if ( isset( $this->oProp->aEnqueuingScripts[ $_sSRCHash ] ) ) { return ''; } 
-        
-        $this->oProp->aEnqueuingScripts[ $_sSRCHash ] = $this->oUtil->uniteArrays( 
-            ( array ) $aCustomArgs,
-            array(     
-                'sPageSlug' => $sPageSlug,
-                'sTabSlug'  => $sTabSlug,
-                'sSRC'      => $sSRC,
-                'sType'     => 'script',
-                'handle_id' => 'script_' . $this->oProp->sClassName . '_' .  ( ++$this->oProp->iEnqueuedScriptIndex ),
-            ),
-            self::$_aStructure_EnqueuingResources
-        );
-
-        // Store the attributes in another container by url.
-        $this->oProp->aResourceAttributes[ $this->oProp->aEnqueuingScripts[ $_sSRCHash ]['handle_id'] ] = $this->oProp->aEnqueuingScripts[ $_sSRCHash ]['attributes'];
-        
-        return $this->oProp->aEnqueuingScripts[ $_sSRCHash ][ 'handle_id' ];
-        
+        return $this->_enqueueResourceByType( $sSRC, $sPageSlug, $sTabSlug, $aCustomArgs, 'script' );
     }
+        /**
+         * Enqueues a resouce.
+         * 
+         * @since       3.5.3
+         * @param       string      $sSRC           The source path or url.
+         * @param       string      $sPageSlug      The page slug that the item gets enqueued.
+         * @param       string      $sTabSlug       The page slug that the item gets enqueued.
+         * @param       array       $aCustomArgs    A custom argument array.
+         * @param       string      $sType          Accepts 'style' or 'script'
+         */
+        private function _enqueueResourceByType( $sSRC, $sPageSlug='', $sTabSlug='', $aCustomArgs=array(), $sType='style' ) {
+            
+            $sSRC       = trim( $sSRC );
+            if ( empty( $sSRC ) ) { return ''; }
+            $sSRC       = $this->oUtil->resolveSRC( $sSRC );
 
+            // Get the property name for the type
+            $_sContainerPropertyName     = $this->_getContainerPropertyNameByType( $sType );
+            $_sEnqueuedIndexPropertyName = $this->_getEnqueuedIndexPropertyNameByType( $sType );
+            
+            // setting the key based on the url prevents duplicate items
+            $_sSRCHash  = md5( $sSRC );
+            if ( isset( $this->oProp->{$_sContainerPropertyName}[ $_sSRCHash ] ) ) { 
+                return ''; 
+            } 
+            
+            $this->oProp->{$_sContainerPropertyName}[ $_sSRCHash ] = $this->oUtil->uniteArrays( 
+                ( array ) $aCustomArgs,
+                array(     
+                    'sPageSlug' => $sPageSlug,
+                    'sTabSlug'  => $sTabSlug,
+                    'sSRC'      => $sSRC,
+                    'sType'     => $sType,
+                    'handle_id' => $sType . '_' . $this->oProp->sClassName . '_' .  ( ++$this->oProp->{$_sEnqueuedIndexPropertyName} ),
+                )
+                + self::$_aStructure_EnqueuingResources
+            );
+
+            // Store the attributes in another container by url.
+            $this->oProp->aResourceAttributes[ $this->oProp->{$_sContainerPropertyName}[ $_sSRCHash ]['handle_id'] ] = $this->oProp->{$_sContainerPropertyName}[ $_sSRCHash ]['attributes'];
+            
+            return $this->oProp->{$_sContainerPropertyName}[ $_sSRCHash ][ 'handle_id' ];
+            
+        }
+            /**
+             * Returns the property name that contains the information of resources by type.
+             * @since       3.5.3
+             * @return      string      the property name that contains the information of resources by type.
+             */
+            private function _getContainerPropertyNameByType( $sType ) {
+                switch ( $sType ) {
+                    default:
+                    case 'style':
+                        return 'aEnqueuingStyles';
+                    case 'script':
+                        return 'aEnqueuingScripts';
+                }
+            }
+            /**
+             * Returns the property name that contains the added count of resources by type.
+             * @since       3.5.3
+             * @return      string      the property name that contains the added count of resources by type.
+             */            
+            private function _getEnqueuedIndexPropertyNameByType( $sType ) {
+                switch ( $sType ) {
+                    default:
+                    case 'style':
+                        return 'iEnqueuedStyleIndex';
+                    case 'script':
+                        return 'iEnqueuedScriptIndex';
+                }
+            }            
     /**
      * Enqueues a style source without conditions.
      * 
@@ -278,8 +319,8 @@ class AdminPageFramework_Resource_Page extends AdminPageFramework_Resource_Base 
      */
     protected function _enqueueSRCByConditoin( $aEnqueueItem ) {
 
-        $sCurrentPageSlug   = isset( $_GET['page'] ) ? $_GET['page'] : '';
-        $sCurrentTabSlug    = isset( $_GET['tab'] ) ? $_GET['tab'] : $this->oProp->getCurrentTab( $sCurrentPageSlug );
+        $sCurrentPageSlug   = $this->oProp->getCurrentPageSlug();
+        $sCurrentTabSlug    = $this->oProp->getCurrentTabSlug( $sCurrentPageSlug );
         $sPageSlug          = $aEnqueueItem['sPageSlug'];
         $sTabSlug           = $aEnqueueItem['sTabSlug'];
 

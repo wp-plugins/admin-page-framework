@@ -85,9 +85,11 @@ class AdminPageFramework_FormTable_Base extends AdminPageFramework_FormOutput {
     /**
      * Returns the collapsible argument array from the given sections definition array.
      * 
-     * @since   3.4.0
+     * @since       3.4.0
+     * @since       3.5.3       Remvoed the second `$iSectionIndex` parameter as it was not used.
+     * @return      array
      */
-    protected function _getCollapsibleArgument( array $aSections=array(), $iSectionIndex=0 ) {
+    protected function _getCollapsibleArgument( array $aSections=array() ) {
         
         // Only the first found item is needed
         foreach( $aSections as $_aSection ) {
@@ -98,7 +100,10 @@ class AdminPageFramework_FormTable_Base extends AdminPageFramework_FormOutput {
                 return array();
             }
             
-            $_aSection['collapsible']['toggle_all_button'] = $this->_sanitizeToggleAllButtonArgument( $_aSection['collapsible']['toggle_all_button'], $_aSection );
+            $_aSection['collapsible']['toggle_all_button'] = $this->_sanitizeToggleAllButtonArgument( 
+                $_aSection['collapsible']['toggle_all_button'], 
+                $_aSection 
+            );
 
             return $_aSection['collapsible'];
         }
@@ -110,6 +115,7 @@ class AdminPageFramework_FormTable_Base extends AdminPageFramework_FormOutput {
          * @since       3.4.0
          * @param       string      $sToggleAll         Comma delimited button positions.
          * @param       array       $aSection           The section definition array.
+         * @return      string
          */
         private function _sanitizeToggleAllButtonArgument( $sToggleAll, array $aSection ) {
             
@@ -127,17 +133,26 @@ class AdminPageFramework_FormTable_Base extends AdminPageFramework_FormOutput {
                 return 0;
             }            
             
-            $_aToggleAll = true === $sToggleAll || 1 ===  $sToggleAll 
-                ? array( 'top-right', 'bottom-right' )
-                : explode( ',', $sToggleAll );
-            
-            if ( $aSection['_is_first_index'] ) {                
-                $_aToggleAll = $this->dropElementByValue( $_aToggleAll, array( 1, true, 0, false, 'bottom-right', 'bottom-left' ) );
-            }
-            if ( $aSection['_is_last_index'] ) {
-                $_aToggleAll = $this->dropElementByValue( $_aToggleAll, array( 1, true, 0, false, 'top-right', 'top-left' ) );                    
-            } 
-            $_aToggleAll = empty( $_aToggleAll ) ? array( 0 ) : $_aToggleAll;
+            $_aToggleAll = $this->getAOrB(
+                true === $sToggleAll || 1 ===  $sToggleAll, // evaluate
+                array( 'top-right', 'bottom-right' ),   // if true
+                explode( ',', $sToggleAll ) // if false
+            );            
+            $_aToggleAll = $this->getAOrB(
+                $aSection['_is_first_index'],
+                $this->dropElementByValue( $_aToggleAll, array( 1, true, 0, false, 'bottom-right', 'bottom-left' ) ),
+                $_aToggleAll
+            );
+            $_aToggleAll = $this->getAOrB(
+                $aSection['_is_last_index'],
+                $this->dropElementByValue( $_aToggleAll, array( 1, true, 0, false, 'top-right', 'top-left' ) ),
+                $_aToggleAll
+            );
+            $_aToggleAll = $this->getAOrB(
+                empty( $_aToggleAll ),
+                array( 0 ),
+                $_aToggleAll
+            );
             return implode( ',', $_aToggleAll );
             
         }
@@ -281,4 +296,22 @@ JAVASCRIPTS;
             
     }
  
+ 
+    /**
+     * Returns some framework information for debugging.
+     * 
+     * @since       3.5.3
+     * @return      string      Some information for debugging.
+     */
+    protected function _getDebugInfo( $sFieldsType ) {
+        if ( ! $this->isDebugModeEnabled() ) {
+            return '';
+        }
+        if ( ! in_array( $sFieldsType, array( 'widget', 'post_meta_box', 'page_meta_box', 'user_meta' ) ) ) {
+            return '';
+        }
+        return "<div class='admin-page-framework-info'>" 
+                . 'Debug Info: ' . AdminPageFramework_Registry::NAME . ' '. AdminPageFramework_Registry::getVersion() 
+            . "</div>";
+    }
 }

@@ -45,6 +45,7 @@ abstract class AdminPageFramework_Form_Controller extends AdminPageFramework_For
      *
      * @since       2.0.0
      * @since       3.0.0           Changed the scope to public from protected.
+     * @since       3.5.3           Removed the parameter declarations as they are caught with the func_get_args().
      * @access      public
      * @remark      Accepts variadic parameters; the number of accepted parameters are not limited to three.
      * @remark      The actual registration will be performed in the <em>_replyToRegisterSettings()</em> method with the <em>admin_menu</em> hook.
@@ -68,7 +69,7 @@ abstract class AdminPageFramework_Form_Controller extends AdminPageFramework_For
      * @param       array           (optional) add more section array to the next parameters as many as necessary.
      * @return      void
      */     
-    public function addSettingSections( $aSection1, $aSection2=null, $_and_more=null ) {
+    public function addSettingSections( /* $aSection1, $aSection2=null, $_and_more=null */ ) {
         
         foreach( func_get_args() as $asSection ) { 
             $this->addSettingSection( $asSection ); 
@@ -94,29 +95,45 @@ abstract class AdminPageFramework_Form_Controller extends AdminPageFramework_For
     public function addSettingSection( $asSection ) {
                 
         if ( ! is_array( $asSection ) ) {
-            $this->_sTargetPageSlug = is_string( $asSection ) ? $asSection : $this->_sTargetPageSlug;
+            $this->_sTargetPageSlug = is_string( $asSection )
+                ? $asSection 
+                : $this->_sTargetPageSlug;
             return;
         } 
         
         $aSection = $asSection;
-        $this->_sTargetPageSlug         = isset( $aSection['page_slug'] ) ? $aSection['page_slug'] : $this->_sTargetPageSlug;
-        $this->_sTargetTabSlug          = isset( $aSection['tab_slug'] ) ? $aSection['tab_slug'] : $this->_sTargetTabSlug;
-        $this->_sTargetSectionTabSlug   = isset( $aSection['section_tab_slug'] ) ? $aSection['section_tab_slug'] : $this->_sTargetSectionTabSlug;
+        $this->_sTargetPageSlug         = $this->oUtil->getElement( $aSection, 'page_slug', $this->_sTargetPageSlug );
+        $this->_sTargetTabSlug          = $this->oUtil->getElement( $aSection, 'tab_slug', $this->_sTargetTabSlug );
+        $this->_sTargetSectionTabSlug   = $this->oUtil->getElement( $aSection, 'section_tab_slug', $this->_sTargetSectionTabSlug );
         $aSection = $this->oUtil->uniteArrays( 
             $aSection, 
             array( 
-                'page_slug'         => $this->_sTargetPageSlug ? $this->_sTargetPageSlug : null, // checking the value allows the user to reset the internal target manually
-                'tab_slug'          => $this->_sTargetTabSlug ? $this->_sTargetTabSlug : null,
-                'section_tab_slug'  => $this->_sTargetSectionTabSlug ? $this->_sTargetSectionTabSlug : null,
+                'page_slug'         => $this->_sTargetPageSlug, 
+                'tab_slug'          => $this->_sTargetTabSlug, 
+                'section_tab_slug'  => $this->_sTargetSectionTabSlug, 
+
+                // @depreacated 3.5.3+ Not sure if the checking the property values are necessary.
+                // checking the value allows the user to reset the internal target manually
+                // 'page_slug'         => $this->_sTargetPageSlug ? $this->_sTargetPageSlug : null, 
+                // 'tab_slug'          => $this->_sTargetTabSlug ? $this->_sTargetTabSlug : null,
+                // 'section_tab_slug'  => $this->_sTargetSectionTabSlug ? $this->_sTargetSectionTabSlug : null,
+                
             )
         ); // avoid undefined index warnings.
         
-        $aSection['page_slug']          = $aSection['page_slug'] ? $this->oUtil->sanitizeSlug( $aSection['page_slug'] ) : ( $this->oProp->sDefaultPageSlug ? $this->oProp->sDefaultPageSlug : null );
+        $aSection['page_slug']          = $aSection['page_slug'] 
+            ? $this->oUtil->sanitizeSlug( $aSection['page_slug'] ) 
+            : ( $this->oProp->sDefaultPageSlug 
+                ? $this->oProp->sDefaultPageSlug 
+                : null 
+            );
         $aSection['tab_slug']           = $this->oUtil->sanitizeSlug( $aSection['tab_slug'] );
         $aSection['section_tab_slug']   = $this->oUtil->sanitizeSlug( $aSection['section_tab_slug'] );
         
-        // The page slug is necessary.
-        if ( ! $aSection['page_slug'] ) { return; }
+        // A page slug is required.
+        if ( ! $aSection['page_slug'] ) {
+            return; 
+        }
         $this->oForm->addSection( $aSection );
         
     }
@@ -132,6 +149,7 @@ abstract class AdminPageFramework_Form_Controller extends AdminPageFramework_For
     * 
     * @since        2.0.0
     * @since        3.0.0       Changed the scope to public from protected.
+    * @since        3.5.3       Removed the parameter declarations as they are caught with the func_get_args().
     * @access       public
     * @remark       Accepts variadic parameters; the number of accepted parameters are not limited to three.
     * @param        string      $sSectionID1        the section ID to remove.
@@ -139,7 +157,7 @@ abstract class AdminPageFramework_Form_Controller extends AdminPageFramework_For
     * @param        string      $_and_more          (optional) add more section IDs to the next parameters as many as necessary.
     * @return       void
     */    
-    public function removeSettingSections( $sSectionID1=null, $sSectionID2=null, $_and_more=null ) {    
+    public function removeSettingSections( /* $sSectionID1=null, $sSectionID2=null, $_and_more=null */ ) {    
         
         foreach( func_get_args() as $_sSectionID ) {
             $this->oForm->removeSection( $_sSectionID );
@@ -193,12 +211,13 @@ abstract class AdminPageFramework_Form_Controller extends AdminPageFramework_For
      * );</code>
      * 
      * @since       2.0.0
-     * @since       3.0.0 Changed the scope to public from protected.
+     * @since       3.0.0       Changed the scope to public from protected.
+     * @since       3.5.3       Removed the parameter declarations as they are caught with the func_get_args().
      * @access      public
      * @remark      Accepts variadic parameters; the number of accepted parameters are not limited to three.
      * @remark      The actual registration will be performed in the <em>_replyToRegisterSettings()</em> method with the <em>admin_menu</em> hook.
      */     
-    public function addSettingFields( $aField1, $aField2=null, $_and_more=null ) {    
+    public function addSettingFields( /* $aField1, $aField2=null, $_and_more=null */ ) {    
         foreach( func_get_args() as $aField ) { 
             $this->addSettingField( $aField ); 
         }
@@ -267,16 +286,19 @@ abstract class AdminPageFramework_Form_Controller extends AdminPageFramework_For
      * </code>
      * 
      * @since       3.3.0
-     * @since       3.3.5           Made it respect last input arrays.
+     * @since       3.3.5       Made it respect last input arrays.
+     * @since       3.5.3       When a parameter is not set, it returns the entire options.
      * @param       The key that points the dimensional array key of the options array.
      */
-    public function getValue() {
+    public function getValue( /* $sDimensionalKey1, $sDimensionalKey2 ... */ ) {
         
-        $_aParams   = func_get_args();        
+        $_aDimensionalKeys   = func_get_args();        
         return AdminPageFramework_WPUtility::getOption( 
             $this->oProp->sOptionKey, 
-            $_aParams, 
-            null,            // default
+            empty( $_aDimensionalKeys ) 
+                ? null                  // will return the entire options array
+                : $_aDimensionalKeys,   // dimensional keys
+            null, // default
             $this->getSavedOptions() + $this->oProp->getDefaultOptions( $this->oForm->aFields ) // additional array to merge with the options
         );
         

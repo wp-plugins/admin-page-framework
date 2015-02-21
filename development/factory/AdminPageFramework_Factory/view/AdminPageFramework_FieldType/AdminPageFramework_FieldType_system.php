@@ -3,7 +3,7 @@
  * Admin Page Framework
  * 
  * http://en.michaeluno.jp/admin-page-framework/
- * Copyright (c) 2013-2014 Michael Uno; Licensed MIT
+ * Copyright (c) 2013-2015 Michael Uno; Licensed MIT
  * 
  */
 
@@ -220,71 +220,76 @@ CSSRULES;
     }    
         /**
          * Returns the system information value for a textarea tag.
+         * 
+         * @return      string      The human readable system information.
          */
         private function _getSystemInfomation( $asValue=null, $asCustomData=null, $iPrintType=1 ) {
 
             if ( isset( $asValue ) ) {
                 return $asValue;
             }
-        
-            global $wpdb;
-            
-            $_aData = $this->getAsArray( $asCustomData );
-            $_aData = $_aData + array(
-                'Admin Page Framework'  => isset( $_aData['Admin Page Framework'] )
-                    ? null
-                    : AdminPageFramework_Registry::getInfo(),
-                'WordPress'             => isset( $_aData['WordPress'] )
-                    ? null
-                    : $this->_getSiteInfo(),
-                'PHP'                   => isset( $_aData['PHP'] )
-                    ? null
-                    : $this->_getPHPInfo(),
-                'PHP Error Log'         => isset( $_aData['PHP Error Log'] )
-                    ? null
-                    : $this->_getPHPErrorLog(),
-                'MySQL'                 => isset( $_aData['MySQL'] )
-                    ? null
-                    : $this->getMySQLInfo(),
-                'MySQL Error Log'       => isset( $_aData['MySQL Error Log'] ) 
-                    ? null
-                    : $this->_getMySQLErrorLog(),
-                'Server'                => isset( $_aData['Server'] )
-                    ? null
-                    : $this->_getWebServerInfo(),
-                'Browser'               => isset( $_aData['Browser'] )
-                    ? null
-                    : $this->_getClientInfo(),
 
-            );
-            
             $_aOutput   = array();
-            foreach( $_aData as $_sSection => $_aInfo ) {
-
-                // Skipping an empty element allows the user to remove a section by setting an empty section.
-                if ( empty( $_aInfo ) ) { continue; }
-            
-                switch ( $iPrintType ) {
-                    default:
-                    case 1: // use the framework readable representation of arrays.
-                        $_aOutput[] = $this->getReadableArrayContents( $_sSection, $_aInfo, 32 ) . PHP_EOL;
-                        break;
-                    case 2: // use print_r()
-                        $_aOutput[] = "[{$_sSection}]" . PHP_EOL
-                            . print_r( $_aInfo, true ) . PHP_EOL;
-                        break;
-                }
-                
+            foreach( $this->_getFormattedSystemInformation( $asCustomData ) as $_sSection => $_aInfo ) {
+                $_aOutput[] = $this->_getSystemInfoBySection( $_sSection, $_aInfo, $iPrintType );
             }
             return implode( PHP_EOL, $_aOutput );
             
         }
             /**
+             * Returns the formatted system information array.
+             * @since       3.5.3
+             * @internal
+             * @return      array       the formatted system information array.
+             */
+            private function _getFormattedSystemInformation( $asCustomData ) {
+                
+                $_aData = $this->getAsArray( $asCustomData );
+                $_aData = $_aData + array(
+                    'Admin Page Framework'  => isset( $_aData['Admin Page Framework'] )
+                        ? null
+                        : AdminPageFramework_Registry::getInfo(),
+                    'WordPress'             => $this->_getSiteInfoWithCache( ! isset( $_aData['WordPress'] ) ),
+                    'PHP'                   => $this->_getPHPInfo( ! isset( $_aData['PHP'] ) ),
+                    'PHP Error Log'         => $this->_getErrorLogByType( 'php', ! isset( $_aData['PHP Error Log'] ) ),
+                    'MySQL'                 => isset( $_aData['MySQL'] )
+                        ? null
+                        : $this->getMySQLInfo(),    // defined in the utility class.
+                    'MySQL Error Log'       => $this->_getErrorLogByType( 'mysql', ! isset( $_aData['MySQL Error Log'] ) ),
+                    'Server'                => $this->_getWebServerInfo( ! isset( $_aData['Server'] ) ),
+                    'Browser'               => $this->_getClientInfo( ! isset( $_aData['Browser'] ) ),
+                );
+                
+                // Dropping empty elements allows the user to remove a section by setting an empty section.
+                return array_filter( $_aData );
+                
+            }        
+            /**
+             * Returns the system information by section.
+             * @since       3.5.3
+             * @return      string      The system information by section.
+             */
+            private function _getSystemInfoBySection( $sSectionName, $aData, $iPrintType ) {
+                switch ( $iPrintType ) {
+                    default:
+                    case 1: // use the framework readable representation of arrays.
+                        return $this->getReadableArrayContents( $sSectionName, $aData, 32 ) . PHP_EOL;
+                    case 2: // use print_r()
+                        return "[{$sSectionName}]" . PHP_EOL
+                            . print_r( $aData, true ) . PHP_EOL;
+                }                      
+            }
+            /**
              * Returns a client information
              * 
              * @since       3.4.6
+             * @since       3.5.3       Added the $bGenerateInfo paramter. This is to reduce conditional statment in the caller method.
              */
-            private function _getClientInfo() {
+            private function _getClientInfo( $bGenerateInfo=true ) {
+                 
+                if ( ! $bGenerateInfo ) {
+                    return '';
+                }
                  
                 // Check the browscap value in the ini file first to prevent warnings from being populated
                 $_aBrowser = @ini_get( 'browscap' ) 
@@ -298,79 +303,92 @@ CSSRULES;
             }
             
             /**
-             * Returns a PHP error log.
+             * Returns a error log by type.
              * 
-             * @since       3.4.6
+             * @since       3.5.3
+             * @return      string      The found error log.
+             * @param       string      $sType          The error log type. Either 'php' or 'mysql' is accepted.
+             * @param       boolean     $bGenerateInfo  Whether to generate a log. This is for the caller method to reduce a conditinal statement.
              */
-            private function _getPHPErrorLog() {
+            private function _getErrorLogByType( $sType, $bGenerateInfo=true ) {
 
-                $_sLog = $this->getPHPErrorLog( 200 );
+                if ( ! $bGenerateInfo ) {
+                    return '';
+                }
+                switch ( $sType ) {
+                    default:
+                    case 'php':
+                        $_sLog = $this->getPHPErrorLog( 200 );
+                        break;
+                    case 'mysql':
+                        $_sLog = $this->getMySQLErrorLog( 200 );
+                        break;
+                }
                 return empty( $_sLog )
-                    ? __( 'No log found.', 'admin-page-framework' )
-                    : $_sLog;
-            
-            }
-            
-            /**
-             * Returns a MySQL error log.
-             * 
-             * @since       3.4.6
-             */
-            private function _getMySQLErrorLog() {
+                    ? $this->oMsg->get( 'no_log_found' )
+                    : $_sLog;            
                 
-                $_sLog = $this->getMySQLErrorLog( 200 );
-                return empty( $_sLog )
-                    ? __( 'No log found.', 'admin-page-framework' )
-                    : $_sLog;
-                    
             }
+
             /**
              * Caches the WordPress installed site information.
              */
             static private $_aSiteInfo;
             /**
-             * Returns the Wordpress installed site.
-             * since        3.4.6
+             * Returns the Wordpress installed site. 
+             * 
+             * Uses a cache if stored in a previous call.
+             * 
+             * @since       3.4.6
+             * @since       3.5.3       Added the $bGenerateInfo paramter. This is to reduce conditional statment in the caller method.
+             * @return      array      The generated site information array.
              */
-            private function _getSiteInfo() {
+            private function _getSiteInfoWithCache( $bGenerateInfo=true ) {
                 
-                if ( isset( self::$_aSiteInfo ) ) {
+                if ( ! $bGenerateInfo || isset( self::$_aSiteInfo ) ) {
                     return self::$_aSiteInfo;
                 }
-                
-                global $wpdb;
-                
-                self::$_aSiteInfo = array(
-                    __( 'Version', 'admin-page-framework' )                 => $GLOBALS['wp_version'],
-                    __( 'Language', 'admin-page-framework' )                => ( defined( 'WPLANG' ) && WPLANG ? WPLANG : 'en_US' ),
-                    __( 'Memory Limit', 'admin-page-framework' )            => $this->getReadableBytes( $this->getNumberOfReadableSize( WP_MEMORY_LIMIT ) ),
-                    __( 'Multi-site', 'admin-page-framework' )              => $this->_getYesOrNo( is_multisite() ), 
-                    __( 'Permalink Structure', 'admin-page-framework' )     => get_option( 'permalink_structure' ), 
-                    __( 'Active Theme', 'admin-page-framework' )            => $this->_getActiveThemeName(),
-                    __( 'Registered Post Statuses', 'admin-page-framework' ) => implode( ', ', get_post_stati() ),
-                    'WP_DEBUG'                                              => $this->_getEnabledOrDisabled( defined( 'WP_DEBUG' ) && WP_DEBUG ),
-                    'WP_DEBUG_LOG'                                            => $this->_getEnabledOrDisabled( defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ),
-                    'WP_DEBUG_DISPLAY'                                        => $this->_getEnabledOrDisabled( defined( 'WP_DEBUG_DISPLAY' ) && WP_DEBUG_DISPLAY ),
-                    __( 'Table Prefix', 'admin-page-framework' )            => $wpdb->prefix,
-                    __( 'Table Prefix Length', 'admin-page-framework' )     => strlen( $wpdb->prefix ),
-                    __( 'Table Prefix Status', 'admin-page-framework' )     => strlen( $wpdb->prefix ) >16 ? __( 'Too Long', 'admin-page-framework' ) : __( 'Acceptable', 'admin-page-frmework' ),
-                    'wp_remote_post()'                                      => $this->_getWPRemotePostStatus(),
-                    'wp_remote_get()'                                       => $this->_getWPRemoteGetStatus(),
-                    __( 'WP_CONTENT_DIR Writeable', 'admin-page-framework' ) => $this->_getYesOrNo( is_writable( WP_CONTENT_DIR ) ),
-                    __( 'Active Plugins', 'admin-page-framework' )          => PHP_EOL . $this->_getActivePlugins(),
-                    __( 'Network Active Plugins', 'admin-page-framework' )  => PHP_EOL . $this->_getNetworkActivePlugins(),
-                    __( 'Constants', 'admin-page-framework' )               => $this->getDefinedConstants( 'user' ),
-                );          
+                self::$_aSiteInfo = self::_getSiteInfo();
                 return self::$_aSiteInfo;
                 
             }
+                /**
+                 * Returns the WordPress site information.
+                 * @internal
+                 * @since       3.5.3
+                 * @return      array       The WordPress site information.
+                 */
+                private function _getSiteInfo() {
+                    global $wpdb;
+                    return array(
+                        __( 'Version', 'admin-page-framework' )                  => $GLOBALS['wp_version'],
+                        __( 'Language', 'admin-page-framework' )                 => $this->getSiteLanguage(),
+                        __( 'Memory Limit', 'admin-page-framework' )             => $this->getReadableBytes( $this->getNumberOfReadableSize( WP_MEMORY_LIMIT ) ),
+                        __( 'Multi-site', 'admin-page-framework' )               => $this->getAOrB( is_multisite(), $this->oMsg->get( 'yes' ), $this->oMsg->get( 'no' ) ), 
+                        __( 'Permalink Structure', 'admin-page-framework' )      => get_option( 'permalink_structure' ), 
+                        __( 'Active Theme', 'admin-page-framework' )             => $this->_getActiveThemeName(),
+                        __( 'Registered Post Statuses', 'admin-page-framework' ) => implode( ', ', get_post_stati() ),
+                        'WP_DEBUG'                                               => $this->getAOrB( $this->isDebugModeEnabled(), $this->oMsg->get( 'enabled' ), $this->oMsg->get( 'disabled' ) ),
+                        'WP_DEBUG_LOG'                                           => $this->getAOrB( $this->isDebugLogEnabled(), $this->oMsg->get( 'enabled' ), $this->oMsg->get( 'disabled' ) ),
+                        'WP_DEBUG_DISPLAY'                                       => $this->getAOrB( $this->isDebugDisplayEnabled(), $this->oMsg->get( 'enabled' ), $this->oMsg->get( 'disabled' ) ),
+                        __( 'Table Prefix', 'admin-page-framework' )             => $wpdb->prefix,
+                        __( 'Table Prefix Length', 'admin-page-framework' )      => strlen( $wpdb->prefix ),
+                        __( 'Table Prefix Status', 'admin-page-framework' )      => $this->getAOrB( strlen( $wpdb->prefix ) > 16, $this->oMsg->get( 'acceptable' ), $this->oMsg->get( 'too_long' ) ),
+                        'wp_remote_post()'                                       => $this->_getWPRemotePostStatus(),
+                        'wp_remote_get()'                                        => $this->_getWPRemoteGetStatus(),
+                        __( 'WP_CONTENT_DIR Writeable', 'admin-page-framework' ) => $this->getAOrB( is_writable( WP_CONTENT_DIR ), $this->oMsg->get( 'yes' ), $this->oMsg->get( 'no' ) ), 
+                        __( 'Active Plugins', 'admin-page-framework' )           => PHP_EOL . $this->_getActivePlugins(),
+                        __( 'Network Active Plugins', 'admin-page-framework' )   => PHP_EOL . $this->_getNetworkActivePlugins(),
+                        __( 'Constants', 'admin-page-framework' )                => $this->getDefinedConstants( 'user' ),
+                    );                        
+                }
                 /**
                  * Returns the active theme name.
                  */
                 private function _getActiveThemeName() {
                     
                     // If the WordPress version is less than 3.4,
-                    if ( version_compare( $GLOBALS['wp_version'], '3.4', '<' ) ) {                      
+                    if ( version_compare( $GLOBALS['wp_version'], '3.4', '<' ) ) {
                         $_aThemeData = get_theme_data( get_stylesheet_directory() . '/style.css' );
                         return $_aThemeData['Name'] . ' ' . $_aThemeData['Version'];
                     } 
@@ -382,6 +400,7 @@ CSSRULES;
                 /**
                  * Returns a list of active plugins.
                  * 
+                 * @return      string
                  */
                 private function _getActivePlugins() {
                 
@@ -398,6 +417,7 @@ CSSRULES;
                 } 
                 /**
                  * Returns a list of network-activated plugins.
+                 * @return      string
                  */
                 private function _getNetworkActivePlugins() {
                     
@@ -420,6 +440,7 @@ CSSRULES;
                 /**
                  * Checks if the wp_remote_post() function is functioning.
                  * 
+                 * @return      string
                  */
                 private function _getWPRemotePostStatus() {
                     
@@ -436,12 +457,13 @@ CSSRULES;
                         )
                         : $_vResponse;
                     $this->setTransient( 'apf_rp_check', $_vResponse, 60 );
-                    return $this->_getFunctionalOrNot( ! is_wp_error( $_vResponse ) && $_vResponse['response']['code'] >= 200 && $_vResponse['response']['code'] < 300 ) ;
-                    
+                    return $this->getAOrB( $this->_isHttpRequestError( $_vResponse ), $this->oMsg->get( 'not_functional' ), $this->oMsg->get( 'functional' ) );
+                        
                 }   
                 /**
                  * Checks if the wp_remote_post() function is functioning.
                  * 
+                 * @return      string
                  */
                 private function _getWPRemoteGetStatus() {
                     
@@ -456,9 +478,31 @@ CSSRULES;
                         )
                         : $_vResponse;
                     $this->setTransient( 'apf_rg_check', $_vResponse, 60 );
-                    return $this->_getFunctionalOrNot( ! is_wp_error( $_vResponse ) && $_vResponse['response']['code'] >= 200 && $_vResponse['response']['code'] < 300 ) ;
+                    return $this->getAOrB( $this->_isHttpRequestError( $_vResponse ), $this->oMsg->get( 'not_functional' ), $this->oMsg->get( 'functional' ) );
                     
-                }                  
+                }       
+                    /**
+                     * Checks the HTTP request response has an error.
+                     * @since       3.5.3
+                     * @return      bool
+                     */
+                    private function _isHttpRequestError( $mResponse ) {
+                        
+                        // if ( ! is_wp_error( $_vResponse ) && $_vResponse['response']['code'] >= 200 && $_vResponse['response']['code'] < 300 ) {
+                        //  echo 'no error' .
+                        // }
+                        if ( is_wp_error( $mResponse ) ) {
+                            return true;
+                        }
+                        if ( $mResponse['response']['code'] < 200 ) {
+                            return true;
+                        }
+                        if ( $mResponse['response']['code'] >= 300 ) {
+                            return true;
+                        }
+                        return false;
+                    }
+                    
             /**
              * Caches the php information.
              * @since       3.4.6
@@ -468,17 +512,18 @@ CSSRULES;
             /**
              * Returns the PHP information.
              * @since       3.4.6
+             * @since       3.5.3       Added the $bGenerateInfo paramter. This is to reduce conditional statment in the caller method.
              */
-            private function _getPHPInfo() {
+            private function _getPHPInfo( $bGenerateInfo=true ) {
                 
-                if ( isset( self::$_aPHPInfo ) ) {
+                if ( ! $bGenerateInfo || isset( self::$_aPHPInfo ) ) {
                     return self::$_aPHPInfo;
                 }
                 
                 $_oErrorReporting   = new AdminPageFramework_ErrorReporting;
                 self::$_aPHPInfo = array(
                     __( 'Version', 'admin-page-framework' )                 => phpversion(),
-                    __( 'Safe Mode', 'admin-page-framework' )               => $this->_getYesOrNo( @ini_get( 'safe_mode' ) ),
+                    __( 'Safe Mode', 'admin-page-framework' )               => $this->getAOrB( @ini_get( 'safe_mode' ), $this->oMsg->get( 'yes' ), $this->oMsg->get( 'no' ) ), 
                     __( 'Memory Limit', 'admin-page-framework' )            => @ini_get( 'memory_limit' ),
                     __( 'Upload Max Size', 'admin-page-framework' )         => @ini_get( 'upload_max_filesize' ),
                     __( 'Post Max Size', 'admin-page-framework' )           => @ini_get( 'post_max_size' ),
@@ -486,16 +531,16 @@ CSSRULES;
                     __( 'Max Execution Time', 'admin-page-framework' )      => @ini_get( 'max_execution_time' ),
                     __( 'Max Input Vars', 'admin-page-framework' )          => @ini_get( 'max_input_vars' ),
                     __( 'Argument Separator', 'admin-page-framework' )      => @ini_get( 'arg_separator.output' ),
-                    __( 'Allow URL File Open', 'admin-page-framework' )     => $this->_getYesOrNo( @ini_get( 'allow_url_fopen' ) ),
-                    __( 'Display Errors', 'admin-page-framework' )          => $this->_getOnOrOff( @ini_get( 'display_errors' ) ),
-                    __( 'Log Errors', 'admin-page-framework' )              => $this->_getOnOrOff( @ini_get( 'log_errors' ) ),
+                    __( 'Allow URL File Open', 'admin-page-framework' )     => $this->getAOrB( @ini_get( 'allow_url_fopen' ),    $this->oMsg->get( 'yes' ), $this->oMsg->get( 'no' ) ),
+                    __( 'Display Errors', 'admin-page-framework' )          => $this->getAOrB( @ini_get( 'display_errors' ),     $this->oMsg->get( 'on' ), $this->oMsg->get( 'off' ) ),
+                    __( 'Log Errors', 'admin-page-framework' )              => $this->getAOrB( @ini_get( 'log_errors' ),         $this->oMsg->get( 'on' ), $this->oMsg->get( 'off' ) ),
                     __( 'Error log location', 'admin-page-framework' )      => @ini_get( 'error_log' ),
                     __( 'Error Reporting Level', 'admin-page-framework' )   => $_oErrorReporting->getErrorLevel(),
-                    __( 'FSOCKOPEN', 'admin-page-framework' )               => $this->_getSupportedOrNot( function_exists( 'fsockopen' ) ),
-                    __( 'cURL', 'admin-page-framework' )                    => $this->_getSupportedOrNot( function_exists( 'curl_init' ) ),
-                    __( 'SOAP', 'admin-page-framework' )                    => $this->_getSupportedOrNot( class_exists( 'SoapClient' ) ),
-                    __( 'SUHOSIN', 'admin-page-framework' )                 => $this->_getSupportedOrNot( extension_loaded( 'suhosin' ) ),
-                    'ini_set()'                                             => $this->_getSupportedOrNot( function_exists( 'ini_set' ) ),
+                    __( 'FSOCKOPEN', 'admin-page-framework' )               => $this->getAOrB( function_exists( 'fsockopen' ),   $this->oMsg->get( 'supported' ), $this->oMsg->get( 'not_supported' ) ),
+                    __( 'cURL', 'admin-page-framework' )                    => $this->getAOrB( function_exists( 'curl_init' ),   $this->oMsg->get( 'supported' ), $this->oMsg->get( 'not_supported' ) ),
+                    __( 'SOAP', 'admin-page-framework' )                    => $this->getAOrB( class_exists( 'SoapClient' ),     $this->oMsg->get( 'supported' ), $this->oMsg->get( 'not_supported' ) ),
+                    __( 'SUHOSIN', 'admin-page-framework' )                 => $this->getAOrB( extension_loaded( 'suhosin' ),    $this->oMsg->get( 'supported' ), $this->oMsg->get( 'not_supported' ) ),
+                    'ini_set()'                                             => $this->getAOrB( function_exists( 'ini_set' ),     $this->oMsg->get( 'supported' ), $this->oMsg->get( 'not_supported' ) ),
                 ) 
                 + $this->getPHPInfo()
                 + array( 
@@ -510,50 +555,24 @@ CSSRULES;
             /**
              * Returns the web server information.
              * @since       3.4.6
+             * @since       3.5.3       Added the $bGenerateInfo paramter. This is to reduce conditional statment in the caller method.
              */                      
-            private function _getWebServerInfo() {
-                
-                return array(
-                    __( 'Web Server', 'admin-page-framework' )                  => $_SERVER['SERVER_SOFTWARE'],
-                    'SSL'                                                       => $this->_getYesOrNo( is_ssl() ),
-                    __( 'Session', 'admin-page-framework' )                     => $this->_getEnabledOrDisabled( isset( $_SESSION ) ),
-                    __( 'Session Name', 'admin-page-framework' )                => esc_html( @ini_get( 'session.name' ) ),
-                    __( 'Session Cookie Path', 'admin-page-framework' )         => esc_html( @ini_get( 'session.cookie_path' ) ),
-                    __( 'Session Save Path', 'admin-page-framework' )           => esc_html( @ini_get( 'session.save_path' ) ),
-                    __( 'Session Use Cookies', 'admin-page-framework' )         => $this->_getOnOrOff( @ini_get( 'session.use_cookies' ) ),
-                    __( 'Session Use Only Cookies', 'admin-page-framework' )    => $this->_getOnOrOff( @ini_get( 'session.use_only_cookies' ) ),                                    
-                ) + $_SERVER;                
+            private function _getWebServerInfo( $bGenerateInfo=true ) {
+                        
+                return $bGenerateInfo 
+                    ? array(
+                        __( 'Web Server', 'admin-page-framework' )                  => $_SERVER['SERVER_SOFTWARE'],
+                        'SSL'                                                       => $this->getAOrB( is_ssl(), $this->oMsg->get( 'yes' ), $this->oMsg->get( 'no' ) ),
+                        __( 'Session', 'admin-page-framework' )                     => $this->getAOrB( isset( $_SESSION ), $this->oMsg->get( 'enabled' ), $this->oMsg->get( 'disabled' ) ),
+                        __( 'Session Name', 'admin-page-framework' )                => esc_html( @ini_get( 'session.name' ) ),
+                        __( 'Session Cookie Path', 'admin-page-framework' )         => esc_html( @ini_get( 'session.cookie_path' ) ),
+                        __( 'Session Save Path', 'admin-page-framework' )           => esc_html( @ini_get( 'session.save_path' ) ),
+                        __( 'Session Use Cookies', 'admin-page-framework' )         => $this->getAOrB( @ini_get( 'session.use_cookies' ), $this->oMsg->get( 'on' ), $this->oMsg->get( 'off' ) ),
+                        __( 'Session Use Only Cookies', 'admin-page-framework' )    => $this->getAOrB( @ini_get( 'session.use_only_cookies' ), $this->oMsg->get( 'on' ), $this->oMsg->get( 'off' ) ),
+                    ) + $_SERVER
+                    : '';
                 
             }
-                    
-
-    /**
-     * Methods for labels.
-     */
-    private function _getYesOrNo( $bBoolean ) {
-        return $bBoolean 
-            ? __( 'Yes', 'admin-page-framework' )
-            : __( 'No', 'admin-page-framework' );
-    }
-    private function _getEnabledOrDisabled( $bBoolean ) {
-        return $bBoolean 
-            ? __( 'Enabled', 'admin-page-framework' )
-            : __( 'Disabled', 'admin-page-framework' );
-    }
-    private function _getOnOrOff( $bBoolean ) {
-        return $bBoolean
-            ? __( 'On', 'admin-page-framework' )
-            : __( 'Off', 'admin-page-framework' );
-    }
-    private function _getSupportedOrNot( $bBoolean ) {
-        return $bBoolean
-            ? __( 'Supported', 'admin-page-framework' )
-            : __( 'Not supported', 'admin-page-framework' );                
-    }
-    private function _getFunctionalOrNot( $bBoolean ) {
-        return $bBoolean
-            ? __( 'Functional', 'admin-page-framework' )
-            : __( 'Not functional', 'admin-page-framework' );                                
-    }
+    
  
 }

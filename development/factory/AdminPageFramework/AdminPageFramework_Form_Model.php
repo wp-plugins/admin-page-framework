@@ -62,7 +62,7 @@ abstract class AdminPageFramework_Form_Model extends AdminPageFramework_Form_Mod
      * @since       3.3.0
      * @since       3.3.1       Moved from `AdminPageFramework_Setting_Base`.
      */
-    function __construct( $sOptionKey=null, $sCallerPath=null, $sCapability='manage_options', $sTextDomain='admin-page-framework' ) {
+    public function __construct( $sOptionKey=null, $sCallerPath=null, $sCapability='manage_options', $sTextDomain='admin-page-framework' ) {
         
         parent::__construct( $sOptionKey, $sCallerPath, $sCapability, $sTextDomain );
 
@@ -88,7 +88,7 @@ abstract class AdminPageFramework_Form_Model extends AdminPageFramework_Form_Mod
 
         }
         
-        // Get and post method checking.
+        // Checking the GET and POST methods.
         if ( isset( $_REQUEST['apf_remote_request_test'] ) && '_testing' === $_REQUEST['apf_remote_request_test'] ) {
             exit( 'OK' );
         }
@@ -118,7 +118,7 @@ abstract class AdminPageFramework_Form_Model extends AdminPageFramework_Form_Mod
             }
             self::$_bDoneEmail = true;
 
-            $_sTransient = isset( $_GET['transient'] ) ? $_GET['transient'] : '';
+            $_sTransient = $this->oUtil->getElement( $_GET, 'transient', '' );
             if ( ! $_sTransient ) {
                 return;
             }
@@ -240,9 +240,9 @@ abstract class AdminPageFramework_Form_Model extends AdminPageFramework_Form_Mod
         $this->oForm->format();
 
         // 2-3. Now set required properties for conditioning.
-        $_sCurrentPageSlug = isset( $_GET['page'] ) && $_GET['page'] ? $_GET['page'] : '';
+        $_sCurrentPageSlug = $this->oProp->getCurrentPageSlug();
         $this->oForm->setCurrentPageSlug( $_sCurrentPageSlug );
-        $this->oForm->setCurrentTabSlug( $this->oProp->getCurrentTab( $_sCurrentPageSlug ) );
+        $this->oForm->setCurrentTabSlug( $this->oProp->getCurrentTabSlug( $_sCurrentPageSlug ) );
 
         // 2-4. Do conditioning.
         $this->oForm->applyConditions();

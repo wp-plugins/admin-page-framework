@@ -3,7 +3,7 @@
  * Admin Page Framework
  * 
  * http://en.michaeluno.jp/admin-page-framework/
- * Copyright (c) 2013-2014 Michael Uno; Licensed MIT
+ * Copyright (c) 2013-2015 Michael Uno; Licensed MIT
  * 
  */
 
@@ -23,13 +23,10 @@ abstract class AdminPageFramework_Factory_Model extends AdminPageFramework_Facto
     /**
      * Calls the setUp() method. 
      * 
-     * All the factory classes should call this method instead of directly calling the setUp() method.
-     * This is because it allows the developer to design an abstract base class per package basis.
-     * For example, if a plugin uses multiple meta-box classes and they all need to register certain field types, 
-     * creating a base class that deals with the registration will be convenient. For that the developer can simply override 
-     * this method rather than using the start_{instantiated class name} hook in each extended class.
-     * 
-     * @since 3.1.0
+     * @since       3.1.0
+     * @todo        Deprecate this method. This method was intended to be used in a user defined abstract class 
+     * but it requires to call the setUp() method in the overridden method so it's not that useful.
+     * @internal
      */
     protected function _setUp() { 
         $this->setUp();
@@ -93,10 +90,12 @@ abstract class AdminPageFramework_Factory_Model extends AdminPageFramework_Facto
             foreach( $_aFields as $_iSubSectionIndexOrFieldID => $_aSubSectionOrField )  {
                 
                 // if it's a sub-section
-                if ( is_numeric( $_iSubSectionIndexOrFieldID ) && is_int( $_iSubSectionIndexOrFieldID + 0 ) ) {    
+                if ( $this->oUtil->isNumericInteger( $_iSubSectionIndexOrFieldID ) ) {
 
                     // no need to repeat the same set of fields
-                    if ( $_bIsSubSectionLoaded ) { continue; } 
+                    if ( $_bIsSubSectionLoaded ) { 
+                        continue;
+                    }
                     $_bIsSubSectionLoaded = true;
                     foreach( $_aSubSectionOrField as $_aField ) {
                         $this->_registerField( $_aField );     
@@ -121,11 +120,11 @@ abstract class AdminPageFramework_Factory_Model extends AdminPageFramework_Facto
         protected function _registerField( array $aField ) {
             
             // Set relevant scripts and styles for the field.
-            AdminPageFramework_FieldTypeRegistration::_setFieldResources( $aField, $this->oProp, $this->oResource ); 
+            AdminPageFramework_FieldTypeRegistration::_setFieldResources( $aField, $this->oProp, $this->oResource );
 
             // For the contextual help pane,
             if ( $aField['help'] ) {
-                $this->oHelpPane->_addHelpTextForFormFields( $aField['title'], $aField['help'], $aField['help_aside'] );     
+                $this->oHelpPane->_addHelpTextForFormFields( $aField['title'], $aField['help'], $aField['help_aside'] );
             }
             
             // Call the field type callback method to let it know the field type is registered.
@@ -133,7 +132,10 @@ abstract class AdminPageFramework_Factory_Model extends AdminPageFramework_Facto
                 isset( $this->oProp->aFieldTypeDefinitions[ $aField['type'] ][ 'hfDoOnRegistration' ] ) 
                 && is_callable( $this->oProp->aFieldTypeDefinitions[ $aField['type'] ][ 'hfDoOnRegistration' ] )
             ) {
-                call_user_func_array( $this->oProp->aFieldTypeDefinitions[ $aField['type'] ][ 'hfDoOnRegistration' ], array( $aField ) );
+                call_user_func_array( 
+                    $this->oProp->aFieldTypeDefinitions[ $aField['type'] ][ 'hfDoOnRegistration' ],
+                    array( $aField )
+                );
             }
             
         }    
@@ -189,10 +191,12 @@ abstract class AdminPageFramework_Factory_Model extends AdminPageFramework_Facto
         if ( $bDelete ) {
             add_action( 'shutdown', array( $this, '_replyToDeleteFieldErrors' ) );
         }
-        return isset( $_aFieldErrors[ $_sID ] ) 
-            ? $_aFieldErrors[ $_sID ]
-            : array();
-
+        return $this->oUtil->getElementAsArray(
+            $_aFieldErrors,
+            $_sID,
+            array()
+        );
+        
     }    
     
     /**
@@ -205,10 +209,15 @@ abstract class AdminPageFramework_Factory_Model extends AdminPageFramework_Facto
      */
     protected function _isValidationErrors() {
 
-        if ( isset( $GLOBALS['aAdminPageFramework']['aFieldErrors'] ) && $GLOBALS['aAdminPageFramework']['aFieldErrors'] ) {
+        if ( 
+            isset( $GLOBALS['aAdminPageFramework']['aFieldErrors'] ) 
+            && $GLOBALS['aAdminPageFramework']['aFieldErrors'] ) 
+        {
             return true;
         }
-        return $this->oUtil->getTransient( "apf_field_erros_" . get_current_user_id() );
+        return $this->oUtil->getTransient( 
+            "apf_field_erros_" . get_current_user_id() 
+        );
 
     }
 
@@ -229,10 +238,13 @@ abstract class AdminPageFramework_Factory_Model extends AdminPageFramework_Facto
      * 
      * @since       3.0.4
      * @internal
+     * @return      void
      */ 
     public function _replyToSaveFieldErrors() {
         
-        if ( ! isset( $GLOBALS['aAdminPageFramework']['aFieldErrors'] ) ) { return; }
+        if ( ! isset( $GLOBALS['aAdminPageFramework']['aFieldErrors'] ) ) { 
+            return; 
+        }
 
         $this->oUtil->setTransient( 
             "apf_field_erros_" . get_current_user_id(),  
@@ -248,13 +260,21 @@ abstract class AdminPageFramework_Factory_Model extends AdminPageFramework_Facto
      * @remark      This method will be triggered with the 'shutdown' hook.
      * @since       3.0.4 
      * @internal
+     * @return      void
      */
     public function _replyToSaveNotices() {
         
-        if ( ! isset( $GLOBALS['aAdminPageFramework']['aNotices'] ) ) { return; }
-        if ( empty( $GLOBALS['aAdminPageFramework']['aNotices'] ) ) { return; }
+        if ( ! isset( $GLOBALS['aAdminPageFramework']['aNotices'] ) ) { 
+            return; 
+        }
+        if ( empty( $GLOBALS['aAdminPageFramework']['aNotices'] ) ) { 
+            return; 
+        }
                 
-        $this->oUtil->setTransient( 'apf_notices_' . get_current_user_id(), $GLOBALS['aAdminPageFramework']['aNotices'] );
+        $this->oUtil->setTransient( 
+            'apf_notices_' . get_current_user_id(), 
+            $GLOBALS['aAdminPageFramework']['aNotices'] 
+        );
         
     }
     
@@ -264,10 +284,11 @@ abstract class AdminPageFramework_Factory_Model extends AdminPageFramework_Facto
      * The user may just override this method instead of defining a `validation_{...}` callback method.
      * 
      * @since       3.4.1
+     * @remark      Declare this method in each factory class as the form of parameters will be different which triggers PHP strict standard warnings.
      */
-    public function validate( $aInput, $aOldInput, $oFactory ) {
-        return $aInput;
-    }    
+    // public function validate( $aInput, $aOldInput, $oFactory ) {
+        // return $aInput;
+    // }
     
     /**
      * Saves user last input in the database as a transient.
@@ -276,6 +297,7 @@ abstract class AdminPageFramework_Factory_Model extends AdminPageFramework_Facto
      * 
      * @since       3.4.1
      * @return      boolean     True if set; otherwise, false.
+     * @internal
      */
     public function _setLastInput( array $aLastInput ) {
         return $this->oUtil->setTransient( 

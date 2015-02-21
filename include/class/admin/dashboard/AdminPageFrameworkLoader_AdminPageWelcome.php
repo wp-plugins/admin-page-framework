@@ -29,40 +29,47 @@ class AdminPageFrameworkLoader_AdminPageWelcome extends AdminPageFramework {
             return;
         }
         
-        add_action( 'admin_init', array( $this, '_replyToHandleRedirects' ) );
+        add_action( 'admin_menu', array( $this, '_replyToHandleRedirects' ) );
         
     }
         /**
          * Handles page redirects.
          * 
-         * This is called with the'admin_init' hook to prevent the plugin from performing the redirect when the plugin is not activated or intervene the activation process.
-         * If this is called in the start() method above, it will redirect the user to the page during the activation process and the user gets a page that is not created because the plugin is not activated.
+         * This is called to prevent the plugin from performing the redirect when the plugin is not activated or intervene the activation process.
+         * If this is called in the start() method above, it will redirect the user to the page during the activation process 
+         * and the user gets a page that is not created because the plugin is not activated.
+         * 
+         * @callback    action      admin_menu
+         * @since       3.5.0
+         * @sicne       3.5.3       Change the hook from `admin_init` as the resetting option results in an error 'You do not have permission to access this page.'
          */
         public function _replyToHandleRedirects() {
                 
-            $_oOption = AdminPageFrameworkLoader_Option::getInstance();
-                    
             // When newly installed, the 'welcomed' value is not set.
-            if ( ! $_oOption->get( 'welcomed' ) ) {
-                
-                $_oOption->set( 'welcomed', true );
-                $_oOption->set( 'version_upgraded_from', AdminPageFrameworkLoader_Registry::Version );
-                $_oOption->set( 'version_saved', AdminPageFrameworkLoader_Registry::Version );
-                $_oOption->save();
-                $this->_gotToWelcomePage();
-                
+            $_oOption = AdminPageFrameworkLoader_Option::getInstance();
+            if ( ! $_oOption->get( 'welcomed' ) ) {                
+                $this->_setInitialOptions( $_oOption, AdminPageFrameworkLoader_Registry::VERSION );
+                $this->_gotToWelcomePage(); // will exit
             }
             if ( $_oOption->hasUpgraded() ) {
-
-                $_oOption->set( 'welcomed', true );
-                $_oOption->set( 'version_upgraded_from', $_oOption->get( 'version_saved' ) );
-                $_oOption->set( 'version_saved', AdminPageFrameworkLoader_Registry::Version );
-                $_oOption->save();
-                $this->_gotToWelcomePage();
-                
+                $this->_setInitialOptions( $_oOption, $_oOption->get( 'version_saved' ) );
+                $this->_gotToWelcomePage(); // will exit
             }            
             
         }
+            /**
+             * 
+             * @return void
+             */
+            private function _setInitialOptions( $oOption, $sVersionUpgradedFrom ) {
+                
+                $oOption->set( 'welcomed', true );
+                $oOption->set( 'version_upgraded_from', $sVersionUpgradedFrom );
+                $oOption->set( 'version_saved', AdminPageFrameworkLoader_Registry::VERSION );
+                $oOption->save();                
+                
+            }
+            
         private function _gotToWelcomePage() {        
             $_sWelcomePageURL = apply_filters( 
                 'admin_page_framework_loader_filter_admin_welcome_redirect_url',
@@ -91,7 +98,7 @@ class AdminPageFrameworkLoader_AdminPageWelcome extends AdminPageFramework {
         // Sub-pages
         $this->addSubMenuItems( 
             array(
-                'title'         => AdminPageFrameworkLoader_Registry::ShortName,
+                'title'         => AdminPageFrameworkLoader_Registry::SHORTNAME,
                 'page_slug'     => AdminPageFrameworkLoader_Registry::$aAdminPages['about'],    // page slug
                 'show_in_menu'  => false,
             )
@@ -123,22 +130,34 @@ class AdminPageFrameworkLoader_AdminPageWelcome extends AdminPageFramework {
             new AdminPageFrameworkLoader_AdminPageWelcome_Welcome( 
                 $this,              // factory object
                 $_sPageSlug,        // page slug
-                'welcome'           // tab slug
+                array(
+                    'tab_slug'      => 'welcome',
+                    'title'         => __( "What's New", 'admin-page-framework-loader' ),   // '
+                )                
             );        
             new AdminPageFrameworkLoader_AdminPageWelcome_Guide(
                 $this,        
-                $_sPageSlug,       
-                'guide'            
+                $_sPageSlug,                       
+                array(
+                    'tab_slug'      => 'guide',
+                    'title'         => __( 'Getting Started', 'admin-page-framework-loader' ),
+                )                
             );         
             new AdminPageFrameworkLoader_AdminPageWelcome_ChangeLog(
                 $this,          
-                $_sPageSlug,    
-                'change_log'    
+                $_sPageSlug,   
+                array(
+                    'tab_slug'      => 'change_log',
+                    'title'         => __( 'Change Log', 'admin-page-framework-loader' ),
+                )
             );
             new AdminPageFrameworkLoader_AdminPageWelcome_Credit(
                 $this,        
                 $_sPageSlug,  
-                'credit'      
+                array(
+                    'tab_slug'      => 'credit',
+                    'title'         => __( 'Credit', 'admin-page-framework-loader' ),
+                )                
             );                 
             
             $this->_setPreferences();
@@ -198,8 +217,8 @@ class AdminPageFrameworkLoader_AdminPageWelcome extends AdminPageFramework {
      */
     public function replyToFilterContentTop( $sContent ) {
 
-        $_sVersion      = '- ' . AdminPageFrameworkLoader_Registry::Version;
-        $_sPluginName   = AdminPageFrameworkLoader_Registry::ShortName . ' ' . $_sVersion;
+        $_sVersion      = '- ' . AdminPageFrameworkLoader_Registry::VERSION;
+        $_sPluginName   = AdminPageFrameworkLoader_Registry::SHORTNAME . ' ' . $_sVersion;
         
         $_aOutput   = array();
         $_aOutput[] = "<h1>" 

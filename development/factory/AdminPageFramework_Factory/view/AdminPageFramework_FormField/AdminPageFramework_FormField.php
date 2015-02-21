@@ -3,7 +3,7 @@
  * Admin Page Framework
  * 
  * http://en.michaeluno.jp/admin-page-framework/
- * Copyright (c) 2013-2014 Michael Uno; Licensed MIT
+ * Copyright (c) 2013-2015 Michael Uno; Licensed MIT
  * 
  */
 
@@ -13,71 +13,116 @@
  * @since       2.0.0
  * @since       2.0.1       Added the <em>size</em> type.
  * @since       2.1.5       Separated the methods that defines field types to different classes.
- * @extends     AdminPageFramework_FormField_Base
+ * @extends     AdminPageFramework_FormField_FieldDefinition
  * @package     AdminPageFramework
  * @subpackage  Form
  * @internal
  */
-class AdminPageFramework_FormField extends AdminPageFramework_FormField_Base {
-            
+class AdminPageFramework_FormField extends AdminPageFramework_FormField_FieldDefinition {
+       
+    /**
+     * Checks whether a section is set.
+     * @return      boolean
+     * @internal
+     * @since       3.5.3
+     * @param       array       $aField     a field definition array.
+     */
+    private function _isSectionSet( array $aField ) {
+        return isset( $aField['section_id'] ) 
+            && $aField['section_id'] 
+            && '_default' !== $aField['section_id'];
+    }  
+
     /**
      * Returns the input tag name for the name attribute.
      * 
-     * @since   2.0.0
-     * @since   3.0.0       Dropped the page slug dimension. Deprecated the 'name' field key to override the name attribute since the new 'attribute' key supports the functionality.
-     * @since   3.2.0       Added the $hfFilterCallback parameter.
+     * @since       2.0.0
+     * @since       3.0.0       Dropped the page slug dimension. Deprecated the 'name' field key to override the name attribute since the new 'attribute' key supports the functionality.
+     * @since       3.2.0       Added the $hfFilterCallback parameter.
+     * @since       3.5.3       Added a type hint to the first parameter and dropped the default value to only accept an array.
+     * @return      string
      */
-    private function _getInputName( $aField=null, $sKey='', $hfFilterCallback=null ) {
+    private function _getInputName( array $aField, $sKey='', $hfFilterCallback=null ) {
         
-        $sKey           = ( string ) $sKey; // casting string is required as 0 value may have been interpreted as false.
-        $aField         = isset( $aField ) ? $aField : $this->aField;
-        $_sKey          = '0' !== $sKey && empty( $sKey ) ? '' : "[{$sKey}]";
-        $_sSectionIndex = isset( $aField['section_id'], $aField['_section_index'] ) ? "[{$aField['_section_index']}]" : "";
-        $_sResult       = '';
-        $_sResultTail   = '';
-        switch( $aField['_fields_type'] ) {
-            default:
-            case 'page':
-                $sSectionDimension = isset( $aField['section_id'] ) && $aField['section_id'] && '_default' != $aField['section_id']
+        $_sKey          = ( string ) $sKey; // a 0 value may have been interpreted as false.
+        $_sKey          = $this->getAOrB(
+            '0' !== $_sKey && empty( $_sKey ),
+            '',
+            "[{$_sKey}]"
+        );
+        $_sSectionIndex = isset( $aField['section_id'], $aField['_section_index'] ) 
+            ? "[{$aField['_section_index']}]" 
+            : "";
+
+        // @todo        Handle these by a callback set via each factory class.
+        $_aMethodNamesByFieldsType  = array(
+            'page'          => '_getInputName_page',
+            'page_meta_box' => '_getInputName_meta_box',
+            'post_meta_box' => '_getInputName_meta_box',
+            'taxonomy'      => '_getInputName_taxonomy',
+            'widget'        => '_getInputName_widget',
+            'user_meta'     => '_getInputName_user_meta',
+        );
+        $_sMethodName    = isset( $_aMethodNamesByFieldsType[ $aField['_fields_type'] ] )
+            ? $_aMethodNamesByFieldsType[ $aField['_fields_type'] ]
+            : '_getInputName_page';
+        
+        // @todo        The variable `$_sResultTail` seems to be introduced for the widget fields type that sets a callback for the output.
+        // Examine it can be replaced simpy with the `$sKey` value like meta boxes.
+        $_sResultTail    = '';            
+        $_sNameAttribute = $this->{$_sMethodName}( 
+            $aField, 
+            $_sKey,
+            $_sSectionIndex,
+            $_sResultTail   // by reference - will be updated in the method
+        );
+        return is_callable( $hfFilterCallback )
+            ? call_user_func_array( $hfFilterCallback, array( $_sNameAttribute ) ) 
+                . $_sResultTail
+            : $_sNameAttribute 
+                . $_sResultTail;
+             
+    }
+        /**#@+
+         * Generates an input name attribute by fields type.
+         * @internal
+         * @return      string      The generated input tag attribute.
+         * @since       3.5.3
+         * @todo        Handle these with a callback set via each factory class.
+         */        
+        private function _getInputName_page( array $aField, $_sKey, $_sSectionIndex, &$_sResultTail ) {
+            $_sResultTail       = '';   // not used
+            $_sSectionDimension = $this->_isSectionSet( $aField )
                     ? "[{$aField['section_id']}]"
                     : '';
-                $_sResult = "{$aField['option_key']}{$sSectionDimension}{$_sSectionIndex}[{$aField['field_id']}]{$_sKey}";
-                break;
-                
-            case 'page_meta_box':
-            case 'post_meta_box':
-                $_sResult = isset( $aField['section_id'] ) && $aField['section_id'] && '_default' != $aField['section_id']
-                    ? "{$aField['section_id']}{$_sSectionIndex}[{$aField['field_id']}]{$_sKey}"
-                    : "{$aField['field_id']}{$_sKey}";
-                break;
-                
-            // taxonomy fields type does not support sections.
-            case 'taxonomy': 
-                $_sResult = "{$aField['field_id']}{$_sKey}";
-                break;
-                
-            // 3.2.0+, 3.5.2+ Fixed a bug that secion names were not set properly
-            // This one is tricky as the core widget factory method enclose this value in []. So when the framework field has a section, it must not end with ].
-            case 'widget':      
-                $_sResult       = isset( $aField['section_id'] ) && $aField['section_id'] && '_default' != $aField['section_id']
-                    ? "{$aField['section_id']}]{$_sSectionIndex}[{$aField['field_id']}"
-                    : "{$aField['field_id']}";
-                $_sResultTail   = $_sKey;                  
-                break;            
-                
-            case 'user_meta':   // 3.5.0+
-                $_sResult       = isset( $aField['section_id'] ) && $aField['section_id'] && '_default' != $aField['section_id']
-                    ? "{$aField['section_id']}{$_sSectionIndex}[{$aField['field_id']}]"
-                    : "{$aField['field_id']}";            
-                $_sResultTail   = $_sKey;
-                break;
-                
+            return "{$aField['option_key']}{$_sSectionDimension}{$_sSectionIndex}[{$aField['field_id']}]{$_sKey}";
         }
-        return is_callable( $hfFilterCallback )
-            ? call_user_func_array( $hfFilterCallback, array( $_sResult ) ) . $_sResultTail
-            : $_sResult . $_sResultTail;
-            
-    }
+        private function _getInputName_meta_box( array $aField, $_sKey, $_sSectionIndex, &$_sResultTail ) {
+            $_sResultTail       = '';   // not used
+            return $this->_isSectionSet( $aField )
+                ? "{$aField['section_id']}{$_sSectionIndex}[{$aField['field_id']}]{$_sKey}"
+                : "{$aField['field_id']}{$_sKey}";
+        }
+        private function _getInputName_taxonomy( array $aField, $_sKey, $_sSectionIndex, &$_sResultTail ) {
+            $_sResultTail = $_sSectionIndex = '';   // not used
+            return "{$aField['field_id']}{$_sKey}";   
+        }
+        /**
+         * @remark      This one is tricky as the core widget factory method enclose this value in []. So when the framework field has a section, it must NOT end with ].
+         */
+        private function _getInputName_widget( array $aField, $_sKey, $_sSectionIndex, &$_sResultTail ) {
+            $_sResultTail   = $_sKey;                  
+            return $this->_isSectionSet( $aField )
+                ? "{$aField['section_id']}]{$_sSectionIndex}[{$aField['field_id']}"
+                : "{$aField['field_id']}";
+        }
+        private function _getInputName_user_meta( array $aField, $_sKey, $_sSectionIndex, &$_sResultTail ) {
+            $_sResultTail   = $_sKey;            
+            return $this->_isSectionSet( $aField )
+                ? "{$aField['section_id']}{$_sSectionIndex}[{$aField['field_id']}]"
+                : "{$aField['field_id']}";            
+        }
+        /**#@-*/    
         
     /**
      * Retrieves the field name attribute whose dimensional elements are delimited by the pile character.
@@ -85,54 +130,89 @@ class AdminPageFramework_FormField extends AdminPageFramework_FormField_Base {
      * Instead of [] enclosing array elements, it uses the pipe(|) to represent the multi dimensional array key.
      * This is used to create a reference to the submit field name to determine which button is pressed.
      * 
-     * @remark  Used by the import and submit field types.
-     * @since   2.0.0
-     * @since   2.1.5       Made the parameter mandatory. Changed the scope to protected from private. Moved from AdminPageFramework_FormField.
-     * @since   3.0.0       Moved from the submit field type class. Dropped the page slug dimension.
-     * @since   3.2.0       Added the $hfFilterCallback parameter.
+     * @remark      Used by the import and submit field types.
+     * @since       2.0.0
+     * @since       2.1.5       Made the parameter mandatory. Changed the scope to protected from private. Moved from AdminPageFramework_FormField.
+     * @since       3.0.0       Moved from the submit field type class. Dropped the page slug dimension.
+     * @since       3.2.0       Added the $hfFilterCallback parameter.
+     * @return      string
      */ 
-    protected function _getFlatInputName( $aField, $sKey='', $hfFilterCallback=null ) {    
+    protected function _getFlatInputName( array $aField, $sKey='', $hfFilterCallback=null ) {    
         
-        $sKey           = ( string ) $sKey; // casting string is important as 0 value may have been interpreted as false.
-        $_sKey          = '0' !== $sKey && empty( $sKey ) ? '' : "|{$sKey}";
-        $_sSectionIndex = isset( $aField['section_id'], $aField['_section_index'] ) ? "|{$aField['_section_index']}" : "";
-        $_sResult       = '';
-        $_sResultTail   = '';
-        switch( $aField['_fields_type'] ) {
-            default:
-            case 'page':
-                $sSectionDimension = isset( $aField['section_id'] ) && $aField['section_id'] && '_default' != $aField['section_id']
-                    ? "|{$aField['section_id']}"
-                    : '';
-                $_sResult = "{$aField['option_key']}{$sSectionDimension}{$_sSectionIndex}|{$aField['field_id']}{$_sKey}";
-                break;
-                
-            case 'page_meta_box':
-            case 'post_meta_box':
-                $_sResult = isset( $aField['section_id'] ) && $aField['section_id'] && '_default' != $aField['section_id']
-                    ? "{$aField['section_id']}{$_sSectionIndex}|{$aField['field_id']}{$_sKey}"
-                    : "{$aField['field_id']}{$_sKey}";
-                break;
-                
-            // taxonomy fields type does not support sections.
-            case 'taxonomy': 
-                $_sResult = "{$aField['field_id']}{$_sKey}";
-                break;
+        $_sKey          = ( string ) $sKey; // a 0 value may have been interpreted as false.
+        $_sKey          = $this->getAOrB(
+            '0' !== $_sKey && empty( $_sKey ),
+            '',
+            "|{$_sKey}"
+        );
+        $_sSectionIndex = isset( $aField['section_id'], $aField['_section_index'] ) 
+            ? "|{$aField['_section_index']}" 
+            : "";
+
+        // @todo        Handle these by a callback set via each factory class.
+        $_aMethodNamesByFieldsType  = array(
+            'page'          => '_getFlatInputName_page',
+            'page_meta_box' => '_getFlatInputName_meta_box',
+            'post_meta_box' => '_getFlatInputName_meta_box',
+            'taxonomy'      => '_getFlatInputName_taxonomy',
+            'widget'        => '_getFlatInputName_other',
+            'user_meta'     => '_getFlatInputName_other',
+        );    
+        $_sMethodName    = isset( $_aMethodNamesByFieldsType[ $aField['_fields_type'] ] )
+            ? $_aMethodNamesByFieldsType[ $aField['_fields_type'] ]
+            : '_getInputName_page';
             
-            case 'widget':      // 3.2.0+                
-            case 'user_meta':   // 3.5.0+            
-                $_sResult       = isset( $aField['section_id'] ) && $aField['section_id'] && '_default' != $aField['section_id']
-                    ? "{$aField['section_id']}{$_sSectionIndex}|{$aField['field_id']}"
-                    : "{$aField['field_id']}";            
-                $_sResultTail   = $_sKey;
-                break;
-                
-        }    
+        // @todo        The variable `$_sResultTail` seems to be introduced for the widget fields type that sets a callback for the output.
+        // Examine it can be replaced simpy with the `$sKey` value like meta boxes.
+        $_sResultTail        = '';            
+        $_sFlatNameAttribute = $this->{$_sMethodName}( 
+            $aField, 
+            $_sKey,
+            $_sSectionIndex,
+            $_sResultTail   // by reference - will be updated in the method
+        );
         return is_callable( $hfFilterCallback )
-            ? call_user_func_array( $hfFilterCallback, array( $_sResult ) ) . $_sResultTail
-            : $_sResult . $_sResultTail;    
-            
+            ? call_user_func_array( $hfFilterCallback, array( $_sFlatNameAttribute ) ) 
+                . $_sResultTail
+            : $_sFlatNameAttribute 
+                . $_sResultTail;
+                
     }
+        /**#@+
+         * Generates a flat input name (delimited by the pipe character) by fields type.
+         * @internal
+         * @return      string      The generated input tag attribute.
+         * @since       3.5.3
+         * @todo        Handle these with a callback set via each factory class.
+         */        
+        private function _getFlatInputName_page( array $aField, $_sKey, $_sSectionIndex, &$_sResultTail ) {
+            $_sResultTail       = ''; // unsed
+            $_sSectionDimension = $this->_isSectionSet( $aField )
+                ? "|{$aField['section_id']}"
+                : '';
+            return "{$aField['option_key']}{$_sSectionDimension}{$_sSectionIndex}|{$aField['field_id']}{$_sKey}";
+        }
+        private function _getFlatInputName_meta_box( array $aField, $_sKey, $_sSectionIndex, &$_sResultTail ) {
+            $_sResultTail = ''; // unsed
+            return $this->_isSectionSet( $aField )
+                ? "{$aField['section_id']}{$_sSectionIndex}|{$aField['field_id']}{$_sKey}"
+                : "{$aField['field_id']}{$_sKey}";            
+        }                    
+        /**
+         * @remark      the taxonomy fields type does not support sections.
+         */
+        private function _getFlatInputName_taxonomy( array $aField, $_sKey, $_sSectionIndex, &$_sResultTail ) {
+            $_sSectionIndex = $_sResultTail = ''; // to be clear theser are unused.
+            return "{$aField['field_id']}{$_sKey}";
+        }                    
+        private function _getFlatInputName_other( array $aField, $_sKey, $_sSectionIndex, &$_sResultTail ) {
+            $_sResultTail   = $_sKey;            
+            return $this->_isSectionSet( $aField )
+                ? "{$aField['section_id']}{$_sSectionIndex}|{$aField['field_id']}"
+                : "{$aField['field_id']}";            
+        }                    
+        /**#@-*/        
+    
         
     /**
      * Returns the input tag ID.
@@ -146,7 +226,9 @@ class AdminPageFramework_FormField extends AdminPageFramework_FormField_Base {
      */
     static public function _getInputID( $aField, $isIndex=0, $hfFilterCallback=null ) {
         
-        $_sSectionIndex  = isset( $aField['_section_index'] ) ? '__' . $aField['_section_index'] : ''; // double underscore
+        $_sSectionIndex  = isset( $aField['_section_index'] ) 
+            ? '__' . $aField['_section_index'] 
+            : ''; // double underscore
         $_isFieldIndex   = '__' . $isIndex; // double underscore
         $_sResult        = isset( $aField['section_id'] ) && '_default' != $aField['section_id']
             ? $aField['section_id'] . $_sSectionIndex . '_' . $aField['field_id'] . $_isFieldIndex
@@ -171,7 +253,9 @@ class AdminPageFramework_FormField extends AdminPageFramework_FormField_Base {
      */
     static public function _getInputTagBaseID( $aField, $hfFilterCallback=null )  {
         
-        $_sSectionIndex = isset( $aField['_section_index'] ) ? '__' . $aField['_section_index'] : '';
+        $_sSectionIndex = isset( $aField['_section_index'] )
+            ? '__' . $aField['_section_index'] 
+            : '';
         $_sResult       = isset( $aField['section_id'] ) && '_default' != $aField['section_id']
             ? $aField['section_id'] . $_sSectionIndex . '_' . $aField['field_id']
             : $aField['field_id'];
@@ -183,21 +267,30 @@ class AdminPageFramework_FormField extends AdminPageFramework_FormField_Base {
     
     /** 
      * Retrieves the input field HTML output.
+     * 
      * @since       2.0.0
      * @since       2.1.6       Moved the repeater script outside the fieldset tag.
+     * @return      string
      */ 
     public function _getFieldOutput() {
         
         $_aFieldsOutput = array(); 
 
         /* 1. Prepend the field error message. */
-        $_sFieldError = $this->_getFieldError( $this->aErrors, $this->aField['section_id'], $this->aField['field_id'] );
-        if ( $_sFieldError ) {
+        $_sFieldError = $this->_getFieldError( 
+            $this->aErrors, 
+            $this->aField['section_id'], 
+            $this->aField['field_id'] 
+        );
+        if ( '' !== $_sFieldError ) {
             $_aFieldsOutput[] = $_sFieldError;
         }
                     
         /* 2. Set the tag ID used for the field container HTML tags. */
-        $this->aField['tag_id'] = $this->_getInputTagBaseID( $this->aField, $this->aCallbacks['hfTagID'] );
+        $this->aField['tag_id'] = $this->_getInputTagBaseID( 
+            $this->aField, 
+            $this->aCallbacks['hfTagID']
+        );
             
         /* 3. Construct fields array for sub-fields */
         $_aFields = $this->_constructFieldsArray( $this->aField, $this->aOptions );
@@ -211,104 +304,202 @@ class AdminPageFramework_FormField extends AdminPageFramework_FormField_Base {
     }
     
         /**
-         * Returns the output of the given fieldset(main field and its sub-fields) array.
+         * Returns the output of the given fieldset (main field and its sub-fields) array.
          * 
          * @since   3.1.0
          * @since   3.2.0   Added the $aCallbacks parameter.
          */ 
         private function _getFieldsOutput( array $aFields, array $aCallbacks=array() ) {
 
-            $_aOutput   = array();
-            foreach( $aFields as $__sKey => $__aField ) {
-
-                /* Retrieve the field definition for this type - this process enables to have mixed field types in sub-fields 
-                 * The $this->aFieldTypeDefinitions property stores default key-values of all the registered field types.
-                 * */ 
-                $_aFieldTypeDefinition = isset( $this->aFieldTypeDefinitions[ $__aField['type'] ] )
-                    ? $this->aFieldTypeDefinitions[ $__aField['type'] ] 
-                    : $this->aFieldTypeDefinitions['default'];
-                    
-                if ( ! is_callable( $_aFieldTypeDefinition['hfRenderField'] ) ) {
-                    continue;
-                }     
-
-                /* Set some internal keys */ 
-                $_bIsSubField                           = is_numeric( $__sKey ) && 0 < $__sKey;
-                $__aField['_index']                     = $__sKey;
-                $__aField['input_id']                   = $this->_getInputID( $__aField, $__sKey, $aCallbacks['hfID'] ); //  ({section id}_){field_id}_{index}
-                $__aField['_input_name']                = $this->_getInputName( $__aField, $__aField['_is_multiple_fields'] ? $__sKey : '', $aCallbacks['hfName'] );    
-                $__aField['_input_name_flat']           = $this->_getFlatInputName( $__aField, $__aField['_is_multiple_fields'] ? $__sKey : '', $aCallbacks['hfNameFlat'] ); // used for submit, export, import field types     
-                $__aField['_field_container_id']        = "field-{$__aField['input_id']}"; // used in the attribute below plus it is also used in the sample custom field type.
-
-                    // @todo for issue #158 https://github.com/michaeluno/admin-page-framework/issues/158               
-                    // These models are for generating ids and names dynamically.
-                    $__aField['_input_id_model']            = $this->_getInputID( $__aField, '-fi-',  $aCallbacks['hfID'] ); // 3.3.1+ referred by the repeatable field script
-                    $__aField['_input_name_model']          = $this->_getInputName( $__aField, $__aField['_is_multiple_fields'] ? '-fi-': '', $aCallbacks['hfName'] );      // 3.3.1+ referred by the repeatable field script
-                    $__aField['_fields_container_id_model'] = "field-{$__aField['_input_id_model']}"; // [3.3.1+] referred by the repeatable field script
-                    
-                $__aField['_fields_container_id']       = "fields-{$this->aField['tag_id']}";
-                $__aField['_fieldset_container_id']     = "fieldset-{$this->aField['tag_id']}";
-                $__aField                               = $this->uniteArrays(
-                    $__aField, // includes the user-set values.
-                    array( // the automatically generated values.
-                        'attributes' => array(
-                            'id'                => $__aField['input_id'],
-                            'name'              => $__aField['_input_name'],
-                            'value'             => $__aField['value'],
-                            'type'              => $__aField['type'], // text, password, etc.
-                            'disabled'          => null,
-                            'data-id_model'     => $__aField['_input_id_model'],    // 3.3.1+
-                            'data-name_model'   => $__aField['_input_name_model'],  // 3.3.1+
-                        )
-                    ),
-                    ( array ) $_aFieldTypeDefinition['aDefaultKeys'] // this allows sub-fields with different field types to set the default key-values for the sub-field.
+            $_aOutput = array();
+            foreach( $aFields as $_isIndex => $_aField ) {
+                $_aOutput[] = $this->_getEachFieldOutput( 
+                    $_aField, 
+                    $_isIndex, 
+                    $aCallbacks,
+                    $this->isLastElement( $aFields, $_isIndex )
                 );
-                
-                $__aField['attributes']['class'] = 'widget' === $__aField['_fields_type'] && is_callable( $aCallbacks['hfClass'] )
-                    ? call_user_func_array( $aCallbacks['hfClass'], array( $__aField['attributes']['class'] ) )
-                    : $__aField['attributes']['class'];
-                $__aField['attributes']['class'] = $this->generateClassAttribute(
-                    $__aField['attributes']['class'],  
-                    $this->dropElementsByType( $__aField['class'] )
-                );
-
-                /* Callback the registered function to output the field */     
-                $_aFieldAttributes = array(
-                    'id'            => $__aField['_field_container_id'],
-                    'data-type'     => "{$__aField['type']}",   // this is referred by the repeatable field JavaScript script.
-                    'data-id_model' => $__aField['_fields_container_id_model'], // 3.3.1+
-                    'class'         => "admin-page-framework-field admin-page-framework-field-{$__aField['type']}" 
-                        . ( $__aField['attributes']['disabled'] ? ' disabled' : null )
-                        . ( $_bIsSubField ? ' admin-page-framework-subfield' : null ),
-                );
-                
-                $_aOutput[] = $__aField['before_field']
-                    . "<div " . $this->_getFieldContainerAttributes( $__aField, $_aFieldAttributes, 'field' ) . ">"
-                        . call_user_func_array(
-                            $_aFieldTypeDefinition['hfRenderField'],
-                            array( $__aField )
-                        )
-                        . ( ( $sDelimiter = $__aField['delimiter'] )
-                            ? "<div " . $this->generateAttributes( array(
-                                    'class' => 'delimiter',
-                                    'id'    => "delimiter-{$__aField['input_id']}",
-                                    'style' => $this->isLastElement( $aFields, $__sKey ) ? "display:none;" : "",
-                                ) ) . ">{$sDelimiter}</div>"
-                            : ""
-                        )
-                    . "</div>"
-                    . $__aField['after_field'];
-
             }     
-
-            return implode( PHP_EOL, $_aOutput );
+            return implode( PHP_EOL, array_filter( $_aOutput ) );
             
         }
-    
+        
+            /**
+             * Returns the HTML output of the given field.
+             * @internal
+             * @since       3.5.3
+             * @return      string      the HTML output of the given field.
+             */
+            private function _getEachFieldOutput( array $aField, $isIndex, array $aCallbacks, $bIsLastElement=false ) {
+                
+                // Field type definition - allows mixed field types in sub-fields 
+                $_aFieldTypeDefinition = $this->_getFieldTypeDefinition( $aField['type'] );
+                if ( ! is_callable( $_aFieldTypeDefinition['hfRenderField'] ) ) {
+                    return '';
+                }     
+
+                // Set some internal keys 
+                $aField = $this->_getFormatedFieldDefinitionArray( $aField, $isIndex, $aCallbacks, $_aFieldTypeDefinition );
+                
+                // Callback the registered function to output the field 
+                $_aFieldAttributes = $this->_getFieldAttributes( $aField );
+                            
+                return $aField['before_field']
+                    . "<div " . $this->_getFieldContainerAttributes( $aField, $_aFieldAttributes, 'field' ) . ">"
+                        . call_user_func_array(
+                            $_aFieldTypeDefinition['hfRenderField'],
+                            array( $aField )
+                        )
+                        . $this->_getDelimiter( $aField, $bIsLastElement )
+                    . "</div>"
+                    . $aField['after_field'];                
+                
+            }
+                /**
+                 * Returns the registered field type definition array of the given field type slug.
+                 * 
+                 * @remark      The $this->aFieldTypeDefinitions property stores default key-values of all the registered field types.
+                 * @internal
+                 * @since       3.5.3
+                 * @return      array   The field type definition array.
+                 */
+                private function _getFieldTypeDefinition( $sFieldTypeSlug ) {
+                    return $this->getElement(
+                        $this->aFieldTypeDefinitions,
+                        $sFieldTypeSlug,
+                        $this->aFieldTypeDefinitions['default']
+                    );
+                }  
+                /**
+                 * Returns the formatted field definition array.
+                 * @internal
+                 * @since       3.5.3
+                 * @return      array       The formatted field definition array.
+                 */
+                private function _getFormatedFieldDefinitionArray( array $aField, $isIndex, array $aCallbacks, $aFieldTypeDefinition ) {
+
+                    $_bIsSubField                         = is_numeric( $isIndex ) && 0 < $isIndex;
+                    $aField['_is_sub_field']              = $_bIsSubField;      // 3.5.3+
+                    $aField['_index']                     = $isIndex;
+                    
+                    // 'input_id' - something like ({section id}_){field_id}_{index} e.g. my_section_id_my_field_id_0
+                    $aField['input_id']                   = $this->_getInputID( 
+                        $aField, 
+                        $isIndex, 
+                        $aCallbacks['hfID']
+                   ); 
+                    $aField['_input_name']                = $this->_getInputName(
+                        $aField, 
+                        $this->getAOrB(
+                            $aField['_is_multiple_fields'],
+                            $isIndex,
+                            ''
+                        ),
+                        $aCallbacks['hfName']
+                    );
+                    // '_input_name_flat' - used for submit, export, import field types     
+                    $aField['_input_name_flat']           = $this->_getFlatInputName(
+                        $aField,
+                        $this->getAOrB(
+                            $aField['_is_multiple_fields'],
+                            $isIndex,
+                            ''
+                        ),
+                        $aCallbacks['hfNameFlat']
+                    ); 
+                    // used in the attribute below plus it is also used in the sample custom field type.
+                    $aField['_field_container_id']        = "field-{$aField['input_id']}";
+
+                        // @todo for issue #158 https://github.com/michaeluno/admin-page-framework/issues/158               
+                        // These models are for generating ids and names dynamically.
+                        $aField['_input_id_model']            = $this->_getInputID( $aField, '-fi-',  $aCallbacks['hfID'] ); // 3.3.1+ referred by the repeatable field script
+                        $aField['_input_name_model']          = $this->_getInputName( $aField, $aField['_is_multiple_fields'] ? '-fi-': '', $aCallbacks['hfName'] );      // 3.3.1+ referred by the repeatable field script
+                        $aField['_fields_container_id_model'] = "field-{$aField['_input_id_model']}"; // [3.3.1+] referred by the repeatable field script
+                        
+                    $aField['_fields_container_id']       = "fields-{$this->aField['tag_id']}";
+                    $aField['_fieldset_container_id']     = "fieldset-{$this->aField['tag_id']}";
+                    $aField                               = $this->uniteArrays(
+                        $aField, // includes the user-set values.
+                        array( // the automatically generated values.
+                            'attributes' => array(
+                                'id'                => $aField['input_id'],
+                                'name'              => $aField['_input_name'],
+                                'value'             => $aField['value'],
+                                'type'              => $aField['type'], // text, password, etc.
+                                'disabled'          => null,
+                                'data-id_model'     => $aField['_input_id_model'],    // 3.3.1+
+                                'data-name_model'   => $aField['_input_name_model'],  // 3.3.1+
+                            )
+                        ),
+                        ( array ) $aFieldTypeDefinition['aDefaultKeys'] // this allows sub-fields with different field types to set the default key-values for the sub-field.
+                    );
+                    
+                    $aField['attributes']['class'] = 'widget' === $aField['_fields_type'] && is_callable( $aCallbacks['hfClass'] )
+                        ? call_user_func_array( $aCallbacks['hfClass'], array( $aField['attributes']['class'] ) )
+                        : $aField['attributes']['class'];
+                    $aField['attributes']['class'] = $this->generateClassAttribute(
+                        $aField['attributes']['class'],  
+                        $this->dropElementsByType( $aField['class'] )
+                    );
+                    return $aField;
+                    
+                }
+                /**
+                 * Returns the field container attribute array.
+                 * 
+                 * @remark      _getFormatedFieldDefinitionArray() should be performed prior to callign this method.
+                 * @param       array       $aField     The field definition array. This should have been formatted already witjh the `_getFormatedFieldDefinitionArray()` method.
+                 * @return      array       The generated field container attribute array.
+                 * @internal   
+                 * @since       3.5.3
+                 */
+                private function _getFieldAttributes( array $aField ) {            
+                    return array(
+                        'id'            => $aField['_field_container_id'],
+                        'data-type'     => "{$aField['type']}",   // this is referred by the repeatable field JavaScript script.
+                        'data-id_model' => $aField['_fields_container_id_model'], // 3.3.1+
+                        'class'         => "admin-page-framework-field admin-page-framework-field-{$aField['type']}"
+                            . $this->getAOrB(
+                                $aField['attributes']['disabled'],
+                                ' disabled',
+                                ''
+                            )
+                            . $this->getAOrB(
+                                $aField['_is_sub_field'],
+                                ' admin-page-framework-subfield',
+                                ''
+                            ) 
+                    );
+                }     
+                /**
+                 * Returns the HTML output of delimiter
+                 * @internal
+                 * @since       3.5.3
+                 * @return      string      the HTML output of delimiter
+                 */
+                private function _getDelimiter( array $aField, $bIsLastElement ) {
+                    return $aField['delimiter']
+                        ? "<div " . $this->generateAttributes( 
+                                array(
+                                    'class' => 'delimiter',
+                                    'id'    => "delimiter-{$aField['input_id']}",
+                                    'style' => $this->getAOrB(
+                                        $bIsLastElement,
+                                        "display:none;",
+                                        ""
+                                    ),
+                                ) 
+                            ) . ">"
+                                . $aField['delimiter']
+                            . "</div>"
+                        : '';
+                }                
+                
         /**
          * Returns the final fields output.
          * 
-         * @since 3.1.0
+         * @since       3.1.0
+         * @return      string
          */
         private function _getFinalOutput( array $aField, array $aFieldsOutput, $iFieldsCount ) {
                             
@@ -325,8 +516,8 @@ class AdminPageFramework_FormField extends AdminPageFramework_FormField_Base {
             $_aFieldsContainerAttributes = array(
                 'id'            => 'fields-' . $aField['tag_id'],
                 'class'         => 'admin-page-framework-fields'
-                    . ( $aField['repeatable'] ? ' repeatable' : '' )
-                    . ( $aField['sortable'] ? ' sortable' : '' ),
+                    . $this->getAOrB( $aField['repeatable'], ' repeatable', '' )
+                    . $this->getAOrB( $aField['sortable'], ' sortable', '' ),
                 'data-type'     => $aField['type'], // this is referred by the sortable field JavaScript script.
             );
             
@@ -353,7 +544,10 @@ class AdminPageFramework_FormField extends AdminPageFramework_FormField_Base {
                 
                 // Add the description
                 if ( isset( $aField['description'] ) )  {
-                    $_aOutput[] = $this->_getDescription( $aField['description'] );
+                    $_aOutput[] = $this->_getDescriptions( 
+                        $aField['description'],
+                        'admin-page-framework-fields-description'
+                    );
                 }
                     
                 // Add the repeater & sortable scripts 
@@ -362,25 +556,7 @@ class AdminPageFramework_FormField extends AdminPageFramework_FormField_Base {
                 return implode( PHP_EOL, $_aOutput );
                 
             }
-                /**
-                 * Returns the HTML formatted description blocks by the given description definition.
-                 * 
-                 * @since   3.3.0
-                 * @return  string      The description output.
-                 */
-                private function _getDescription( $asDescription ) {
-                    
-                    if ( empty( $asDescription ) ) { return ''; }
-                    
-                    $_aOutput = array();
-                    foreach( $this->getAsArray( $asDescription ) as $_sDescription ) {
-                        $_aOutput[] = "<p class='admin-page-framework-fields-description'>"
-                                . "<span class='description'>{$_sDescription}</span>"
-                            . "</p>";
-                    }
-                    return implode( PHP_EOL, $_aOutput );
-                    
-                }
+    
                 /**
                  * Returns the output of JavaScript scripts for the field (and its sub-fields).
                  * 
@@ -408,148 +584,55 @@ class AdminPageFramework_FormField extends AdminPageFramework_FormField_Base {
         /**
          * Returns the set field error message to the section or field.
          * 
-         * @since 3.1.0
+         * @since       3.1.0
+         * @return      string     The error string message. An empty value if not found.
          */
         private function _getFieldError( $aErrors, $sSectionID, $sFieldID ) {
             
             // If this field has a section and the error element is set
-            if ( 
-                isset( 
-                    $aErrors[ $sSectionID ], 
-                    $aErrors[ $sSectionID ][ $sFieldID ]
-                )
-                && is_array( $aErrors[ $sSectionID ] )
-                && ! is_array( $aErrors[ $sSectionID ][ $sFieldID ] )
-                
-            ) {     
-                return "<span class='field-error'>*&nbsp;{$this->aField['error_message']}" 
+            if ( $this->_hasFieldErrorsOfSection( $aErrors, $sSectionID, $sFieldID ) ) {   
+                return "<span class='field-error'>*&nbsp;{$this->aField['error_message']}"         
                         . $aErrors[ $sSectionID ][ $sFieldID ]
                     . "</span>";
-            } 
+            }             
             
             // if this field does not have a section and the error element is set,
-            if ( isset( $aErrors[ $sFieldID ] ) && ! is_array( $aErrors[ $sFieldID ] ) ) {
-                return "<span class='field-error'>*&nbsp;{$this->aField['error_message']}" 
+            if ( $this->_hasFieldError( $aErrors, $sFieldID ) ) {
+                return "<span class='field-error'>*&nbsp;{$this->aField['error_message']}"                           
                         . $aErrors[ $sFieldID ]
                     . "</span>";
-            }     
+            }  
+            return '';
             
         }    
-    
-        /**
-         * Returns the array of fields 
-         * 
-         * @since       3.0.0
-         */
-        protected function _constructFieldsArray( &$aField, &$aOptions ) {
-
-            /* Get the set value(s) */
-            $vSavedValue    = $this->_getStoredInputFieldValue( $aField, $aOptions );
-            
-            /* Separate the first field and sub-fields */
-            $aFirstField    = array();
-            $aSubFields     = array();
-            foreach( $aField as $nsIndex => $vFieldElement ) {
-                if ( is_numeric( $nsIndex ) ) {
-                    $aSubFields[] = $vFieldElement;
-                } else {
-                    $aFirstField[ $nsIndex ] = $vFieldElement;
-                }
-            }     
-            
-            /* Create the sub-fields of repeatable fields based on the saved values */
-            if ( $aField['repeatable'] ) {
-                foreach( ( array ) $vSavedValue as $iIndex => $vValue ) {
-                    if ( 0 == $iIndex ) { continue; }
-                    $aSubFields[ $iIndex - 1 ] = isset( $aSubFields[ $iIndex - 1 ] ) && is_array( $aSubFields[ $iIndex - 1 ] ) 
-                        ? $aSubFields[ $iIndex - 1 ] 
-                        : array();     
-                }
-            }
-            
-            /* Put the initial field and the sub-fields together in one array */
-            foreach( $aSubFields as &$aSubField ) {
-                
-                /* Before merging recursively, evacuate the label element which should not be merged */
-                $aLabel = isset( $aSubField['label'] ) 
-                    ? $aSubField['label']
-                    : ( isset( $aFirstField['label'] )
-                         ? $aFirstField['label'] 
-                         : null
-                    );
-                
-                /* Do recursive array merging */
-                $aSubField = $this->uniteArrays( $aSubField, $aFirstField ); // the 'attributes' array of some field types have more than one dimensions. // $aSubField = $aSubField + $aFirstField;
-                
-                /* Restore the label element */
-                $aSubField['label'] = $aLabel;
-                
-            }
-            $aFields = array_merge( array( $aFirstField ), $aSubFields );
-                    
-            /* Set the saved values */     
-            if ( count( $aSubFields ) > 0 || $aField['repeatable'] || $aField['sortable'] ) { // means the elements are saved in an array.
-                foreach( $aFields as $iIndex => &$aThisField ) {
-                    $aThisField['_saved_value'] = isset( $vSavedValue[ $iIndex ] ) ? $vSavedValue[ $iIndex ] : null;
-                    $aThisField['_is_multiple_fields'] = true;
-                }
-            } else {
-                $aFields[ 0 ]['_saved_value'] = $vSavedValue;
-                $aFields[ 0 ]['_is_multiple_fields'] = false;
-            } 
-
-            /* Determine the value */
-            unset( $aThisField ); // PHP requires this for a previously used variable as reference.
-            foreach( $aFields as &$aThisField ) {
-                $aThisField['_is_value_set_by_user'] = isset( $aThisField['value'] );
-                $aThisField['value'] = isset( $aThisField['value'] ) 
-                    ? $aThisField['value'] 
-                    : ( isset( $aThisField['_saved_value'] ) 
-                        ? $aThisField['_saved_value']
-                        : ( isset( $aThisField['default'] )
-                            ? $aThisField['default']
-                            : null
-                        )
-                    );     
-            }
-
-            return $aFields;
-            
-        }
-        
             /**
-             * Returns the stored field value.
+             * Checks whether the given field has a section and an error element is set or not.
              * 
-             * It checks if a previously saved option value exists or not. Regular setting pages and page meta boxes will be applied here.
-             * It's important to return null if not set as the returned value will be checked later on whether it is set or not. If an empty value is returned, they will think it's set.
-             * 
-             * @since       2.0.0
-             * @since       3.0.0       Removed the check of the 'value' and 'default' keys. Made it use the '_fields_type' internal key.
-             * @since       3.1.0       Changed the name to _getStoredInputFieldValue from _getInputFieldValue
-             * @since       3.4.1       Removed the switch block as it was redundant.
+             * @internal
+             * @since       3.5.3
+             * @return      boolean
              */
-            private function _getStoredInputFieldValue( $aField, $aOptions ) {    
-
-                // If a section is not set, check the first dimension element.
-                if ( ! isset( $aField['section_id'] ) || '_default' == $aField['section_id'] ) {
-                    return isset( $aOptions[ $aField['field_id'] ] )
-                        ? $aOptions[ $aField['field_id'] ]
-                        : null;     
-                }
-                    
-                // At this point, the section dimension is set.
-                
-                // If it belongs to a sub section,
-                if ( isset( $aField['_section_index'] ) ) {
-                    return isset( $aOptions[ $aField['section_id'] ][ $aField['_section_index'] ][ $aField['field_id'] ] )
-                        ? $aOptions[ $aField['section_id'] ][ $aField['_section_index'] ][ $aField['field_id'] ]
-                        : null;     
-                }
-                
-                // Otherwise, return the second dimension element.
-                return isset( $aOptions[ $aField['section_id'] ][ $aField['field_id'] ] )
-                    ? $aOptions[ $aField['section_id'] ][ $aField['field_id'] ]
-                    : null;
-                                                
-            }     
+            private function _hasFieldErrorsOfSection( $aErrors, $sSectionID, $sFieldID ) {
+                return ( 
+                    isset( 
+                        $aErrors[ $sSectionID ], 
+                        $aErrors[ $sSectionID ][ $sFieldID ]
+                    )
+                    && is_array( $aErrors[ $sSectionID ] )
+                    && ! is_array( $aErrors[ $sSectionID ][ $sFieldID ] )
+                );
+            }
+            /**
+             * Checks whether the given field has a field error.
+             * @internal
+             * @since       3.5.3
+             * @return      boolean
+             */
+            private function _hasFieldError( $aErrors, $sFieldID ) {
+                return ( 
+                    isset( $aErrors[ $sFieldID ] ) 
+                    && ! is_array( $aErrors[ $sFieldID ] )
+                );
+            }
+            
 }

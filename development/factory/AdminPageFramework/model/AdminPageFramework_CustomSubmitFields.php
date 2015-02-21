@@ -18,10 +18,23 @@
  * @internal
  */
 abstract class AdminPageFramework_CustomSubmitFields extends AdminPageFramework_WPUtility {
-     
-    public function __construct( $aPostElement ) {
+    
+    /**
+     * Stores $_POST array content or sub-element of the $_POST array.
+     */
+    public $aPost = array();
+    
+    /**
+     * Stores the subject form field input ID.
+     */
+    public $sInputID;
+    
+    /**
+     * Sets up properties.
+     */
+    public function __construct( array $aPostElement ) {
             
-        $this->aPost = $aPostElement;
+        $this->aPost    = $aPostElement;
         $this->sInputID = $this->getInputID( $aPostElement['submit'] ); // the submit element must be set by the field type.
     
     }
@@ -36,9 +49,11 @@ abstract class AdminPageFramework_CustomSubmitFields extends AdminPageFramework_
      */ 
     protected function getSubmitValueByType( $aElement, $sInputID, $sElementKey='format' ) {
             
-        return ( isset( $aElement[ $sInputID ][ $sElementKey ] ) )
-            ? $aElement[ $sInputID ][ $sElementKey ]
-            : null;
+        return $this->getElement( 
+            $aElement,  // subject array
+            array( $sInputID, $sElementKey ), // dimensional keys
+            null    // default
+        );
         
     }     
     

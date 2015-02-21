@@ -3,7 +3,7 @@
  * Admin Page Framework
  * 
  * http://en.michaeluno.jp/admin-page-framework/
- * Copyright (c) 2013-2014 Michael Uno; Licensed MIT
+ * Copyright (c) 2013-2015 Michael Uno; Licensed MIT
  * 
  */
 
@@ -11,9 +11,9 @@
  * The base class for Property classes.
  * 
  * Provides the common methods  and properties for the property classes that are used by the main class, the meta box class, and the post type class.
- * @since 2.1.0
- * @package AdminPageFramework
- * @subpackage Property
+ * @since       2.1.0
+ * @package     AdminPageFramework
+ * @subpackage  Property
  * @internal
  */ 
 abstract class AdminPageFramework_Property_Base {
@@ -271,23 +271,42 @@ abstract class AdminPageFramework_Property_Base {
         'hfNameFlat'    => null,    // the flat input name attribute
         'hfClass'       => null,    // the class attribute
     );
+    
+    /**
+     * The utility object.
+     * @since       3.5.3
+     */
+    public $oUtil;
                 
     /**
      * Sets up necessary property values.
      */
     public function __construct( $oCaller, $sCallerPath, $sClassName, $sCapability, $sTextDomain, $sFieldsType ) {
         
+        $this->oUtil            = new AdminPageFramework_WPUtility; // 3.5.3+
         $this->oCaller          = $oCaller;
-        $this->sCallerPath      = $sCallerPath ? $sCallerPath : null;
+        $this->sCallerPath      = $this->oUtil->getAOrB(
+            $sCallerPath,
+            $sCallerPath,
+            null
+        );
         $this->sClassName       = $sClassName;     
         $this->sClassHash       = md5( $sClassName );    
-        $this->sCapability      = empty( $sCapability ) ? 'manage_options' : $sCapability ;
-        $this->sTextDomain      = empty( $sTextDomain ) ? 'admin-page-framework' : $sTextDomain;
+        $this->sCapability      = $this->oUtil->getAOrB(
+            empty( $sCapability ),
+            'manage_options',
+            $sCapability
+        );
+        $this->sTextDomain      = $this->oUtil->getAOrB(
+            empty( $sTextDomain ),
+            'admin-page-framework',
+            $sTextDomain
+        );
         $this->sFieldsType      = $sFieldsType;
         $GLOBALS['aAdminPageFramework'] = isset( $GLOBALS['aAdminPageFramework'] ) && is_array( $GLOBALS['aAdminPageFramework'] ) 
             ? $GLOBALS['aAdminPageFramework']
             : array( 'aFieldFlags' => array() );
-        $this->sPageNow         = AdminPageFramework_WPUtility::getPageNow();
+        $this->sPageNow         = $this->oUtil->getPageNow();
         $this->bIsAdmin         = is_admin();
         $this->bIsAdminAjax     = in_array( $this->sPageNow, array( 'admin-ajax.php' ) );
         
@@ -315,21 +334,21 @@ abstract class AdminPageFramework_Property_Base {
     static public function _setLibraryData() {
 
         self::$_aLibraryData = array(
-            'sName'         => AdminPageFramework_Registry::Name,
+            'sName'         => AdminPageFramework_Registry::NAME,
             'sURI'          => AdminPageFramework_Registry::URI,
-            'sScriptName'   => AdminPageFramework_Registry::Name,
-            'sLibraryName'  => AdminPageFramework_Registry::Name,
+            'sScriptName'   => AdminPageFramework_Registry::NAME,
+            'sLibraryName'  => AdminPageFramework_Registry::NAME,
             'sLibraryURI'   => AdminPageFramework_Registry::URI,
             'sPluginName'   => '',
             'sPluginURI'    => '',
             'sThemeName'    => '',
             'sThemeURI'     => '',
             'sVersion'      => AdminPageFramework_Registry::getVersion(),
-            'sDescription'  => AdminPageFramework_Registry::Description,
-            'sAuthor'       => AdminPageFramework_Registry::Author,
-            'sAuthorURI'    => AdminPageFramework_Registry::AuthorURI,
-            'sTextDomain'   => AdminPageFramework_Registry::TextDomain,
-            'sDomainPath'   => AdminPageFramework_Registry::TextDomainPath,
+            'sDescription'  => AdminPageFramework_Registry::DESCRIPTION,
+            'sAuthor'       => AdminPageFramework_Registry::AUTHOR,
+            'sAuthorURI'    => AdminPageFramework_Registry::AUTHOR_URI,
+            'sTextDomain'   => AdminPageFramework_Registry::TEXT_DOMAIN,
+            'sDomainPath'   => AdminPageFramework_Registry::TEXT_DOMAIN_PATH,
             'sNetwork'      => '',
             '_sitewide'     => '',
         );
@@ -343,7 +362,9 @@ abstract class AdminPageFramework_Property_Base {
      * @since 3.0.0
      */
     static public function _getLibraryData() {
-        return isset( self::$_aLibraryData ) ? self::$_aLibraryData : self::_setLibraryData();     
+        return isset( self::$_aLibraryData ) 
+            ? self::$_aLibraryData 
+            : self::_setLibraryData();     
     }
     
     /*
@@ -367,7 +388,7 @@ abstract class AdminPageFramework_Property_Base {
             return $_aCallerInfo;
         }
         if ( 'plugin' == $_aCallerInfo['sType'] ) {
-            return AdminPageFramework_WPUtility::getScriptData( $_aCallerInfo['sPath'], $_aCallerInfo['sType'] ) + $_aCallerInfo;
+            return $this->oUtil->getScriptData( $_aCallerInfo['sPath'], $_aCallerInfo['sType'] ) + $_aCallerInfo;
         }
         if ( 'theme' == $_aCallerInfo['sType'] ) {
             $_oTheme = wp_get_theme(); // stores the theme info object
@@ -404,54 +425,7 @@ abstract class AdminPageFramework_Property_Base {
         return 'unknown';    
     
     }    
-        
-    
-    /**
-     * Checks if the current page is post editing page that belongs to the given post type(s).
-     * 
-     * @since 3.0.0
-     * @param array|string The post type slug(s) to check. If this is empty, the method just checks the current page is a post definition page.
-     * Otherwise, it will check if the page belongs to the given post type(s).
-     * @return boolean
-     * @deprecated
-     */
-    public function isPostDefinitionPage( $asPostTypes=array() ) {
-        
-        $_aPostTypes = ( array ) $asPostTypes;
-        
-        // If it's not the post definition page, 
-        if ( ! in_array( $this->sPageNow, array( 'post.php', 'post-new.php', ) ) ) {
-            return false;
-        }
-        
-        // If the parameter is empty, 
-        if ( empty( $_aPostTypes ) ) {
-            return true;
-        }
-        
-        // If the parameter the post type are set and it's in the given post types, 
-        if ( isset( $_GET['post_type'] ) && in_array( $_GET['post_type'], $_aPostTypes ) ) {
-            return true;
-        }
-        
-        // Find the post type from the post ID.
-        $this->_sCurrentPostType = isset( $this->_sCurrentPostType )
-            ? $this->_sCurrentPostType
-            : ( isset( $_GET['post'] )
-                ? get_post_type( $_GET['post'] )
-                : ''
-            );
-        
-        // If the found post type is in the given post types,
-        if ( isset( $_GET['post'], $_GET['action'] ) && in_array( $this->_sCurrentPostType, $_aPostTypes ) ) {
-            return true;     
-        }     
-        
-        // Otherwise,
-        return false;
-        
-    }    
-    
+            
     /**
      * Retrieves the option array.
      * 
@@ -474,7 +448,9 @@ abstract class AdminPageFramework_Property_Base {
      */
     protected function _getLastInput() {
         
-        $_vValue = AdminPageFramework_WPUtility::getTransient( 'apf_tfd' . md5( 'temporary_form_data_' . $this->sClassName . get_current_user_id() ) );
+        $_sKey      = 'apf_tfd' . md5( 'temporary_form_data_' . $this->sClassName . get_current_user_id() );
+        $_vValue    = $this->oUtil->getTransient( $_sKey );
+        $this->oUtil->deleteTransient( $_sKey );
         if ( is_array( $_vValue ) ) {
             return $_vValue;
         }
@@ -492,7 +468,9 @@ abstract class AdminPageFramework_Property_Base {
     public function __get( $sName ) {
         
         if ( 'aScriptInfo' === $sName ) {
-            $this->sCallerPath = $this->sCallerPath ? $this->sCallerPath : AdminPageFramework_Utility::getCallerScriptPath( __FILE__ );
+            $this->sCallerPath = $this->sCallerPath 
+                ? $this->sCallerPath 
+                : AdminPageFramework_Utility::getCallerScriptPath( __FILE__ );
             $this->aScriptInfo = $this->getCallerInfo( $this->sCallerPath );
             return $this->aScriptInfo;    
         }

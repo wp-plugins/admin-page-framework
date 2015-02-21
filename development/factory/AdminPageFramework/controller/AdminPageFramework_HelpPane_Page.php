@@ -40,7 +40,7 @@ class AdminPageFramework_HelpPane_Page extends AdminPageFramework_HelpPane_Base 
      * 
      * @internal
      */
-    function __construct( $oProp ) {
+    public function __construct( $oProp ) {
         
         parent::__construct( $oProp );
         
@@ -48,7 +48,6 @@ class AdminPageFramework_HelpPane_Page extends AdminPageFramework_HelpPane_Base 
             return;
         }
         
-        // The contextual help pane.
         add_action( 'admin_head', array( $this, '_replyToRegisterHelpTabs' ), 200 );     
         
     }
@@ -63,29 +62,45 @@ class AdminPageFramework_HelpPane_Page extends AdminPageFramework_HelpPane_Base 
      * @remark      the screen object is supported in WordPress 3.3 or above.
      * @since       2.1.0
      * @internal
+     * @callback    action      admin_head
      */  
     public function _replyToRegisterHelpTabs() {
-            
-        $sCurrentPageSlug = isset( $_GET['page'] ) ? $_GET['page'] : '';
-        $sCurrentPageTabSlug = isset( $_GET['tab'] ) ? $_GET['tab'] : ( isset( $this->oProp->aDefaultInPageTabs[ $sCurrentPageSlug ] ) ? $this->oProp->aDefaultInPageTabs[ $sCurrentPageSlug ] : '' );
+
+        $_sCurrentPageSlug  = $this->oProp->getCurrentPageSlug();
+        $_sCurrentTabSlug   = $this->oProp->getCurrentTabSlug( $_sCurrentPageSlug );
         
-        if ( empty( $sCurrentPageSlug ) ) return;
-        if ( ! $this->oProp->isPageAdded( $sCurrentPageSlug ) ) return;
-        
+        if ( ! $this->oProp->isPageAdded( $_sCurrentPageSlug ) ) { 
+            return; 
+        }
+
         foreach( $this->oProp->aHelpTabs as $aHelpTab ) {
-            
-            if ( $sCurrentPageSlug != $aHelpTab['sPageSlug'] ) continue;
-            if ( isset( $aHelpTab['sPageTabSlug'] ) && ! empty( $aHelpTab['sPageTabSlug'] ) && $sCurrentPageTabSlug != $aHelpTab['sPageTabSlug'] ) continue;
-                
+            $this->_registerHelpTab( $aHelpTab, $_sCurrentPageSlug, $_sCurrentTabSlug );
+        }
+        
+    }
+        /**
+         * Registers a help tab item.
+         * @since       3.5.3
+         * @internal
+         * @return      void
+         */
+        private function _registerHelpTab( array $aHelpTab, $sCurrentPageSlug, $sCurrentTabSlug ) {
+           
+            if ( $sCurrentPageSlug != $aHelpTab['sPageSlug'] ) { 
+                return;
+            }
+            if ( isset( $aHelpTab['sPageTabSlug'] ) && ! empty( $aHelpTab['sPageTabSlug'] ) && $sCurrentTabSlug != $aHelpTab['sPageTabSlug'] ) {
+                return;
+            }
+
             $this->_setHelpTab( 
                 $aHelpTab['sID'], 
                 $aHelpTab['sTitle'], 
                 $aHelpTab['aContent'], 
                 $aHelpTab['aSidebar']
-            );
+            );            
+            
         }
-        
-    }
     
     /**
      * Adds the given contextual help tab contents into the property.

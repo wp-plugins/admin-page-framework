@@ -19,7 +19,7 @@
  * @subpackage  Form
  * @internal
  */
-class AdminPageFramework_FormField_Base extends AdminPageFramework_FormOutput {
+abstract class AdminPageFramework_FormField_Base extends AdminPageFramework_FormOutput {
 
     /**
      * Stores the field definition array.
@@ -29,7 +29,7 @@ class AdminPageFramework_FormField_Base extends AdminPageFramework_FormOutput {
     /**
      * Stores field type definitions.
      */
-    public $aFIeldTypeDefinitions = array();
+    public $aFieldTypeDefinitions = array();
         
     /**
      * Stores stored options in the database.

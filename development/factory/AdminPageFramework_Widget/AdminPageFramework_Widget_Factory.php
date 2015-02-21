@@ -82,7 +82,10 @@ class AdminPageFramework_Widget_Factory extends WP_Widget {
         return $this->oCaller->oUtil->addAndApplyFilters(
             $this->oCaller, 
             "validation_{$this->oCaller->oProp->sClassName}", 
-            $this->oCaller->validate( $aSubmittedFormData, $aSavedFormData, $this->oCaller ),
+            call_user_func_array( 
+                array( $this->oCaller, 'validate' ),    // triggers __call()
+                array( $aSubmittedFormData, $aSavedFormData, $this->oCaller )
+            ), // 3.5.3+                        
             $aSavedFormData,
             $this->oCaller
         );

@@ -3,7 +3,7 @@
  * Admin Page Framework
  * 
  * http://en.michaeluno.jp/admin-page-framework/
- * Copyright (c) 2013-2014 Michael Uno; Licensed MIT
+ * Copyright (c) 2013-2015 Michael Uno; Licensed MIT
  * 
  */
 
@@ -12,10 +12,10 @@
  * 
  * This class stores various types of values. This is used to encapsulate properties so that it helps to avoid naming conflicts.
  * 
- * @since 2.0.0
- * @package AdminPageFramework
- * @subpackage Property
- * @extends AdminPageFramework_Property_Base
+ * @since       2.0.0
+ * @package     AdminPageFramework
+ * @subpackage  Property
+ * @extends     AdminPageFramework_Property_Base
  * @internal
  */
 class AdminPageFramework_Property_Page extends AdminPageFramework_Property_Base {
@@ -323,7 +323,7 @@ class AdminPageFramework_Property_Page extends AdminPageFramework_Property_Base 
      */
     protected function _getOptions() {
     
-        $_aOptions = AdminPageFramework_WPUtility::addAndApplyFilter( // Parameters: $oCallerObject, $sFilter, $vInput, $vArgs...
+        $_aOptions = $this->oUtil->addAndApplyFilter( // Parameters: $oCallerObject, $sFilter, $vInput, $vArgs...
             $this->oCaller, // 3.4.1+ changed from $GLOBALS['aAdminPageFramework']['aPageClasses'][ $this->sClassName ], // the caller object
             'options_' . $this->sClassName, // options_{instantiated class name}
             $this->sOptionKey ? get_option( $this->sOptionKey, array() ) : array()
@@ -334,8 +334,7 @@ class AdminPageFramework_Property_Page extends AdminPageFramework_Property_Base 
 // However, in getSavedOptions, also the last input array is merged when the 'confirmation' query key is set,
 // that should be done here.
         $_aLastInput = isset( $_GET['field_errors'] ) && $_GET['field_errors'] ? $this->_getLastInput() : array();
-        $_aOptions   = empty( $_aOptions ) ? array() : AdminPageFramework_WPUtility::getAsArray( $_aOptions );     
-        $_aOptions   = $_aLastInput + $_aOptions;
+        $_aOptions   = $_aLastInput + $this->oUtil->getAsArray( $_aOptions );
         return $_aOptions;
     }
         
@@ -372,49 +371,81 @@ class AdminPageFramework_Property_Page extends AdminPageFramework_Property_Base 
             return;
         }
     
-        return update_option( $this->sOptionKey, $aOptions !== null ? $aOptions : $this->aOptions );
+        return update_option( 
+            $this->sOptionKey, 
+            null !== $aOptions
+                ? $aOptions 
+                : $this->aOptions 
+        );
         
     }
     
     
     /**
      * Checks if the given page slug is one of the pages added by the framework.
-     * @since 2.0.0
-     * @since 2.1.0 Set the default value to the parameter and if the parameter value is empty, it applies the current $_GET['page'] value.
-     * @return boolean Returns true if it is of framework's added page; otherwise, false.
+     * @since       2.0.0
+     * @since       2.1.0       Set the default value to the parameter and if the parameter value is empty, it applies the current $_GET['page'] value.
+     * @return      boolean      Returns true if it is of framework's added page; otherwise, false.
      */
     public function isPageAdded( $sPageSlug='' ) {    
         
-        $sPageSlug = $sPageSlug ? trim( $sPageSlug ) : ( isset( $_GET['page'] ) ? $_GET['page'] : '' );
+        $sPageSlug = trim( $sPageSlug );
+        $sPageSlug = $sPageSlug 
+            ? $sPageSlug 
+            : $this->getCurrentPageSlug();
         return isset( $this->aPages[ $sPageSlug ] );
 
     }
     
     /**
+     * Retrieves the currently loading page slug.
+     * 
+     * @since       3.5.3
+     * @return      string      The found page slug. An empty string if not found.
+     * @remark      Do not return `null` when not found as some framework methods check the retuened value with `isset()` and if null is given, `isset()` yields `false` while it does `true` for an emtpy string ('').
+     */
+    public function getCurrentPageSlug() {
+        return $this->oUtil->getElement( 
+            $_GET,  // subject array
+            'page', // key
+            ''      // default
+        );            
+    }
+
+    /**
      * Retrieves the currently loading tab slug.
      * 
-     * The tricky part is that even no tab is set in the $_GET array, it's possible that it could be in the page of the default tab.
-     * This method will check that.
+     * The tricky part is that even no tab is set in the $_GET array, it's possible that it could be the default tab of the loading page.
+     * This method checks that.
      * 
      * @since       3.0.0
      * @since       3.5.0       Added the `$sCurrentPageSlug` parameter because the page-meta-box class determines the caller factory object by page slug.
-     */
-    public function getCurrentTab( $sCurrentPageSlug='' ) {
+     * @since       3.5.3       Changed the name from 'getCurrentTab()' to be more specific.
+     * @return      string      The found tab slug. An empty string if not found.
+     * @remark      Do not return `null` when not found as some framework methods check the returned value with `isset()` and if null is given, `isset()` yields `false` while it does `true` for an empty string ('').
+     */    
+    public function getCurrentTabSlug( $sCurrentPageSlug='' ) {
         
         if ( isset( $_GET['tab'] ) && $_GET['tab'] ) { 
             return $_GET['tab'];
         }
         $sCurrentPageSlug = $sCurrentPageSlug
             ? $sCurrentPageSlug
-            : ( isset( $_GET['page'] ) && $_GET['page']
-                ? $_GET['page']
-                : ''
-            );
+            : $this->getCurrentPageSlug();
         return $sCurrentPageSlug
             ? $this->getDefaultInPageTab( $sCurrentPageSlug )
-            : null;
+            : '';
             
-    }
+    }    
+        /**
+         * An alias of getCurrentTabSlug();
+         * 
+         * @deprecated  3.5.3
+         */
+        public function getCurrentTab( $sCurrentPageSlug='' ) {
+            return $this->getCurrentTabSlug( $sCurrentPageSlug );            
+        }
+    
     /**
      * Retrieves the default in-page tab from the given tab slug.
      * 
@@ -426,11 +457,15 @@ class AdminPageFramework_Property_Page extends AdminPageFramework_Property_Base 
      */         
     public function getDefaultInPageTab( $sPageSlug ) {
     
-        if ( ! $sPageSlug ) return '';     
-        return isset( $this->aDefaultInPageTabs[ $sPageSlug ] ) 
-            ? $this->aDefaultInPageTabs[ $sPageSlug ]
-            : '';
-
+        if ( ! $sPageSlug ) { 
+            return ''; 
+        }
+        return $this->oUtil->getElement( 
+            $this->aDefaultInPageTabs,  // subject array
+            $sPageSlug, // key
+            ''    // default
+        );
+        
     }    
         
     /**
@@ -447,10 +482,11 @@ class AdminPageFramework_Property_Page extends AdminPageFramework_Property_Base 
                 
                 $_vDefault = $this->_getDefautValue( $_aField );
                 
-                if ( isset( $_aField['section_id'] ) && $_aField['section_id'] != '_default' )
+                if ( isset( $_aField['section_id'] ) && $_aField['section_id'] != '_default' ) {
                     $_aDefaultOptions[ $_aField['section_id'] ][ $_sFieldID ] = $_vDefault;
-                else
+                } else {
                     $_aDefaultOptions[ $_sFieldID ] = $_vDefault;
+                }
                     
             }
                 
@@ -469,38 +505,45 @@ class AdminPageFramework_Property_Page extends AdminPageFramework_Property_Base 
         private function _getDefautValue( $aField ) {
             
             // Check if sub-fields exist whose keys are numeric
-            $_aSubFields = AdminPageFramework_Utility::getIntegerElements( $aField );
-            
+            $_aSubFields = $this->oUtil->getIntegerKeyElements( $aField );
+
             // If there are no sub-fields     
             if ( count( $_aSubFields ) == 0 ) {
-                $_aField = $aField;
-                return isset( $_aField['value'] )
-                    ? $_aField['value']
-                    : ( isset( $_aField['default'] )
-                        ? $_aField['default']
-                        : null
-                    );
+                return $this->oUtil->getElement(
+                    $aField,   // subject
+                    'value',    // key
+                    $this->oUtil->getElement(   // default value
+                        $aField,   // subject  
+                        'default',  // key
+                        null        // default value
+                    )
+                );
             }
             
             // Otherwise, there are sub-fields
             $_aDefault = array();
             array_unshift( $_aSubFields, $aField ); // insert the main field into the very first index.
-            foreach( $_aSubFields as $_iIndex => $_aField ) 
-                $_aDefault[ $_iIndex ] = isset( $_aField['value'] )
-                    ? $_aField['value']
-                    : ( isset( $_aField['default'] )
-                        ? $_aField['default']
-                        : null
-                    );
+            foreach( $_aSubFields as $_iIndex => $_aField ) {
+                $_aDefault[ $_iIndex ] = $this->oUtil->getElement( 
+                    $_aField,   // subject
+                    'value',    // key
+                    $this->oUtil->getElement(   // default value
+                        $_aField,   // subject  
+                        'default',  // key
+                        null        // default value
+                    )
+                ); 
+            }
             return $_aDefault;
             
         }
     
-    /*
-     * callback methods
+    /**
+     * Returns the set capability.
+     * @callback        option_page_capability_{$this->sOptionKey}
      */ 
     public function _replyToGetCapability() {
         return $this->sCapability;
-    }    
+    }
         
 }

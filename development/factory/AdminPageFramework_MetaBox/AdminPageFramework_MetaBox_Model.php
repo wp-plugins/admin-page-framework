@@ -3,7 +3,7 @@
  * Admin Page Framework
  * 
  * http://en.michaeluno.jp/admin-page-framework/
- * Copyright (c) 2013-2014 Michael Uno; Licensed MIT
+ * Copyright (c) 2013-2015 Michael Uno; Licensed MIT
  * 
  */
 
@@ -14,6 +14,7 @@
  * @since           3.3.0
  * @package         AdminPageFramework
  * @subpackage      MetaBox
+ * @internal
  */
 abstract class AdminPageFramework_MetaBox_Model extends AdminPageFramework_MetaBox_Router {
     
@@ -25,9 +26,23 @@ abstract class AdminPageFramework_MetaBox_Model extends AdminPageFramework_MetaB
     private $_bIsNewPost = false;    
 
     /**
+     * A validation callback method.
+     * 
+     * The user may just override this method instead of defining a `validation_{...}` callback method.
+     * 
+     * @since       3.4.1
+     * @since       3.5.3       Moved from `AdminPageFramework_Factory_Model`. or not.
+     * @remark      Do not even declare this method to avoid PHP strict standard warnings.
+     */
+    // public function validate( $aInput, $aOldInput, $oFactory ) {
+        // return $aInput;
+    // }         
+    
+    /**
      * Sets up validation hooks.
      * 
      * @since       3.3.0
+     * @internal
      */
     protected function _setUpValidationHooks( $oScreen ) {
 
@@ -87,7 +102,7 @@ abstract class AdminPageFramework_MetaBox_Model extends AdminPageFramework_MetaB
         // Set the option array - the framework will refer to this data when displaying the fields.
         $this->_setOptionArray( 
             $this->_getPostID(),
-            $this->oForm->aConditionedFields 
+            $this->oUtil->getAsArray( $this->oForm->aConditionedFields )
         ); 
         
         // Add the repeatable section elements to the fields definition array.
@@ -100,6 +115,7 @@ abstract class AdminPageFramework_MetaBox_Model extends AdminPageFramework_MetaB
         /**
          * Returns the post ID associated with the loading page.
          * @since   3.4.1
+         * @internal
          */
         private function _getPostID()  {
             
@@ -117,59 +133,6 @@ abstract class AdminPageFramework_MetaBox_Model extends AdminPageFramework_MetaB
             return null;
             
         }
-
-    /**
-     * Extracts the user submitted values from the $_POST array.
-     * 
-     * @since       3.0.0
-     * @internal
-     */
-    protected function _getInputArray( array $aFieldDefinitionArrays, array $aSectionDefinitionArrays ) {
-        
-        // Construct an array consisting of the submitted registered field values.
-        $_aInput = array();
-        foreach( $aFieldDefinitionArrays as $_sSectionID => $_aSubSectionsOrFields ) {
-            
-            // If a section is not set,
-            if ( '_default' == $_sSectionID ) {
-                $_aFields = $_aSubSectionsOrFields;
-                foreach( $_aFields as $_aField ) {
-                    $_aInput[ $_aField['field_id'] ] = isset( $_POST[ $_aField['field_id'] ] ) 
-                        ? $_POST[ $_aField['field_id'] ] 
-                        : null;
-                }
-                continue;
-            }     
-
-            // At this point, the section is set
-            $_aInput[ $_sSectionID ] = isset( $_aInput[ $_sSectionID ] ) ? $_aInput[ $_sSectionID ] : array();
-            
-            // If the section does not contain sub sections,
-            if ( ! count( $this->oUtil->getIntegerElements( $_aSubSectionsOrFields ) ) ) {
-                
-                $_aFields = $_aSubSectionsOrFields;
-                foreach( $_aFields as $_aField ) {
-                    $_aInput[ $_sSectionID ][ $_aField['field_id'] ] = isset( $_POST[ $_sSectionID ][ $_aField['field_id'] ] )
-                        ? $_POST[ $_sSectionID ][ $_aField['field_id'] ]
-                        : null;
-                }     
-                continue;
-
-            }
-                
-            // Otherwise, it's sub-sections. 
-            // Since the registered fields don't have information how many items the user added, parse the submitted data.
-            foreach( $_POST[ $_sSectionID ] as $_iIndex => $_aFields ) { // will include the main section as well.
-                $_aInput[ $_sSectionID ][ $_iIndex ] = isset( $_POST[ $_sSectionID ][ $_iIndex ] ) 
-                    ? $_POST[ $_sSectionID ][ $_iIndex ]
-                    : null;
-            }
-                            
-        }
-    
-        return $_aInput;
-        
-    }
     
     /**
      * Retrieves the saved meta data as an array.
@@ -192,44 +155,68 @@ abstract class AdminPageFramework_MetaBox_Model extends AdminPageFramework_MetaB
      * This array will be referred later in the getFieldOutput() method.
      * 
      * @since       unknown
-     * @since       3.0.0     the scope is changed to protected as the taxonomy field class redefines it.
+     * @since       3.0.0       the scope is changed to protected as the taxonomy field class redefines it.
+     * @sicne       3.5.3       Removed a type check at the beginning of the method and added a type hint to the parameter. 
+     * This change enables an empty value to be parsed and triggers `options_{class name}` filter hook. Before this change if the option is empty, the hook did not get triggered.
      * @internal    
      * @todo        Add the `options_{instantiated class name}` filter.
      */
-    protected function _setOptionArray( $iPostID, $aFields ) {
+    protected function _setOptionArray( $iPostID, array $aFields ) {
         
-        if ( ! is_array( $aFields ) ) { 
-            return; 
-        }        
-        if ( ! is_numeric( $iPostID ) || ! is_int( $iPostID + 0 ) ) { 
+        if ( ! $this->oUtil->isNumericInteger( $iPostID ) ) {
             return; 
         }
         
-        $this->oProp->aOptions = is_array( $this->oProp->aOptions ) ? $this->oProp->aOptions : array();
-        foreach( $aFields as $_sSectionID => $_aFields ) {
-            
-            if ( '_default' == $_sSectionID  ) {
-                foreach( $_aFields as $_aField ) {
-                    $this->oProp->aOptions[ $_aField['field_id'] ] = get_post_meta( $iPostID, $_aField['field_id'], true );    
-                }
-            }
-            $this->oProp->aOptions[ $_sSectionID ] = get_post_meta( $iPostID, $_sSectionID, true );
-            
-        }
-        
+        $this->oProp->aOptions = $this->oUtil->getAsArray( $this->oProp->aOptions );
+        $this->_fillOptionsArrayFromPostMeta( 
+            $this->oProp->aOptions, 
+            $iPostID, 
+            $aFields
+        );
+          
         // Apply the filter to let third party scripts to set own options array.
-        $this->oProp->aOptions = AdminPageFramework_WPUtility::addAndApplyFilter( // Parameters: $oCallerObject, $sFilter, $vInput, $vArgs...
+        $this->oProp->aOptions = $this->oUtil->addAndApplyFilter( 
             $this, // the caller object
-            'options_' . $this->oProp->sClassName, // options_{instantiated class name}
+            'options_' . $this->oProp->sClassName, 
             $this->oProp->aOptions
         );
         
-        $_aLastInput = isset( $_GET['field_errors'] ) && $_GET['field_errors'] ? $this->oProp->aLastInput : array();
-        $this->oProp->aOptions = empty( $this->oProp->aOptions ) ? array() : AdminPageFramework_WPUtility::getAsArray( $this->oProp->aOptions );
-        $this->oProp->aOptions = $_aLastInput + $this->oProp->aOptions;
+        $_aLastInput = isset( $_GET['field_errors'] ) && $_GET['field_errors'] 
+            ? $this->oProp->aLastInput 
+            : array();
+        $this->oProp->aOptions = $_aLastInput + $this->oUtil->getAsArray( $this->oProp->aOptions );
 
     }
-    
+        /**
+         * Updates the first parameter of the options array with the post meta data associated with the given post ID.
+         * 
+         * @since       3.5.3
+         * @return      void
+         * @internal
+         */
+        private function _fillOptionsArrayFromPostMeta( array &$aOptions, $iPostID, array $aFields ) {
+      
+            foreach( $aFields as $_sSectionID => $_aFields ) {
+                
+                if ( '_default' == $_sSectionID  ) {
+                    foreach( $_aFields as $_aField ) {
+                        $aOptions[ $_aField['field_id'] ] = get_post_meta( 
+                            $iPostID, 
+                            $_aField['field_id'], 
+                            true 
+                        );    
+                    }
+                }
+                $aOptions[ $_sSectionID ] = get_post_meta( 
+                    $iPostID, 
+                    $_sSectionID, 
+                    true 
+                );
+                
+            }
+      
+        }
+        
     /**
      * Returns the filtered section description output.
      * 
@@ -252,15 +239,19 @@ abstract class AdminPageFramework_MetaBox_Model extends AdminPageFramework_MetaB
      * The filter is either 'wp_insert_attachment_data' or 'wp_insert_post_data' and is triggered when a post has not been created so no post id is assigned.
      * 
      * @since       3.3.0
-	 *
+	 * @internal
 	 * @param       array       $aPostData      An array of slashed post data.
      * @param       array       $aUnmodified    An array of sanitized, but otherwise unmodified post data.
      */
     public function _replyToFilterSavingData( $aPostData, $aUnmodified ) {
 
         // Perform initial checks.
-        if ( 'auto-draft' === $aUnmodified['post_status'] ) { return $aPostData; }
-        if ( ! $this->_validateCall() ) { return $aPostData; }
+        if ( 'auto-draft' === $aUnmodified['post_status'] ) { 
+            return $aPostData; 
+        }
+        if ( ! $this->_validateCall() ) { 
+            return $aPostData; 
+        }
         if ( ! in_array( $aUnmodified['post_type'], $this->oProp->aPostTypes ) ) {
             return $aPostData;
         }  
@@ -272,7 +263,7 @@ abstract class AdminPageFramework_MetaBox_Model extends AdminPageFramework_MetaB
         }
         
         // Retrieve the submitted data. 
-        $_aInput        = $this->_getInputArray( $this->oForm->aConditionedFields, $this->oForm->aConditionedSections );
+        $_aInput        = $this->oForm->getUserSubmitDataFromPOST( $this->oForm->aConditionedFields, $this->oForm->aConditionedSections );
         $_aInputRaw     = $_aInput; // store one for the last input array.
         
         // Prepare the saved data. For a new post, the id is set to 0.
@@ -284,7 +275,10 @@ abstract class AdminPageFramework_MetaBox_Model extends AdminPageFramework_MetaB
         $_aInput = $this->oUtil->addAndApplyFilters( 
             $this, 
             "validation_{$this->oProp->sClassName}",
-            $this->validate( $_aInput, $_aSavedMeta, $this ),
+            call_user_func_array( 
+                array( $this, 'validate' ), // triggers __call()
+                array( $_aInput, $_aSavedMeta, $this ) 
+            ), // 3.5.3+            
             $_aSavedMeta, 
             $this 
         ); 
@@ -296,10 +290,11 @@ abstract class AdminPageFramework_MetaBox_Model extends AdminPageFramework_MetaB
             add_filter( 'redirect_post_location', array( $this, '_replyToModifyRedirectPostLocation' ) );
         }
                     
-        $this->_updatePostMeta( 
-            $_iPostID, 
-            $_aInput, 
-            $this->oForm->dropRepeatableElements( $_aSavedMeta ) // Drop repeatable section elements from the saved meta array.
+        $this->oForm->updateMetaDataByType( 
+            $_iPostID,  // object id
+            $_aInput,   // user submit form data
+            $this->oForm->dropRepeatableElements( $_aSavedMeta ), // Drop repeatable section elements from the saved meta array.
+            $this->oForm->sFieldsType   // fields type
         );        
         
         return $aPostData;
@@ -312,6 +307,7 @@ abstract class AdminPageFramework_MetaBox_Model extends AdminPageFramework_MetaB
          * This method is called when a publishing post contains a field error of meta boxes added by the framework.
          * And the query url gets modified to disable the WordPress default admin notice, "Post published.".
          * 
+         * @internal
          * @since       3.3.0
          * @return      string      The modified url to be redirected after publishing the post.
          */
@@ -320,43 +316,13 @@ abstract class AdminPageFramework_MetaBox_Model extends AdminPageFramework_MetaB
             remove_filter( 'redirect_post_location', array( $this, __FUNCTION__ ) );
             return add_query_arg( array( 'message' => 'apf_field_error', 'field_errors' => true ), $sLocation );
             
-        }    
-        
-
-        /**
-         * Saves the post with the given data and the post ID.
-         * 
-         * @since       3.0.4
-         * @internal
-         * @return      void
-         */
-        private function _updatePostMeta( $iPostID, array $aInput, array $aSavedMeta ) {
-            
-            if ( ! $iPostID ) {
-                return;
-            }
-            
-            // Loop through sections/fields and save the data.
-            foreach ( $aInput as $_sSectionOrFieldID => $_vValue ) {
-                
-                if ( is_null( $_vValue ) ) { continue; }
-                
-                $_vSavedValue = isset( $aSavedMeta[ $_sSectionOrFieldID ] ) ? $aSavedMeta[ $_sSectionOrFieldID ] : null;
-                
-                // PHP can compare even array contents with the == operator. See http://www.php.net/manual/en/language.operators.array.php
-                if ( $_vValue == $_vSavedValue ) { continue; } // if the input value and the saved meta value are the same, no need to update it.
-            
-                update_post_meta( $iPostID, $_sSectionOrFieldID, $_vValue );
-                
-            }     
-            
-        }
-            
+        }        
             
         /**
          * Checks whether the function call of processing submitted field values is valid or not.
          * 
          * @since       3.3.0
+         * @internal
          */
         private function _validateCall() {
             

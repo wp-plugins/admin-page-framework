@@ -46,15 +46,17 @@ abstract class AdminPageFramework_Form_View extends AdminPageFramework_Form_Mode
      */  
     public function _replyToGetFieldOutput( $aField ) {
 
-        $_sCurrentPageSlug  = isset( $_GET['page'] ) ? $_GET['page'] : null;    
-        $_sSectionID        = isset( $aField['section_id'] ) ? $aField['section_id'] : '_default';
+        $_sCurrentPageSlug  = $this->oProp->getCurrentPageSlug();
+        $_sSectionID        = $this->oUtil->getElement( $aField, 'section_id', '_default' );
         $_sFieldID          = $aField['field_id'];
         
         // If the specified field does not exist, do nothing.
         if ( $aField['page_slug'] != $_sCurrentPageSlug ) { return ''; }
 
         // Retrieve the field error array.
-        $this->aFieldErrors = isset( $this->aFieldErrors ) ? $this->aFieldErrors : $this->_getFieldErrors( $_sCurrentPageSlug ); 
+        $this->aFieldErrors = isset( $this->aFieldErrors ) 
+            ? $this->aFieldErrors 
+            : $this->_getFieldErrors( $_sCurrentPageSlug ); 
 
         // Render the form field.         
         $sFieldType = isset( $this->oProp->aFieldTypeDefinitions[ $aField['type'] ]['hfRenderField'] ) && is_callable( $this->oProp->aFieldTypeDefinitions[ $aField['type'] ]['hfRenderField'] )

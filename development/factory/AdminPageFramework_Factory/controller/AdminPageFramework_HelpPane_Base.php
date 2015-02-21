@@ -19,12 +19,29 @@
 abstract class AdminPageFramework_HelpPane_Base extends AdminPageFramework_Debug {
     
     /**
+     * A property object.
+     * 
+     * @remark      Set in the constructor.
+     */ 
+    public $oProp;
+    
+    /**
+     * A utility object.
+     * 
+     * @remark      Set in the constructor.
+     */
+    public $oUtil;    
+    
+    /**
      * Stores the screen object.
      * @var object
      * @since 2.1.0
      */ 
     protected $_oScreen;
-    
+       
+    /**
+     * Sets up properties.
+     */
     function __construct( $oProp ) {
         
         $this->oProp = $oProp;
@@ -32,7 +49,6 @@ abstract class AdminPageFramework_HelpPane_Base extends AdminPageFramework_Debug
 
     }
         
-    
     /**
      * Sets the contextual help tab.
      * 
@@ -46,19 +62,24 @@ abstract class AdminPageFramework_HelpPane_Base extends AdminPageFramework_Debug
      */  
     protected function _setHelpTab( $sID, $sTitle, $aContents, $aSideBarContents=array() ) {
         
-        if ( empty( $aContents ) ) return;
+        if ( empty( $aContents ) ) { 
+            return; 
+        }
         
-        $this->_oScreen = isset( $this->_oScreen ) ? $this->_oScreen : get_current_screen();
+        $this->_oScreen = isset( $this->_oScreen ) 
+            ? $this->_oScreen 
+            : get_current_screen();
         $this->_oScreen->add_help_tab( 
             array(
-                'id' => $sID,
-                'title' => $sTitle,
-                'content' => implode( PHP_EOL, $aContents ),
+                'id'        => $sID,
+                'title'     => $sTitle,
+                'content'   => implode( PHP_EOL, $aContents ),
             ) 
         );     
         
-        if ( ! empty( $aSideBarContents ) )
+        if ( ! empty( $aSideBarContents ) ) {
             $this->_oScreen->set_help_sidebar( implode( PHP_EOL, $aSideBarContents ) );
+        }
             
     }
     

@@ -16,4 +16,18 @@
  * @subpackage      AdminPage
  * @internal
  */
-abstract class AdminPageFramework_Model extends AdminPageFramework_Menu_Controller {}
+abstract class AdminPageFramework_Model extends AdminPageFramework_Menu_Controller {
+    
+    /**
+     * A validation callback method.
+     * 
+     * The user may just override this method instead of defining a `validation_{...}` callback method.
+     * 
+     * @since       3.5.3       
+     * @remark      Do not even define the method as the construct of the parameters may change which can lead PHP strict standard warnings.
+     */
+    // public function validate( $aInput, $aOldInput, $oFactory, $aSubmitInfo ) {
+        // return $aInput;
+    // }         
+    
+}

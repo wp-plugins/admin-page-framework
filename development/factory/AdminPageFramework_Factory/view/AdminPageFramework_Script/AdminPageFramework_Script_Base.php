@@ -3,7 +3,7 @@
  * Admin Page Framework
  * 
  * http://en.michaeluno.jp/admin-page-framework/
- * Copyright (c) 2013-2014 Michael Uno; Licensed MIT
+ * Copyright (c) 2013-2015 Michael Uno; Licensed MIT
  * 
  */
 
@@ -11,11 +11,13 @@
  * Provides an abstract base to create an automatic script insertion class.
  * 
  * @since       3.3.0
+ * @since       3.5.3       Extends `AdminPageFramework_WPUtility`.
  * @package     AdminPageFramework
  * @subpackage  JavaScript
  * @internal
+ * @extends     AdminPageFramework_WPUtility
  */
-class AdminPageFramework_Script_Base {
+class AdminPageFramework_Script_Base extends AdminPageFramework_WPUtility {
 
     /**
      * Stores the enqueued script class names.
@@ -51,10 +53,11 @@ class AdminPageFramework_Script_Base {
     /**
      * The user constructor.
      * 
-     * Enqueue dependencies which this method.
+     * Enqueue dependencies with this method.
      *
      * @remark      This should be overridden in extended classes.
      * @since       3.3.0
+     * @return      void
      */
     protected function construct() {}
     
@@ -62,6 +65,10 @@ class AdminPageFramework_Script_Base {
      * Prints the script.
      * 
      * @since       3.3.0
+     * @internal
+     * @return      string      The generated HTML script tag.
+     * @callback    action      admin_footer
+     * @callback    action      customize_controls_print_footer_scripts
      */
     public function _replyToPrintScript() {
         $_sScript = $this->getScript( $this->oMsg );
@@ -74,13 +81,14 @@ class AdminPageFramework_Script_Base {
     }
     
     /**
-     * Returns the JavaScript script.
+     * Returns an inline JavaScript script.
      * 
      * @remark      Extended classes just override this method and return the script.
      * @since       3.3.0
-     * @param       $oMsg           object      The message object.
+     * @param       $oMsg       object      The message object.
+     * @return      string      The inline JavaScript script.
      */
-    static public function getScript() {
+    static public function getScript( /* $oMsg */ ) {
         $_aParams   = func_get_args() + array( null );
         $_oMsg      = $_aParams[ 0 ];                 
         return "";  

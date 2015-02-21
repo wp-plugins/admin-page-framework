@@ -158,6 +158,7 @@ abstract class AdminPageFramework_Factory_Controller extends AdminPageFramework_
      *       )
      * );</code>
      * @since       3.0.0     
+     * @since       3.5.3       Removed the parameter declarations as they are caught with func_get_args().
      * @access      public
      * @remark      Accepts variadic parameters; the number of accepted parameters are not limited to three.
      * @remark      The target section tab slug will be reset once the method returns.
@@ -209,7 +210,7 @@ abstract class AdminPageFramework_Factory_Controller extends AdminPageFramework_
      * @param       array       (optional)  add more section array to the next parameters as many as necessary.
      * @return      void
      */    
-    public function addSettingSections( $aSection1, $aSection2=null, $_and_more=null ) {
+    public function addSettingSections( /* $aSection1, $aSection2=null, $_and_more=null */ ) {
         
         foreach( func_get_args() as $asSection ) { 
             $this->addSettingSection( $asSection ); 
@@ -225,11 +226,11 @@ abstract class AdminPageFramework_Factory_Controller extends AdminPageFramework_
      * 
      * This is useful when adding section arrays in loops.
      * 
-     * @since       3.0.0            Changed the scope to public from protected.
+     * @since       3.0.0               Changed the scope to public from protected.
      * @access      public
      * @remark      The actual registration will be performed in the `_replyToRegisterSettings()` method with the `admin_menu` hook.
      * @remark      The `$oForm` property should be created in each extended class.
-     * @param       array|string     the section array. If a string is passed, it is considered as a target page slug that will be used as a page slug element from the next call so that the element can be omitted.
+     * @param       array|string        the section array. If a string is passed, it is considered as a target page slug that will be used as a page slug element from the next call so that the element can be omitted.
      * @return      void
      */
     public function addSettingSection( $aSection ) {
@@ -249,8 +250,9 @@ abstract class AdminPageFramework_Factory_Controller extends AdminPageFramework_
     * It inserts the given field definition arrays into the class property and later they are parsed when fields are registered. The field definition array requires specific keys. Refer to the parameter section of this method.
     * 
     * @since        2.0.0
+    * @since        3.5.3       Removed the parameter declarations as they are caught with the func_get_args().
     * @remark       Accepts variadic parameters; the number of accepted parameters are not limited to three.
-    * @param        array     the field definition array.
+    * @param        array       the field definition array.
     * <h4>Built-in Field Types</h4>
     * <ul>
     *       <li>**text** - a normal field to enter text input.</li>
@@ -356,7 +358,7 @@ abstract class AdminPageFramework_Factory_Controller extends AdminPageFramework_
     *           <ul>
     *               <li>**href** - (optional, string) the url(s) linked to the submit button.</li>
     *               <li>**redirect_url** - (optional, string) the url(s) redirected to after submitting the input form.</li>
-    *               <li>**reset** - [2.1.2+] (optional, boolean) the option key to delete. Set 1 for the entire option.</li>
+    *               <li>**reset** - [2.1.2+] (optional, boolean|string|array) the option key to delete. Set 1 for the entire option. [3.5.3+] In order to reset a particular field that belongs to a section, set an array representing the dimensional keys such as `array( 'my_sectio_id', 'my_field_id' )`.</li>
     *               <li>**email** - [3.3.0+] (optional, array) Coming soon...
     *                   <ul>
     *                       <li>**to** - (string|array) the email address to send the email to. For multiple email addressed, set comma delimited items.</li>
@@ -495,7 +497,7 @@ abstract class AdminPageFramework_Factory_Controller extends AdminPageFramework_
     * @param        array (optional) add more field arrays to the next parameters as many as necessary.
     * @return       void
     */ 
-    public function addSettingFields( $aField1, $aField2=null, $_and_more=null ) {
+    public function addSettingFields( /* $aField1, $aField2=null, $_and_more=null */ ) {
         foreach( func_get_args() as $aField ) { 
             $this->addSettingField( $aField ); 
         }
@@ -572,19 +574,27 @@ abstract class AdminPageFramework_Factory_Controller extends AdminPageFramework_
      * 
      * @since   3.0.4     
      * @param   array   $aErrors     the field error array. The structure should follow the one contained in the submitted `$_POST` array.
-     */ 
+     */    
     public function setFieldErrors( $aErrors ) {
         
         // The field-errors array will be stored in this global array element.
-        $GLOBALS['aAdminPageFramework']['aFieldErrors'] = isset( $GLOBALS['aAdminPageFramework']['aFieldErrors'] ) ? $GLOBALS['aAdminPageFramework']['aFieldErrors'] : array();
+        $GLOBALS['aAdminPageFramework']['aFieldErrors'] = $this->oUtil->getElement( 
+            $GLOBALS,  // subject array
+            array( 'aAdminPageFramework', 'aFieldErrors' ), // key
+            array()      // default
+        );                    
+
         if ( empty( $GLOBALS['aAdminPageFramework']['aFieldErrors'] ) ) {
             add_action( 'shutdown', array( $this, '_replyToSaveFieldErrors' ) ); // the method is defined in the controller class.
         }
         
         $_sID = md5( $this->oProp->sClassName );
         $GLOBALS['aAdminPageFramework']['aFieldErrors'][ $_sID ] = isset( $GLOBALS['aAdminPageFramework']['aFieldErrors'][ $_sID ] )
-            ? $this->oUtil->uniteArrays( $GLOBALS['aAdminPageFramework']['aFieldErrors'][ $_sID ], $aErrors )
-            : $aErrors;
+            ? $this->oUtil->uniteArrays( 
+                $GLOBALS['aAdminPageFramework']['aFieldErrors'][ $_sID ], 
+                $aErrors 
+            )
+            : $aErrors;                   
     
     }   
     
@@ -617,11 +627,16 @@ abstract class AdminPageFramework_Factory_Controller extends AdminPageFramework_
     * @param        array       $asAttributes   (optional) the tag attribute array applied to the message container HTML element. If a string is given, it is used as the ID attribute value.
     * @param        boolean     $bOverride      (optional) false: do not override when there is a message of the same id. true: override the previous one.
     * @return       void
-    */     
+    */      
     public function setSettingNotice( $sMessage, $sType='error', $asAttributes=array(), $bOverride=true ) {
         
         // The framework user set notification messages will be stored in this global array element.
-        $GLOBALS['aAdminPageFramework']['aNotices'] = isset( $GLOBALS['aAdminPageFramework']['aNotices'] ) ? $GLOBALS['aAdminPageFramework']['aNotices'] : array();
+        $GLOBALS['aAdminPageFramework']['aNotices'] = $this->oUtil->getElement( 
+            $GLOBALS,  // subject array
+            array( 'aAdminPageFramework', 'aNotices' ), // key
+            array()      // default
+        );                                
+        
         
         // If the array is empty, save the array at shutdown.
         if ( empty( $GLOBALS['aAdminPageFramework']['aNotices'] ) ) {
@@ -662,9 +677,14 @@ abstract class AdminPageFramework_Factory_Controller extends AdminPageFramework_
     public function hasSettingNotice( $sType='' ) {
         
         // The framework user set notification messages are stored in this global array element.
-        $_aNotices = isset( $GLOBALS['aAdminPageFramework']['aNotices'] ) ? $GLOBALS['aAdminPageFramework']['aNotices'] : array();
+        $_aNotices = $this->oUtil->getElementAsArray(
+            $GLOBALS,
+            array( 'aAdminPageFramework', 'aNotices' ),
+            array()
+        );
+        
         if ( ! $sType ) {
-            return count( $_aNotices ) ? true : false;
+            return ( bool ) count( $_aNotices );
         }
         
         // Check if there is a message of the type.

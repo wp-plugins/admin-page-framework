@@ -3,12 +3,12 @@
  * Admin Page Framework
  * 
  * http://en.michaeluno.jp/admin-page-framework/
- * Copyright (c) 2013-2014 Michael Uno; Licensed MIT
+ * Copyright (c) 2013-2015 Michael Uno; Licensed MIT
  * 
  */
 
 /**
- * Provides methods to output form elements.
+ * Provides shared methods to output form elements.
  * 
  * 
  * @package     AdminPageFramework
@@ -29,27 +29,19 @@ abstract class AdminPageFramework_FormOutput extends AdminPageFramework_WPUtilit
 
         // [3.3.1+] Changed the custom attributes to take its precedence.
         $_aAttributes = $this->uniteArrays( 
-            isset( $aField['attributes'][ $sContext ] ) && is_array( $aField['attributes'][ $sContext ] )
-                ? $aField['attributes'][ $sContext ] 
-                : array(),
+            $this->getElementAsArray( $aField, array( 'attributes', $sContext ) ),
             $aAttributes
         );
-        
+                    
         $_aAttributes['class']   = $this->generateClassAttribute( 
-            isset( $_aAttributes['class'] ) 
-                ? $_aAttributes['class'] 
-                : array(), 
-            isset( $aField['class'][ $sContext ] )
-                ? $aField['class'][ $sContext ]
-                : array()
+            $this->getElement( $_aAttributes, 'class', array() ),
+            $this->getElement( $aField, array( 'class', $sContext ), array() )
         );  
         
         // Set the visibility CSS property for the outermost container element.
         if ( 'fieldrow' === $sContext && $aField['hidden'] ) { 
             $_aAttributes['style'] = $this->generateStyleAttribute( 
-                isset( $_aAttributes['style'] )
-                    ? $_aAttributes['style']
-                    : array(),
+                $this->getElement( $_aAttributes, 'style', array() ),
                 'display:none' 
             );
         }
@@ -58,5 +50,24 @@ abstract class AdminPageFramework_FormOutput extends AdminPageFramework_WPUtilit
         
     }
     
-    
+    /**
+     * Returns HTML formatted description blocks by the given description definition.
+     * 
+     * @since       3.5.3
+     * @return      string      The description output.
+     */
+    protected function _getDescriptions( $asDescriptions, $sClassAttribute='admin-page-framework-form-element-description' ) {
+        
+        $_aOutput = array();
+        foreach( $this->getAsArray( $asDescriptions ) as $_sDescription ) {
+            $_aOutput[] = "<p class='{$sClassAttribute}'>"
+                    . "<span class='description'>"
+                        . $_sDescription
+                    . "</span>"
+                . "</p>";
+        }
+        return implode( PHP_EOL, $_aOutput );
+        
+    }      
+            
 }

@@ -34,41 +34,84 @@ class AdminPageFramework_Input_select extends AdminPageFramework_Input_Base {
     );
     
     /**
+     * A user constructor.
+     * 
+     * @since       3.5.3
+     * @return      void
+     */
+    protected function construct() {
+        
+        // For backward compatibility.
+        
+        // If the $aField property is set, extract certain elements from it and set them to the attribute array.
+        if ( isset( $this->aField['is_multiple'] ) ) {
+            $this->aAttributes['select']['multiple'] = $this->aField['is_multiple']
+                ? 'multiple'
+                : $this->getElement( $this->aAttributes, array( 'select', 'multiple' ) );
+        }
+        
+    }
+    
+    /**
      * Returns the output of the input element.
      * 
      * @remark       This method should be overridden in each extended class.
      * @since        3.4.0     
      */    
-    public function get() {
+    public function get( /* $aLabels, $aAttributes=array() */ ) {
 
-        $_bIsMultiple          = $this->aField['is_multiple'] 
-            ? true
-            : ( $this->aField['attributes']['select']['multiple'] ? true : false );
-        $_aSelectTagAttributes = $this->uniteArrays(
-            $this->aField['attributes']['select'],      // allowing the user set attributes override the system set attributes.
-            array(
-                'id'        => $this->aField['input_id'],
-                'multiple'  => $_bIsMultiple ? 'multiple' : null,
-                'name'      => $_bIsMultiple ? "{$this->aField['_input_name']}[]" : $this->aField['_input_name'] ,
-                'data-id'   => $this->aField['input_id'],       // referenced by the JavaScript scripts such as the revealer script.
-            )            
-        );
-     
+        // Parameters
+        $_aParams       = func_get_args() + array( 0 => null, 1 => array() );
+        $_aLabels       = $_aParams[ 0 ];
+        $_aAttributes   = $this->uniteArrays(
+            $this->getElementAsArray( $_aParams, 1, array() ),
+            $this->aAttributes 
+        );    
+
         return  
             "<{$this->aOptions['input_container_tag']} " . $this->generateAttributes( $this->aOptions['input_container_attributes'] ) . ">"
-                . "<select " . $this->generateAttributes( $_aSelectTagAttributes ) . " >"
+                . "<select " . $this->generateAttributes( $this->_getSelectAttributes( $_aAttributes ) ) . " >"
                     . $this->_getDropDownList( 
-                        $this->aField['input_id'], 
-                        $this->getAsArray( $this->aField['label'] ),
-                        $this->aField['attributes']
+                        $this->getAttribute( 'id' ),
+                        $this->getAsArray(
+                            isset( $_aLabels ) 
+                                ? $_aLabels
+                                : $this->aField['label'],    // backward compatibility
+                            true
+                        ),
+                        $_aAttributes
                     )
                 . "</select>"
             . "</{$this->aOptions['input_container_tag']}>"
             ;
             
     }
-    
-       /**
+        /**
+         * Retrusn an HTML select attribute array.
+         * @since       3.5.3
+         * @return      array       The generated attribute array for the `select` tag.
+         */
+        private function _getSelectAttributes( array $aBaseAttributes ) {
+            $_bIsMultiple = $this->getElement( $aBaseAttributes, 'multiple' )
+                ? true
+                : ( ( bool ) $this->getElement( $aBaseAttributes, array( 'select', 'multiple' ) ) );
+            return $this->uniteArrays(
+                // allowing the user set attributes override the system set attributes.
+                $this->getElementAsArray( $aBaseAttributes, 'select', array() ),
+                array(
+                    'id'        => $this->getAttribute( 'id' ),
+                    'multiple'  => $_bIsMultiple 
+                        ? 'multiple' 
+                        : null,
+                    'name'      => $_bIsMultiple 
+                        ? $this->getAttribute( 'name' ) . '[]'
+                        : $this->getAttribute( 'name' ),
+                    'data-id'   => $this->getAttribute( 'id' ),       // referenced by the JavaScript scripts such as the revealer script.
+                )
+            );            
+            
+        }
+        /**
          * Returns the option tags of the select field.
          * 
          * @since       2.0.0
@@ -83,43 +126,31 @@ class AdminPageFramework_Input_select extends AdminPageFramework_Input_Base {
          * - optgroup
          * - option
          */     
-        private function _getDropDownList( $sInputID, array $aLabels, array $aAttributes ) {
+        private function _getDropDownList( $sInputID, array $aLabels, array $aBaseAttributes ) {
             
             $_aOutput   = array();
-            $_aValues   = $this->getAsArray( $aAttributes['value'] );
-
             foreach( $aLabels as $__sKey => $__asLabel ) {
                 
-                // For the optgroup tag,
+                // For an optgroup tag,
                 if ( is_array( $__asLabel ) ) {
-                
-                    $_aOptGroupAttributes = isset( $aAttributes['optgroup'][ $__sKey ] ) && is_array( $aAttributes['optgroup'][ $__sKey ] )
-                        ? $aAttributes['optgroup'][ $__sKey ] + $aAttributes['optgroup']
-                        : $aAttributes['optgroup'];
-                        
-                    $_aOutput[] = "<optgroup label='{$__sKey}'" . $this->generateAttributes( $_aOptGroupAttributes ) . ">"
-                            . $this->_getDropDownList( $sInputID, $__asLabel, $aAttributes )
-                        . "</optgroup>";
+                    $_aOutput[] = $this->_getOptGroup(
+                        $aBaseAttributes, 
+                        $sInputID, 
+                        $__sKey, 
+                        $__asLabel
+                    );
                     continue;
-                    
                 }
                 
-                // For the option tag,
-                $_sLabel    = $__asLabel;
-                $_aValues   = isset( $aAttributes['option'][ $__sKey ]['value'] )
-                    ? $aAttributes['option'][ $__sKey ]['value']
-                    : $_aValues;
+                // A normal option tag,
                 $_aOutput[] = $this->_getOptionTag( 
-                    $_sLabel,   // the text label the user sees to be selected
-                    array(      // the attributes array. Here the id and value etc. are set.
-                        'id'        => $sInputID . '_' . $__sKey,
-                        'value'     => $__sKey,
-                        'selected'  => in_array( ( string ) $__sKey, $_aValues ) 
-                            ? 'selected' 
-                            : null,                                        
-                    ) + ( isset( $aAttributes['option'][ $__sKey ] ) && is_array( $aAttributes['option'][ $__sKey ] )
-                        ? $aAttributes['option'][ $__sKey ] + $aAttributes['option']
-                        : $aAttributes['option'] )     
+                    $__asLabel,   // the text label the user sees to be selected
+                    $this->_getOptionTagAttributes( 
+                        $aBaseAttributes, 
+                        $sInputID, 
+                        $__sKey,
+                        $this->getAsArray( $aBaseAttributes['value'], true )
+                    ) 
                 );
                     
             }
@@ -127,15 +158,56 @@ class AdminPageFramework_Input_select extends AdminPageFramework_Input_Base {
             
         }
             /**
-             * 
-             * @sicne       3.4.0
+             * Returns an HTML output of optgroup tag.
+             * @since       3.5.3
+             * @return      string      an HTML output of optgroup tag.
              */
-            private function _getOptionTag( $sLabel, array $aAttributes=array() ) {
-              
-                return "<option " . $this->generateAttributes( $aAttributes ) . " >"    
+            private function _getOptGroup( array $aBaseAttributes, $sInputID, $sKey, $asLabel ) {
+             
+                $_aOptGroupAttributes = isset( $aBaseAttributes['optgroup'][ $sKey ] ) && is_array( $aBaseAttributes['optgroup'][ $sKey ] )
+                    ? $aBaseAttributes['optgroup'][ $sKey ] + $aBaseAttributes['optgroup']
+                    : $aBaseAttributes['optgroup'];
+                $_aOptGroupAttributes = array(
+                    'label' => $sKey,
+                ) + $_aOptGroupAttributes;
+                return "<optgroup " . $this->generateAttributes( $_aOptGroupAttributes ) . ">"
+                        . $this->_getDropDownList( $sInputID, $asLabel, $aBaseAttributes )
+                    . "</optgroup>";
+             
+            }
+        
+            /**
+             * 
+             * @since        3.5.3
+             */
+            private function _getOptionTagAttributes( array $aBaseAttributes, $sInputID, $sKey, $aValues ) {
+            
+                $aValues = $this->getElementAsArray( 
+                    $aBaseAttributes, 
+                    array( 'option', $sKey, 'value' ), 
+                    $aValues 
+                );
+                return array(      
+                        'id'        => $sInputID . '_' . $sKey,
+                        'value'     => $sKey,
+                        'selected'  => in_array( ( string ) $sKey, $aValues ) 
+                            ? 'selected' 
+                            : null,                                        
+                    ) + ( isset( $aBaseAttributes['option'][ $sKey ] ) && is_array( $aBaseAttributes['option'][ $sKey ] )
+                        ? $aBaseAttributes['option'][ $sKey ] + $aBaseAttributes['option']
+                        : $aBaseAttributes['option'] );
+            
+            }
+        
+            /**
+             * Returns an HTML option tag output.
+             * @sicne       3.4.0
+             * @return      string      The generated option tag HTML output.
+             */
+            private function _getOptionTag( $sLabel, array $aOptionTagAttributes=array() ) {
+                return "<option " . $this->generateAttributes( $aOptionTagAttributes ) . " >"    
                         . $sLabel
                     . "</option>";
-                    
             }
     
 }
