@@ -5,8 +5,8 @@
     Description:    Loads Admin Page Framework which facilitates WordPress plugin and theme development.
     Author:         Michael Uno
     Author URI:     http://michaeluno.jp
-    Version:        3.5.3
     Requirements:   PHP 5.2.4 or above, WordPress 3.3 or above.
+    Version:        3.5.4
 */ 
 
 /**
@@ -16,7 +16,7 @@
  */
 class AdminPageFrameworkLoader_Registry_Base {
 
-	const VERSION        = '3.5.3';    // <--- DON'T FORGET TO CHANGE THIS AS WELL!!
+	const VERSION        = '3.5.4';    // <--- DON'T FORGET TO CHANGE THIS AS WELL!!
 	const NAME           = 'Admin Page Framework - Loader'; // the name is not 'Admin Page Framework' because warning messages gets confusing.
     const SHORTNAME      = 'Admin Page Framework';  // used for a menu title etc.
 	const DESCRIPTION    = 'Loads Admin Page Framework which facilitates WordPress plugin and theme development.';
@@ -29,12 +29,11 @@ class AdminPageFrameworkLoader_Registry_Base {
 	
 }
 /**
- * Provides plugin information.
+ * Provides the plugin information.
  * 
  * The plugin will refer to these information.
  * 
- * @since       3.5.0
- * @remark      
+ * @since       3.5.0 
  */
 final class AdminPageFrameworkLoader_Registry extends AdminPageFrameworkLoader_Registry_Base {
 	        
@@ -53,8 +52,8 @@ final class AdminPageFrameworkLoader_Registry extends AdminPageFrameworkLoader_R
     /**
      * The transient prefix. 
      * 
-     * @remark      This is also accessed from uninstall.php so do not remove.
-     * @remark      Up to 8 characters as transient name allows 45 characters or less ( 40 for site transients ) so that md5 (32 characters) can be added
+     * @remark      This is also accessed from `uninstall.php` so do not remove.
+     * @remark      Do not exceed 8 characters as a transient name allows 45 characters or less ( 40 for site transients ) so that md5 (32 characters) can be added.
      */
 	const TRANSIENT_PREFIX         = 'APFL_';
     
@@ -139,6 +138,7 @@ final class AdminPageFrameworkLoader_Registry extends AdminPageFrameworkLoader_R
     
 	/**
 	 * Sets up static properties.
+     * @return      void
 	 */
 	static public function setUp( $sPluginFilePath=null ) {
 	                    
@@ -150,8 +150,12 @@ final class AdminPageFrameworkLoader_Registry extends AdminPageFrameworkLoader_R
 	/**
 	 * Returns the URL with the given relative path to the plugin path.
 	 * 
-	 * Example:  AdminPageFrameworkLoader_Registry::getPluginURL( 'asset/css/meta_box.css' );
+	 * <h3>Example</h3>
+     * <code>
+     * AdminPageFrameworkLoader_Registry::getPluginURL( 'asset/css/meta_box.css' );
+     * </code>
      * @since       3.5.0
+     * @return      string
 	 */
 	public static function getPluginURL( $sRelativePath='' ) {
 		return plugins_url( $sRelativePath, self::$sFilePath );
@@ -161,6 +165,7 @@ final class AdminPageFrameworkLoader_Registry extends AdminPageFrameworkLoader_R
      * Returns the information of this class.
      * 
      * @since       3.5.0
+     * @return      array
      */
     static public function getInfo() {
         $_oReflection = new ReflectionClass( __CLASS__ );
@@ -177,9 +182,12 @@ final class AdminPageFrameworkLoader_Registry extends AdminPageFrameworkLoader_R
     /**
      * Sets an admin notice.
      * @since       3.5.0
+     * @return      void
      */ 
     static public function setAdminNotice( $sMessage, $sClassAttribute='error' ) {
-        if ( ! is_admin() ) { return; }
+        if ( ! is_admin() ) {  
+            return; 
+        }
         self::$_aAdminNotices[] = array(
             'message'           => $sMessage,
             'class_attribute'   => $sClassAttribute,
@@ -187,8 +195,9 @@ final class AdminPageFrameworkLoader_Registry extends AdminPageFrameworkLoader_R
         add_action( 'admin_notices', array( __CLASS__, '_replyToSetAdminNotice' ) );
     }
         /**
-         * Displayes the set admin notices.
+         * Displays the set admin notices.
          * @since       3.5.0
+         * @return      void
          */
         static public function _replyToSetAdminNotice() {
             foreach( self::$_aAdminNotices as $_aAdminNotice ) {                
@@ -216,7 +225,7 @@ if ( ! class_exists( 'AdminPageFramework' ) ) {
     include( 
         defined( 'WP_DEBUG' ) && WP_DEBUG
             ? dirname( __FILE__ ) . '/development/admin-page-framework.php' // use the development version when you need to do debugging.
-            : dirname( __FILE__ ) . '/library/admin-page-framework.min.php' // use the minified version in your plugins or themes.
+            : dirname( __FILE__ ) . '/library/admin-page-framework/admin-page-framework.php'
     );
 } 
 
