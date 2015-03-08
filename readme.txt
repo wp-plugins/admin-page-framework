@@ -4,7 +4,7 @@ Donate link:        http://michaeluno.jp/en/donate
 Tags:               admin, administration, options, settings, API, framework, library, meta box, custom post type, custom post types, utility, fields, custom field, custom fields, tool, tools, widget, widgets, form, forms, plugin, plugins, theme
 Requires at least:  3.3
 Tested up to:       4.1.1
-Stable tag:         3.5.4
+Stable tag:         3.5.3
 License:            GPLv2 or later
 License URI:        http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -79,10 +79,6 @@ Go to **Dashboard** -> **Admin Page Framework** -> **About** -> **Getting Starte
 <h4>Demo</h4>
 Activate the demo pages to see the possible features of the framework. To activate it, go to **Dashboard** -> **Admin Page Framework** -> **Add Ons** -> **Demo**.
 
-<h4>Necessary Files</h4>
-- **`admin-page-framework.min.php`** is in the *library* folder. Or you can get it from **Dashboard** -> **Admin Page Framework** -> **Tool** -> **Minifier**.
-- Alternatively you may use **`admin-page-framework.php`** located in the *development* folder. In that case, all the class files in the sub-folders need to be copied.
-
 <h4>Documentation</h4>
 - [Online Documentation](http://admin-page-framework.michaeluno.jp/en/v3/class-AdminPageFramework.html)
 - [Tutorials](http://admin-page-framework.michaeluno.jp/tutorials/)
@@ -120,10 +116,10 @@ This is a PHP class-based WordPress library that helps to create option pages an
 WordPress plugin/theme developers who want to speed up creating setting forms, widgets, contact form etc. and don't want to require their users to install extra dependencies. 
 
 <h5><strong>Do my plugin/theme users have to install Admin Page Framework?</strong></h5>
-No. Include the minified version of the framework in your distribution package.
+No. Include the generated framework files in your distribution package. You can generate your own framework files via `Dashboard` -> `Admin Page Framework` -> `Tools` -> `Generator`.
 
-<h5><strong>Where can I get the minified version of the framework?</strong></h5>
-It is in the `library` directory of the plugin. Or go to **Dashboard** -> **Admin Page Framework** -> **Tool** -> **Minifier** and press **Download**.
+<h5><strong>Where can I get the framework files to include?</strong></h5>
+Go to `Dashboard` -> `Admin Page Framework` -> `Tools` -> `Generator` and download the files.
 
 <h5><strong>Does my commercial product incorporating your framework library have to be released under GPL2v+?</strong></h5>
 No. The loader plugin is released under GPLv2 or later but the library itself is released under MIT. Make sure to include only the library file.
@@ -207,13 +203,13 @@ This means if you choose a very simple page slug such as <code>about</code> for 
 
 To avoid this, make sure to use a unique page slug. One way to do that is to add a prefix like <code>apf_about</code>. 
 
-<h4>Change Framework PHP Class Names</h4>
+<h4>Use the files generated with the component generator</h4>
+
 There is one thing you need to be careful when you include the framework: the framework version conflicts. Imagine you publish a plugin using the framework v3.4.6 and your plugin user installs a plugin using the framework v3.0.0 which is below your framework version. If the other plugin loads earlier than yours, your plugin may not work properly and vice versa.
 
-There is a way to avoid such a conflict: change the PHP class names of the framework you include. All the class names have the prefix <code>AdminPageFramework</code> so just change it to something like <code>MyPlugin_AdminPageFramework</code>. 
+There is a way to avoid such a conflict: change the PHP class names of the framework you include. All the class names have the prefix <code>AdminPageFramework</code> so just change it to something like <code>MyPlugin_AdminPageFramework</code>.
 
-- Option A. Open the minified version in your code editor and replace all the strings of `AdminPageFramework` to something like `MyPugin_AdminPageFramewok` where `MyPlugin_` is your desired string. Most text editors supports the *Replace All* command so just use that.
-- Option B. Activate the demo plugin and go to **Dashboard** -> **Admin Page Framework** -> **Tool** -> **Minifier**. Set the prefix in the option field and download the file.
+Go to **Dashboard** -> **Admin Page Framework** -> **Tools** -> **Generator**. Set the prefix in the option field and download the files.
 
 If you do not modify the framework class names, you are supposed to extend the `AdminPageFramework` factory class.
 
@@ -230,6 +226,8 @@ class MyAdminPage extends MyPlugin_AdminPageFramework {
     ...
 }
 `
+
+For more detailed instruction, go to **Dashboard** -> **Admin Page Framework** -> **About** -> **Getting Started**.
 
 By the time WordPress's minimum required PHP version becomes 5.3 or higher, we can use name spaces then this problem will be solved.
 
@@ -297,7 +295,8 @@ array(
 <h4>Change Preview Image Size of the 'image' Field Type</h4>
 To specify a custom size to the preview element of the `image` field type, set an attribute array like the below, where 300px is the max width.
 
-`array(
+`
+array(
     'field_id'      => 'my_image_field_id',
     'title'         => __( 'Image', 'admin-page-framework-demo' ),
     'type'          => 'image',
@@ -306,12 +305,14 @@ To specify a custom size to the preview element of the `image` field type, set a
             'style' => 'max-width: 200px;',
         ),
     ),
-),`
+),
+`
 
 <h4>Display items of 'radio' field type one per line</h4>
 To display radio button items one per line, set the `label_min_width` to `100%`.
 
-`array(
+`
+array(
     'field_id'          => 'my_radio_field_id',
     'title'             => __( 'Radio Button', 'admin-page-framework-demo' ),
     'type'              => 'radio',
@@ -321,31 +322,37 @@ To display radio button items one per line, set the `label_min_width` to `100%`.
         'b' => __( 'This is b.', 'admin-page-framework-demo' ),
         'c' => __( 'This is a.', 'admin-page-framework-demo' )c
     ),
-),`
+),
+`
 
 <h4>Set default field value</h4>
 To set the initial value of a field, use the `default` argument in the field definition array.
 
-`array(
+`
+array(
     'field_id'  => 'my_text_field_id',
     'title'     => __( 'My Text Input Field', 'admin-page-framework-demo' ),
     'type'      => 'text',
     'default'   => 'This text will be displayed for the first time that the field is displayed and will be overridden when a user set an own value.',
-),`
+),
+`
 
 <h4>Always display a particular value in a field</h4>
 The `value` argument in the definition array can suppress the saved value. This is useful when you want to set a value from a different data source or create a wizard form that stores the data in a custom location.
 
-`array(
+`
+array(
     'field_id'  => 'my_text_field_id',
     'title'     => __( 'My Text Input Field', 'admin-page-framework-demo' ),
     'type'      => 'text',
     'value'     => 'This will be always set.',
-),`
+),
+`
 
 If it is a repeatable field, set the value in the sub-fields.
 
-`array(
+`
+array(
     'field_id'      => 'my_text_field_id',
     'title'         => __( 'My Text Input Field', 'admin-page-framework-demo' ),
     'type'          => 'text',
@@ -357,7 +364,8 @@ If it is a repeatable field, set the value in the sub-fields.
     array(
         'value' => 'the third value',
     ),    
-),`
+),
+`
 
 Alternately, if it is in a framework's generic pages (not post meta box fields) you may use the `options_{instantiated class name}` filter to suppress the options so that setting the value argument is not necessary.
 See examples, https://gist.github.com/michaeluno/c30713fcfe0d9d45d89f, https://gist.github.com/michaeluno/fcfac27825aa8a35b90f, 
@@ -366,6 +374,12 @@ See examples, https://gist.github.com/michaeluno/c30713fcfe0d9d45d89f, https://g
 Check out [the issues](https://github.com/michaeluno/admin-page-framework/issues?labels=enhancement&page=1&state=open) on GitHub labeled *enhancement*.
 
 == Changelog ==
+
+= 3.5.5 - 2015/03/08 =
+- Added the `footer_right_{...}` and `footer_left_{...}` filter hooks.
+- Fixed an issue that the loader plugin could not get activated when a plugin that includes the framework of a lesser version that that not have a certain class constant.
+- Changed not to include the development version in the plugin distribution package.
+- Changed the `setFooterInfoLeft()` and `setFooterInfoRight()` methods to be deprecated which had not been functional since v3.1.3.
 
 = 3.5.4 - 2015/03/02 =
 - Added the framework component generator in the loader plugin which can be accessed via `Dashboard` -> `Admin Page Framework` -> `Tools` -> `Generator`.
