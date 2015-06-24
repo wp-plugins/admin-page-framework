@@ -4,7 +4,7 @@ Donate link:        http://michaeluno.jp/en/donate
 Tags:               admin, administration, options, settings, API, framework, library, meta box, custom post type, custom post types, utility, fields, custom field, custom fields, tool, tools, widget, widgets, form, forms, plugin, plugins, theme
 Requires at least:  3.3
 Tested up to:       4.2.2
-Stable tag:         3.5.8
+Stable tag:         3.5.7.1
 License:            GPLv2 or later
 License URI:        http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -374,6 +374,17 @@ See examples, https://gist.github.com/michaeluno/c30713fcfe0d9d45d89f, https://g
 Check out [the issues](https://github.com/michaeluno/admin-page-framework/issues?labels=enhancement&page=1&state=open) on GitHub labeled *enhancement*.
 
 == Changelog ==
+
+= 3.5.9 - 2015/06/25 =
+- Added the ability for the `size` field type to create sub-fields by passing an array of labels.
+- Added the `reset_...` action hooks.
+- Added the ability to disable setting notices by passing an empty string to the ` setSettingNotice()` method.
+- Added the ability for the admin page factory class to save form options only for a set time of period by passing an integer for the option key to the constructor.
+- Added the ability for transient utility methods to accept long transient key names.
+- Fixed an issue that post meta-box form fields were not able to set default values when there were existing meta data.
+- Fixed a bug in the `getOption()` utility method that the fourth parameter did not take effect when `null` is given to the second parameter.
+- Changed the timing of rendering the widget title to after the `do_{...}` and `content_{...}` hooks.
+- Changed the zip file name of generated framework files to have a version suffix.
 
 = 3.5.8 - 2015/05/29 =
 - Added the ability for the `getValue()` method to set a default value with the second parameter when the first parameter is an array.
