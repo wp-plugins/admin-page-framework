@@ -174,6 +174,26 @@ $this->setRootMenuPageBySlug( 'MyAdminPageClassA' );
 <h5><strong>Can I create pages in the network admin area?</strong></h5>
 Yes, See the demo.
 
+<h5><strong>Some of my users claim they cannot save options. What would be a possible cause?</strong></h5>
+
+- `max_input_vars` of PHP settings. If this value is small and the there are lots of form input elements, the user may not be able to save the options.
+
+To increase the value, edit `php.ini` and add the following line where `10000` is the increased number.
+
+`
+max_input_vars = 10000
+`
+
+- `max_allowed_packet` of MySQL settings. Try increasing this value in the `my.ini` or `my.cnf` file.
+
+The `500M` in the following line is where the increased value should be set.
+
+`
+max_allowed_packet=500M
+`
+
+Please keep in mind that these are just a few of many possibilities. If you encounter a situation that prevented the user from saving options, please report.
+
 <h5><strong>I cannot find what I'd like to do in tutorials and documentation. Where else should I look for more information?</strong></h5>
 
 - You may directly read the code of the demo plugin. The demo plugin code is located in the `example` directory.
@@ -374,6 +394,11 @@ See examples, https://gist.github.com/michaeluno/c30713fcfe0d9d45d89f, https://g
 Check out [the issues](https://github.com/michaeluno/admin-page-framework/issues?labels=enhancement&page=1&state=open) on GitHub labeled *enhancement*.
 
 == Changelog ==
+ 
+= 3.5.11 - 2015/07/14 =
+- Added a warning to be displayed for forms in generic admin pages when the user form inputs exceeds the PHP `max_input_vars` value.
+- Added the column layout screen options for page meta boxes.
+- Fixed a bug that screen options were not saved in generic pages added by the framework.
 
 = 3.5.10 - 2015/07/05 =
 - Added the `show_submenu_add_new` post type argument which enables to remove "Add New" sub-menu item from the sidebar menu.
